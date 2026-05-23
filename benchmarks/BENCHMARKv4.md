@@ -1,39 +1,28 @@
 # v4 Benchmark: Cross-Module Import Edge Validation
 
-**Date**: 2026-05-24
 **Project**: `complex_app` — 35 files, 7 modules (`auth`, `billing`, `inventory`, `orders`, `notifications`, `analytics`, `shared` + `tests/`)
-**Goal**: Validate that cross-module import edges are correctly detected and graph captures full structural dependencies.
+**Goal**: Validate cross-module import edges + token efficiency with relevant-raw baseline.
 
-## Key Fix
+**Methodology**: `relevant_raw` = raw tokens of only the files whose symbols appear in the query's context subgraph (simulates on-demand file loading per turn, the realistic alternative to ctxgraph).
 
-The importer's `_resolve_import_target` was failing when import paths included the top-level package name. For example, `from complex_app.auth.service import AuthService` was resolved to `complex_app/auth/service.py` relative to root, but the actual file lives at `auth/service.py` (since root is already `complex_app`).
+---
 
-**Fix**: Added fallback resolution — if the first component of the module path matches the root directory name, also try resolving without it.
+## Import Fix
 
-```python
-# Before: only tried full module path
-package_path = module_name.replace(".", "/")
-
-# After: tries both full path and stripped path
-if parts[0] == root_name:
-    candidates.append("/".join(parts[1:]))
-```
+`_resolve_import_target` in `importer.py` failed when import paths included the top-level package name (e.g., `from complex_app.auth.service import AuthService` resolved to `complex_app/auth/service.py` but root is already `complex_app`). Added fallback that strips the root directory name from the module path.
 
 ## Graph Results
 
 | Metric | Value |
 |--------|-------|
 | Files analyzed | 26 |
-| Files skipped | 9 (test artifacts, `__pycache__`) |
+| Files skipped | 9 |
 | Total nodes | 230 |
 | Total edges | **422** |
-| Total import edges | **84** |
-| Cross-module import edges | **84** (all imports are cross-module) |
-| Cross-module module pairs | **18** |
+| Import edges | 84 (all cross-module) |
+| Cross-module pairs | 18 |
 
-All 84 import edges are cross-module (spanning different top-level directories). 18 distinct module pairs. Every module connects to at least one other module.
-
-## Cross-Module Import Matrix
+### Cross-Module Import Matrix
 
 | Source | Targets |
 |--------|---------|
@@ -46,51 +35,46 @@ All 84 import edges are cross-module (spanning different top-level directories).
 | `shared/` (5 files) | `auth/` (1) |
 | `tests/` (3 files) | `analytics/` (3), `auth/` (2), `notifications/` (2), `shared/` (2), `billing/` (1), `inventory/` (1), `orders/` (1) |
 
+---
+
 ## Token Efficiency
 
-| Scenario | Base (no enrichment) | Ollama (enriched) |
-|----------|---------------------|-------------------|
-| Raw tokens | 7,679 | 7,679 |
-| Single-shot avg tokens | 25.4 | 208.6 |
-| Single-shot avg savings | **99.7%** | **97.3%** |
-| Multi-turn avg tot tokens | 141.1 | 1,401.6 |
-| Multi-turn avg savings | **98.2%** | **81.7%** |
-| Ollama enrichment | — | 26 files, 129s (5.0s/file) |
+### Base (AST only — no LLM enrichment)
+
+| Metric | vs All Raw | vs Relevant Raw |
+|--------|:---:|:---:|
+| Raw tokens (35 files) | 7,679 | — |
+| Single-shot avg | 26.6 tok (**99.6%**) | 26.6 tok (**96.8%**) |
+| Multi-turn cumulative avg | 141.1 tok (**98.2%**) | 141.1 tok (**96.8%**) |
+| Overall multi-turn | — | **96.8% savings** |
+
+### Ollama (qwen2.5-coder:7b, 26 files enriched, 128.6s)
+
+| Metric | vs All Raw | vs Relevant Raw |
+|--------|:---:|:---:|
+| Single-shot avg | 238.6 tok (**96.9%**) | 238.6 tok (**83.8%**) |
+| Multi-turn cumulative avg | 1,628.6 tok (**78.8%**) | 1,628.6 tok (**68.6%**) |
+
+### Comparison
+
+| Metric | Base | Ollama |
+|--------|:---:|:---:|
+| Single-shot capsule avg | 26.6 tok | 238.6 tok |
+| Single-shot savings vs relevant | **96.8%** | **83.8%** |
+| Multi-turn cumulative avg | 141.1 tok | 1,628.6 tok |
+| Multi-turn savings vs relevant | **96.8%** | **68.6%** |
+| Build time | 189ms | 183ms |
+| Enrichment time | — | 128.6s (4.9s/file) |
 
 ## Observations
 
-1. **Cross-module edges validated**: All 84 import edges connect files across different modules. `shared/` is the hub (47 incoming edges).
-2. **Token savings remain excellent**: Even with LLM-enriched summaries, 97%+ savings single-shot, 82%+ multi-turn.
-3. **Ollama enclarge overhead**: 129s for 26 files (`qwen2.5-coder:7b`) — 5.0s/file with GPU. Acceptable for one-time build but significant for iterative use.
-4. **Graph size**: 230 nodes + 422 edges stored in ~500KB SQLite DB. Build time under 180ms.
+1. **Cross-module edges working**: 84 import edges, all cross-module. Every module connected. `shared/` is hub with 47 incoming edges.
+2. **Even vs relevant raw, AST-only saves 97%**: The capsule format is dramatically more compact than raw source code for the same set of files.
+3. **Ollama enrichment costs 4x more tokens**: Natural-language summaries are informative but increase capsule size significantly. Still saves 69% vs relevant raw on multi-turn.
+4. **Graph size**: 230 nodes + 422 edges in ~500KB SQLite DB, built in <190ms.
 
-## How to Run
+## Running
 
-### Normal (no enrichment)
 ```bash
 python benchmarks/run_benchmarks_v4.py
-```
-
-### With Ollama
-```bash
-# Requires Ollama at http://localhost:11434
-python benchmarks/run_benchmarks_v4.py
-```
-
-### With Claude
-```bash
-$env:CTXGRAPH_PROVIDER = "claude"
-$env:CTXGRAPH_MODEL = "claude-sonnet-4-20250514"
-$env:ANTHROPIC_API_KEY = "sk-ant-..."
-python benchmarks/run_benchmarks_v4.py
-```
-
-### Switching Providers
-Set `CTXGRAPH_PROVIDER`, `CTXGRAPH_MODEL`, `CTXGRAPH_ENDPOINT`, `ANTHROPIC_API_KEY`, or `OPENAI_API_KEY` as env vars, or use `.ctxgraph/config.toml`:
-
-```toml
-[ai]
-provider = "claude"
-model = "claude-sonnet-4-20250514"
-api_key = "sk-ant-..."
 ```

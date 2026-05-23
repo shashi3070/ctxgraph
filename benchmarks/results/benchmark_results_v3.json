@@ -6,10 +6,13 @@
       "query": "calculator add subtract multiply",
       "capsule_nodes": 10,
       "capsule_edges": 11,
-      "capsule_tokens": 314,
+      "capsule_tokens": 61,
       "raw_tokens": 1558,
+      "relevant_raw_tokens": 1116,
+      "relevant_files": 3,
       "raw_file_count": 7,
-      "savings_pct": 79.8
+      "savings_pct": 96.1,
+      "savings_vs_relevant_pct": 94.5
     },
     {
       "type": "single_shot",
@@ -17,10 +20,13 @@
       "query": "expression parser tokenize",
       "capsule_nodes": 10,
       "capsule_edges": 12,
-      "capsule_tokens": 115,
+      "capsule_tokens": 65,
       "raw_tokens": 1558,
+      "relevant_raw_tokens": 998,
+      "relevant_files": 3,
       "raw_file_count": 7,
-      "savings_pct": 92.6
+      "savings_pct": 95.8,
+      "savings_vs_relevant_pct": 93.5
     },
     {
       "type": "single_shot",
@@ -28,21 +34,27 @@
       "query": "plugin system history logging",
       "capsule_nodes": 10,
       "capsule_edges": 10,
-      "capsule_tokens": 177,
+      "capsule_tokens": 82,
       "raw_tokens": 1558,
+      "relevant_raw_tokens": 375,
+      "relevant_files": 1,
       "raw_file_count": 7,
-      "savings_pct": 88.6
+      "savings_pct": 94.7,
+      "savings_vs_relevant_pct": 78.1
     },
     {
       "type": "single_shot",
       "project": "tiny_app",
       "query": "math operations core functions",
       "capsule_nodes": 10,
-      "capsule_edges": 11,
-      "capsule_tokens": 273,
+      "capsule_edges": 10,
+      "capsule_tokens": 74,
       "raw_tokens": 1558,
+      "relevant_raw_tokens": 417,
+      "relevant_files": 2,
       "raw_file_count": 7,
-      "savings_pct": 82.5
+      "savings_pct": 95.3,
+      "savings_vs_relevant_pct": 82.3
     },
     {
       "type": "single_shot",
@@ -50,21 +62,27 @@
       "query": "main entry point CLI",
       "capsule_nodes": 10,
       "capsule_edges": 12,
-      "capsule_tokens": 262,
+      "capsule_tokens": 89,
       "raw_tokens": 1558,
+      "relevant_raw_tokens": 1276,
+      "relevant_files": 4,
       "raw_file_count": 7,
-      "savings_pct": 83.2
+      "savings_pct": 94.3,
+      "savings_vs_relevant_pct": 93.0
     },
     {
       "type": "single_shot",
       "project": "tiny_app",
       "query": "error handling division",
-      "capsule_nodes": 10,
-      "capsule_edges": 11,
-      "capsule_tokens": 205,
+      "capsule_nodes": 0,
+      "capsule_edges": 0,
+      "capsule_tokens": 19,
       "raw_tokens": 1558,
+      "relevant_raw_tokens": 0,
+      "relevant_files": 0,
       "raw_file_count": 7,
-      "savings_pct": 86.8
+      "savings_pct": 98.8,
+      "savings_vs_relevant_pct": 0.0
     },
     {
       "type": "single_shot",
@@ -72,10 +90,13 @@
       "query": "test calculator functions",
       "capsule_nodes": 10,
       "capsule_edges": 9,
-      "capsule_tokens": 65,
+      "capsule_tokens": 16,
       "raw_tokens": 1558,
+      "relevant_raw_tokens": 257,
+      "relevant_files": 1,
       "raw_file_count": 7,
-      "savings_pct": 95.8
+      "savings_pct": 99.0,
+      "savings_vs_relevant_pct": 93.8
     },
     {
       "type": "single_shot",
@@ -85,8 +106,11 @@
       "capsule_edges": 0,
       "capsule_tokens": 18,
       "raw_tokens": 1558,
+      "relevant_raw_tokens": 0,
+      "relevant_files": 0,
       "raw_file_count": 7,
-      "savings_pct": 98.8
+      "savings_pct": 98.8,
+      "savings_vs_relevant_pct": 0.0
     },
     {
       "type": "single_shot",
@@ -94,21 +118,27 @@
       "query": "user management CRUD",
       "capsule_nodes": 10,
       "capsule_edges": 6,
-      "capsule_tokens": 230,
+      "capsule_tokens": 77,
       "raw_tokens": 6567,
+      "relevant_raw_tokens": 1388,
+      "relevant_files": 4,
       "raw_file_count": 23,
-      "savings_pct": 96.5
+      "savings_pct": 98.8,
+      "savings_vs_relevant_pct": 94.5
     },
     {
       "type": "single_shot",
       "project": "web_api",
       "query": "JWT auth login register",
       "capsule_nodes": 10,
-      "capsule_edges": 7,
-      "capsule_tokens": 289,
+      "capsule_edges": 5,
+      "capsule_tokens": 92,
       "raw_tokens": 6567,
+      "relevant_raw_tokens": 1929,
+      "relevant_files": 5,
       "raw_file_count": 23,
-      "savings_pct": 95.6
+      "savings_pct": 98.6,
+      "savings_vs_relevant_pct": 95.2
     },
     {
       "type": "single_shot",
@@ -116,21 +146,27 @@
       "query": "rate limit middleware",
       "capsule_nodes": 10,
       "capsule_edges": 9,
-      "capsule_tokens": 189,
+      "capsule_tokens": 98,
       "raw_tokens": 6567,
+      "relevant_raw_tokens": 1253,
+      "relevant_files": 4,
       "raw_file_count": 23,
-      "savings_pct": 97.1
+      "savings_pct": 98.5,
+      "savings_vs_relevant_pct": 92.2
     },
     {
       "type": "single_shot",
       "project": "web_api",
       "query": "blog posts publish",
       "capsule_nodes": 10,
-      "capsule_edges": 5,
-      "capsule_tokens": 163,
+      "capsule_edges": 6,
+      "capsule_tokens": 65,
       "raw_tokens": 6567,
+      "relevant_raw_tokens": 1573,
+      "relevant_files": 3,
       "raw_file_count": 23,
-      "savings_pct": 97.5
+      "savings_pct": 99.0,
+      "savings_vs_relevant_pct": 95.9
     },
     {
       "type": "single_shot",
@@ -138,32 +174,41 @@
       "query": "admin routes permission",
       "capsule_nodes": 10,
       "capsule_edges": 3,
-      "capsule_tokens": 71,
+      "capsule_tokens": 33,
       "raw_tokens": 6567,
+      "relevant_raw_tokens": 3271,
+      "relevant_files": 7,
       "raw_file_count": 23,
-      "savings_pct": 98.9
+      "savings_pct": 99.5,
+      "savings_vs_relevant_pct": 99.0
     },
     {
       "type": "single_shot",
       "project": "web_api",
       "query": "password hashing auth service",
       "capsule_nodes": 10,
-      "capsule_edges": 7,
-      "capsule_tokens": 237,
+      "capsule_edges": 4,
+      "capsule_tokens": 98,
       "raw_tokens": 6567,
+      "relevant_raw_tokens": 1929,
+      "relevant_files": 5,
       "raw_file_count": 23,
-      "savings_pct": 96.4
+      "savings_pct": 98.5,
+      "savings_vs_relevant_pct": 94.9
     },
     {
       "type": "single_shot",
       "project": "web_api",
       "query": "middleware pipeline",
       "capsule_nodes": 10,
-      "capsule_edges": 7,
-      "capsule_tokens": 297,
+      "capsule_edges": 3,
+      "capsule_tokens": 100,
       "raw_tokens": 6567,
+      "relevant_raw_tokens": 1253,
+      "relevant_files": 4,
       "raw_file_count": 23,
-      "savings_pct": 95.5
+      "savings_pct": 98.5,
+      "savings_vs_relevant_pct": 92.0
     },
     {
       "type": "single_shot",
@@ -171,21 +216,27 @@
       "query": "user model fields",
       "capsule_nodes": 10,
       "capsule_edges": 6,
-      "capsule_tokens": 172,
+      "capsule_tokens": 77,
       "raw_tokens": 6567,
+      "relevant_raw_tokens": 1388,
+      "relevant_files": 4,
       "raw_file_count": 23,
-      "savings_pct": 97.4
+      "savings_pct": 98.8,
+      "savings_vs_relevant_pct": 94.5
     },
     {
       "type": "single_shot",
       "project": "web_api",
       "query": "post service pagination",
       "capsule_nodes": 10,
-      "capsule_edges": 4,
-      "capsule_tokens": 208,
+      "capsule_edges": 5,
+      "capsule_tokens": 78,
       "raw_tokens": 6567,
+      "relevant_raw_tokens": 1573,
+      "relevant_files": 3,
       "raw_file_count": 23,
-      "savings_pct": 96.8
+      "savings_pct": 98.8,
+      "savings_vs_relevant_pct": 95.0
     },
     {
       "type": "single_shot",
@@ -193,10 +244,13 @@
       "query": "auth service JWT OAuth",
       "capsule_nodes": 10,
       "capsule_edges": 11,
-      "capsule_tokens": 69,
+      "capsule_tokens": 30,
       "raw_tokens": 10587,
+      "relevant_raw_tokens": 769,
+      "relevant_files": 1,
       "raw_file_count": 22,
-      "savings_pct": 99.3
+      "savings_pct": 99.7,
+      "savings_vs_relevant_pct": 96.1
     },
     {
       "type": "single_shot",
@@ -204,32 +258,41 @@
       "query": "billing payment stripe",
       "capsule_nodes": 10,
       "capsule_edges": 13,
-      "capsule_tokens": 95,
+      "capsule_tokens": 27,
       "raw_tokens": 10587,
+      "relevant_raw_tokens": 763,
+      "relevant_files": 1,
       "raw_file_count": 22,
-      "savings_pct": 99.1
+      "savings_pct": 99.7,
+      "savings_vs_relevant_pct": 96.5
     },
     {
       "type": "single_shot",
       "project": "microsvc",
       "query": "notification email push",
       "capsule_nodes": 10,
-      "capsule_edges": 13,
-      "capsule_tokens": 329,
+      "capsule_edges": 14,
+      "capsule_tokens": 23,
       "raw_tokens": 10587,
+      "relevant_raw_tokens": 1150,
+      "relevant_files": 2,
       "raw_file_count": 22,
-      "savings_pct": 96.9
+      "savings_pct": 99.8,
+      "savings_vs_relevant_pct": 98.0
     },
     {
       "type": "single_shot",
       "project": "microsvc",
       "query": "circuit breaker pattern",
       "capsule_nodes": 10,
-      "capsule_edges": 10,
-      "capsule_tokens": 275,
+      "capsule_edges": 11,
+      "capsule_tokens": 26,
       "raw_tokens": 10587,
+      "relevant_raw_tokens": 389,
+      "relevant_files": 1,
       "raw_file_count": 22,
-      "savings_pct": 97.4
+      "savings_pct": 99.8,
+      "savings_vs_relevant_pct": 93.3
     },
     {
       "type": "single_shot",
@@ -237,32 +300,41 @@
       "query": "service registry discovery",
       "capsule_nodes": 10,
       "capsule_edges": 9,
-      "capsule_tokens": 280,
+      "capsule_tokens": 72,
       "raw_tokens": 10587,
+      "relevant_raw_tokens": 3441,
+      "relevant_files": 5,
       "raw_file_count": 22,
-      "savings_pct": 97.4
+      "savings_pct": 99.3,
+      "savings_vs_relevant_pct": 97.9
     },
     {
       "type": "single_shot",
       "project": "microsvc",
       "query": "event bus pub sub",
       "capsule_nodes": 10,
-      "capsule_edges": 9,
-      "capsule_tokens": 88,
+      "capsule_edges": 4,
+      "capsule_tokens": 18,
       "raw_tokens": 10587,
+      "relevant_raw_tokens": 1683,
+      "relevant_files": 3,
       "raw_file_count": 22,
-      "savings_pct": 99.2
+      "savings_pct": 99.8,
+      "savings_vs_relevant_pct": 98.9
     },
     {
       "type": "single_shot",
       "project": "microsvc",
       "query": "distributed tracing",
       "capsule_nodes": 10,
-      "capsule_edges": 10,
-      "capsule_tokens": 296,
+      "capsule_edges": 11,
+      "capsule_tokens": 25,
       "raw_tokens": 10587,
+      "relevant_raw_tokens": 280,
+      "relevant_files": 1,
       "raw_file_count": 22,
-      "savings_pct": 97.2
+      "savings_pct": 99.8,
+      "savings_vs_relevant_pct": 91.1
     },
     {
       "type": "single_shot",
@@ -270,10 +342,13 @@
       "query": "retry backoff timeout",
       "capsule_nodes": 10,
       "capsule_edges": 13,
-      "capsule_tokens": 212,
+      "capsule_tokens": 56,
       "raw_tokens": 10587,
+      "relevant_raw_tokens": 1796,
+      "relevant_files": 3,
       "raw_file_count": 22,
-      "savings_pct": 98.0
+      "savings_pct": 99.5,
+      "savings_vs_relevant_pct": 96.9
     }
   ],
   "multi_turn": [
@@ -284,57 +359,70 @@
       "total_turns": 5,
       "total_nodes_in_graph": 61,
       "raw_tokens_all_files": 1558,
+      "cumulative_relevant_raw_tokens": 1022,
+      "unique_files_visited": 4,
       "raw_file_count": 7,
-      "cumulative_capsule_tokens": 1093,
-      "avg_tokens_per_turn": 218.6,
-      "savings_vs_raw_pct": 29.8,
-      "unique_nodes_visited": 30,
-      "graph_coverage_pct": 49.2,
+      "cumulative_capsule_tokens": 301,
+      "avg_tokens_per_turn": 60.2,
+      "savings_vs_raw_pct": 80.7,
+      "savings_vs_relevant_pct": 70.5,
+      "unique_nodes_visited": 35,
+      "graph_coverage_pct": 57.4,
       "turns": [
         {
           "turn": 1,
           "query": "calculator divide math error",
-          "capsule_tokens": 322,
+          "capsule_tokens": 67,
           "capsule_nodes": 10,
           "capsule_edges": 11,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 3,
+          "relevant_raw_this_turn": 765
         },
         {
           "turn": 2,
           "query": "core division function",
-          "capsule_tokens": 221,
+          "capsule_tokens": 73,
           "capsule_nodes": 10,
-          "capsule_edges": 11,
-          "new_nodes_this_turn": 4,
-          "overlap_with_previous_pct": 60.0
+          "capsule_edges": 10,
+          "new_nodes_this_turn": 8,
+          "overlap_with_previous_pct": 20.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 257
         },
         {
           "turn": 3,
           "query": "error handling try except",
-          "capsule_tokens": 307,
+          "capsule_tokens": 68,
           "capsule_nodes": 10,
           "capsule_edges": 11,
-          "new_nodes_this_turn": 2,
-          "overlap_with_previous_pct": 80.0
+          "new_nodes_this_turn": 5,
+          "overlap_with_previous_pct": 50.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 4,
           "query": "plugin error logging",
-          "capsule_tokens": 177,
+          "capsule_tokens": 76,
           "capsule_nodes": 10,
-          "capsule_edges": 9,
-          "new_nodes_this_turn": 6,
-          "overlap_with_previous_pct": 40.0
+          "capsule_edges": 10,
+          "new_nodes_this_turn": 5,
+          "overlap_with_previous_pct": 50.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 5,
           "query": "test division edge cases",
-          "capsule_tokens": 66,
+          "capsule_tokens": 17,
           "capsule_nodes": 10,
           "capsule_edges": 9,
-          "new_nodes_this_turn": 8,
-          "overlap_with_previous_pct": 20.0
+          "new_nodes_this_turn": 7,
+          "overlap_with_previous_pct": 30.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         }
       ]
     },
@@ -345,66 +433,81 @@
       "total_turns": 6,
       "total_nodes_in_graph": 61,
       "raw_tokens_all_files": 1558,
+      "cumulative_relevant_raw_tokens": 1533,
+      "unique_files_visited": 5,
       "raw_file_count": 7,
-      "cumulative_capsule_tokens": 1138,
-      "avg_tokens_per_turn": 189.7,
-      "savings_vs_raw_pct": 27.0,
-      "unique_nodes_visited": 28,
-      "graph_coverage_pct": 45.9,
+      "cumulative_capsule_tokens": 464,
+      "avg_tokens_per_turn": 77.3,
+      "savings_vs_raw_pct": 70.2,
+      "savings_vs_relevant_pct": 69.7,
+      "unique_nodes_visited": 30,
+      "graph_coverage_pct": 49.2,
       "turns": [
         {
           "turn": 1,
           "query": "plugin system load dispatch",
-          "capsule_tokens": 171,
+          "capsule_tokens": 79,
           "capsule_nodes": 10,
-          "capsule_edges": 9,
+          "capsule_edges": 8,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 2,
+          "relevant_raw_this_turn": 605
         },
         {
           "turn": 2,
           "query": "calculator core math operations",
-          "capsule_tokens": 212,
+          "capsule_tokens": 87,
           "capsule_nodes": 10,
           "capsule_edges": 8,
-          "new_nodes_this_turn": 8,
-          "overlap_with_previous_pct": 20.0
+          "new_nodes_this_turn": 9,
+          "overlap_with_previous_pct": 10.0,
+          "relevant_files_this_turn": 2,
+          "relevant_raw_this_turn": 417
         },
         {
           "turn": 3,
           "query": "plugin base class interface",
-          "capsule_tokens": 176,
+          "capsule_tokens": 84,
           "capsule_nodes": 10,
           "capsule_edges": 8,
           "new_nodes_this_turn": 1,
-          "overlap_with_previous_pct": 90.0
+          "overlap_with_previous_pct": 90.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 511
         },
         {
           "turn": 4,
           "query": "history plugin example",
-          "capsule_tokens": 177,
+          "capsule_tokens": 81,
           "capsule_nodes": 10,
           "capsule_edges": 10,
           "new_nodes_this_turn": 2,
-          "overlap_with_previous_pct": 80.0
+          "overlap_with_previous_pct": 80.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 5,
           "query": "test plugin registration",
-          "capsule_tokens": 140,
+          "capsule_tokens": 44,
           "capsule_nodes": 10,
-          "capsule_edges": 8,
-          "new_nodes_this_turn": 3,
-          "overlap_with_previous_pct": 70.0
+          "capsule_edges": 5,
+          "new_nodes_this_turn": 5,
+          "overlap_with_previous_pct": 50.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 6,
           "query": "main entry CLI args",
-          "capsule_tokens": 262,
+          "capsule_tokens": 89,
           "capsule_nodes": 10,
           "capsule_edges": 12,
-          "new_nodes_this_turn": 4,
-          "overlap_with_previous_pct": 60.0
+          "new_nodes_this_turn": 3,
+          "overlap_with_previous_pct": 70.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         }
       ]
     },
@@ -415,57 +518,70 @@
       "total_turns": 5,
       "total_nodes_in_graph": 61,
       "raw_tokens_all_files": 1558,
+      "cumulative_relevant_raw_tokens": 1373,
+      "unique_files_visited": 4,
       "raw_file_count": 7,
-      "cumulative_capsule_tokens": 632,
-      "avg_tokens_per_turn": 126.4,
-      "savings_vs_raw_pct": 59.4,
+      "cumulative_capsule_tokens": 295,
+      "avg_tokens_per_turn": 59.0,
+      "savings_vs_raw_pct": 81.1,
+      "savings_vs_relevant_pct": 78.5,
       "unique_nodes_visited": 30,
       "graph_coverage_pct": 49.2,
       "turns": [
         {
           "turn": 1,
           "query": "expression parser tokenize",
-          "capsule_tokens": 115,
+          "capsule_tokens": 65,
           "capsule_nodes": 10,
           "capsule_edges": 12,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 3,
+          "relevant_raw_this_turn": 998
         },
         {
           "turn": 2,
           "query": "parser token types regex",
-          "capsule_tokens": 120,
+          "capsule_tokens": 70,
           "capsule_nodes": 10,
           "capsule_edges": 11,
           "new_nodes_this_turn": 3,
-          "overlap_with_previous_pct": 70.0
+          "overlap_with_previous_pct": 70.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 3,
           "query": "parse error handling",
-          "capsule_tokens": 102,
+          "capsule_tokens": 52,
           "capsule_nodes": 10,
           "capsule_edges": 10,
           "new_nodes_this_turn": 4,
-          "overlap_with_previous_pct": 60.0
+          "overlap_with_previous_pct": 60.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 4,
           "query": "calculator evaluate expression",
-          "capsule_tokens": 230,
+          "capsule_tokens": 92,
           "capsule_nodes": 10,
-          "capsule_edges": 12,
-          "new_nodes_this_turn": 5,
-          "overlap_with_previous_pct": 50.0
+          "capsule_edges": 13,
+          "new_nodes_this_turn": 4,
+          "overlap_with_previous_pct": 60.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 375
         },
         {
           "turn": 5,
           "query": "test parser expressions",
-          "capsule_tokens": 65,
+          "capsule_tokens": 16,
           "capsule_nodes": 10,
           "capsule_edges": 9,
-          "new_nodes_this_turn": 8,
-          "overlap_with_previous_pct": 20.0
+          "new_nodes_this_turn": 9,
+          "overlap_with_previous_pct": 10.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         }
       ]
     },
@@ -476,66 +592,81 @@
       "total_turns": 6,
       "total_nodes_in_graph": 61,
       "raw_tokens_all_files": 1558,
+      "cumulative_relevant_raw_tokens": 1533,
+      "unique_files_visited": 5,
       "raw_file_count": 7,
-      "cumulative_capsule_tokens": 1148,
-      "avg_tokens_per_turn": 191.3,
-      "savings_vs_raw_pct": 26.3,
-      "unique_nodes_visited": 40,
-      "graph_coverage_pct": 65.6,
+      "cumulative_capsule_tokens": 374,
+      "avg_tokens_per_turn": 62.3,
+      "savings_vs_raw_pct": 76.0,
+      "savings_vs_relevant_pct": 75.6,
+      "unique_nodes_visited": 41,
+      "graph_coverage_pct": 67.2,
       "turns": [
         {
           "turn": 1,
           "query": "error handling calculator",
-          "capsule_tokens": 313,
+          "capsule_tokens": 60,
           "capsule_nodes": 10,
           "capsule_edges": 11,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 3,
+          "relevant_raw_this_turn": 1116
         },
         {
           "turn": 2,
           "query": "core math exceptions",
-          "capsule_tokens": 221,
+          "capsule_tokens": 73,
           "capsule_nodes": 10,
-          "capsule_edges": 11,
-          "new_nodes_this_turn": 5,
-          "overlap_with_previous_pct": 50.0
+          "capsule_edges": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 2,
+          "relevant_raw_this_turn": 417
         },
         {
           "turn": 3,
           "query": "parser validation errors",
-          "capsule_tokens": 110,
+          "capsule_tokens": 60,
           "capsule_nodes": 10,
           "capsule_edges": 16,
-          "new_nodes_this_turn": 9,
-          "overlap_with_previous_pct": 10.0
+          "new_nodes_this_turn": 8,
+          "overlap_with_previous_pct": 20.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 4,
           "query": "plugin error callback",
-          "capsule_tokens": 177,
+          "capsule_tokens": 76,
           "capsule_nodes": 10,
-          "capsule_edges": 9,
-          "new_nodes_this_turn": 6,
-          "overlap_with_previous_pct": 40.0
+          "capsule_edges": 10,
+          "new_nodes_this_turn": 7,
+          "overlap_with_previous_pct": 30.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 5,
           "query": "main CLI error messages",
-          "capsule_tokens": 262,
+          "capsule_tokens": 89,
           "capsule_nodes": 10,
           "capsule_edges": 12,
-          "new_nodes_this_turn": 3,
-          "overlap_with_previous_pct": 70.0
+          "new_nodes_this_turn": 0,
+          "overlap_with_previous_pct": 100.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 6,
           "query": "test error cases",
-          "capsule_tokens": 65,
+          "capsule_tokens": 16,
           "capsule_nodes": 10,
           "capsule_edges": 9,
-          "new_nodes_this_turn": 7,
-          "overlap_with_previous_pct": 30.0
+          "new_nodes_this_turn": 6,
+          "overlap_with_previous_pct": 40.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         }
       ]
     },
@@ -546,57 +677,70 @@
       "total_turns": 5,
       "total_nodes_in_graph": 61,
       "raw_tokens_all_files": 1558,
+      "cumulative_relevant_raw_tokens": 1533,
+      "unique_files_visited": 5,
       "raw_file_count": 7,
-      "cumulative_capsule_tokens": 771,
-      "avg_tokens_per_turn": 154.2,
-      "savings_vs_raw_pct": 50.5,
-      "unique_nodes_visited": 31,
-      "graph_coverage_pct": 50.8,
+      "cumulative_capsule_tokens": 289,
+      "avg_tokens_per_turn": 57.8,
+      "savings_vs_raw_pct": 81.5,
+      "savings_vs_relevant_pct": 81.1,
+      "unique_nodes_visited": 33,
+      "graph_coverage_pct": 54.1,
       "turns": [
         {
           "turn": 1,
           "query": "calculator core functions",
-          "capsule_tokens": 211,
+          "capsule_tokens": 86,
           "capsule_nodes": 10,
           "capsule_edges": 8,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 4,
+          "relevant_raw_this_turn": 1022
         },
         {
           "turn": 2,
           "query": "add power exponent",
-          "capsule_tokens": 203,
+          "capsule_tokens": 37,
           "capsule_nodes": 10,
-          "capsule_edges": 10,
-          "new_nodes_this_turn": 3,
-          "overlap_with_previous_pct": 70.0
+          "capsule_edges": 9,
+          "new_nodes_this_turn": 6,
+          "overlap_with_previous_pct": 40.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 3,
           "query": "expression parser power operator",
-          "capsule_tokens": 119,
+          "capsule_tokens": 69,
           "capsule_nodes": 10,
           "capsule_edges": 10,
-          "new_nodes_this_turn": 6,
-          "overlap_with_previous_pct": 40.0
+          "new_nodes_this_turn": 8,
+          "overlap_with_previous_pct": 20.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 511
         },
         {
           "turn": 4,
           "query": "test power edge cases",
-          "capsule_tokens": 66,
+          "capsule_tokens": 17,
           "capsule_nodes": 10,
           "capsule_edges": 9,
-          "new_nodes_this_turn": 6,
-          "overlap_with_previous_pct": 40.0
+          "new_nodes_this_turn": 2,
+          "overlap_with_previous_pct": 80.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 5,
           "query": "plugin history log power",
-          "capsule_tokens": 172,
+          "capsule_tokens": 80,
           "capsule_nodes": 10,
           "capsule_edges": 7,
-          "new_nodes_this_turn": 6,
-          "overlap_with_previous_pct": 40.0
+          "new_nodes_this_turn": 7,
+          "overlap_with_previous_pct": 30.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         }
       ]
     },
@@ -607,57 +751,70 @@
       "total_turns": 5,
       "total_nodes_in_graph": 61,
       "raw_tokens_all_files": 1558,
+      "cumulative_relevant_raw_tokens": 1533,
+      "unique_files_visited": 5,
       "raw_file_count": 7,
-      "cumulative_capsule_tokens": 929,
-      "avg_tokens_per_turn": 185.8,
-      "savings_vs_raw_pct": 40.4,
-      "unique_nodes_visited": 35,
-      "graph_coverage_pct": 57.4,
+      "cumulative_capsule_tokens": 336,
+      "avg_tokens_per_turn": 67.2,
+      "savings_vs_raw_pct": 78.4,
+      "savings_vs_relevant_pct": 78.1,
+      "unique_nodes_visited": 38,
+      "graph_coverage_pct": 62.3,
       "turns": [
         {
           "turn": 1,
           "query": "main CLI argument parse",
-          "capsule_tokens": 146,
+          "capsule_tokens": 51,
           "capsule_nodes": 10,
           "capsule_edges": 9,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 3,
+          "relevant_raw_this_turn": 998
         },
         {
           "turn": 2,
           "query": "CLI help text format",
-          "capsule_tokens": 262,
+          "capsule_tokens": 89,
           "capsule_nodes": 10,
           "capsule_edges": 12,
           "new_nodes_this_turn": 6,
-          "overlap_with_previous_pct": 40.0
+          "overlap_with_previous_pct": 40.0,
+          "relevant_files_this_turn": 2,
+          "relevant_raw_this_turn": 535
         },
         {
           "turn": 3,
           "query": "calculator operation list",
-          "capsule_tokens": 279,
+          "capsule_tokens": 104,
           "capsule_nodes": 10,
-          "capsule_edges": 11,
-          "new_nodes_this_turn": 5,
-          "overlap_with_previous_pct": 50.0
+          "capsule_edges": 17,
+          "new_nodes_this_turn": 6,
+          "overlap_with_previous_pct": 40.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 4,
           "query": "plugin list command",
-          "capsule_tokens": 177,
+          "capsule_tokens": 76,
           "capsule_nodes": 10,
-          "capsule_edges": 9,
-          "new_nodes_this_turn": 6,
-          "overlap_with_previous_pct": 40.0
+          "capsule_edges": 10,
+          "new_nodes_this_turn": 7,
+          "overlap_with_previous_pct": 30.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 5,
           "query": "test CLI integration",
-          "capsule_tokens": 65,
+          "capsule_tokens": 16,
           "capsule_nodes": 10,
           "capsule_edges": 9,
-          "new_nodes_this_turn": 8,
-          "overlap_with_previous_pct": 20.0
+          "new_nodes_this_turn": 9,
+          "overlap_with_previous_pct": 10.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         }
       ]
     },
@@ -668,30 +825,37 @@
       "total_turns": 6,
       "total_nodes_in_graph": 61,
       "raw_tokens_all_files": 1558,
+      "cumulative_relevant_raw_tokens": 1533,
+      "unique_files_visited": 5,
       "raw_file_count": 7,
-      "cumulative_capsule_tokens": 1098,
-      "avg_tokens_per_turn": 183.0,
-      "savings_vs_raw_pct": 29.5,
-      "unique_nodes_visited": 26,
-      "graph_coverage_pct": 42.6,
+      "cumulative_capsule_tokens": 376,
+      "avg_tokens_per_turn": 62.7,
+      "savings_vs_raw_pct": 75.9,
+      "savings_vs_relevant_pct": 75.5,
+      "unique_nodes_visited": 28,
+      "graph_coverage_pct": 45.9,
       "turns": [
         {
           "turn": 1,
           "query": "plugin system history",
-          "capsule_tokens": 176,
+          "capsule_tokens": 81,
           "capsule_nodes": 10,
           "capsule_edges": 10,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 375
         },
         {
           "turn": 2,
           "query": "plugin base class API",
-          "capsule_tokens": 176,
+          "capsule_tokens": 84,
           "capsule_nodes": 10,
           "capsule_edges": 8,
-          "new_nodes_this_turn": 1,
-          "overlap_with_previous_pct": 90.0
+          "new_nodes_this_turn": 2,
+          "overlap_with_previous_pct": 80.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 511
         },
         {
           "turn": 3,
@@ -700,34 +864,42 @@
           "capsule_nodes": 0,
           "capsule_edges": 0,
           "new_nodes_this_turn": 0,
-          "overlap_with_previous_pct": 100.0
+          "overlap_with_previous_pct": 100.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 4,
           "query": "calculator use memory",
-          "capsule_tokens": 326,
+          "capsule_tokens": 60,
           "capsule_nodes": 10,
-          "capsule_edges": 12,
-          "new_nodes_this_turn": 7,
-          "overlap_with_previous_pct": 30.0
+          "capsule_edges": 11,
+          "new_nodes_this_turn": 8,
+          "overlap_with_previous_pct": 20.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 230
         },
         {
           "turn": 5,
           "query": "test memory plugin",
-          "capsule_tokens": 140,
+          "capsule_tokens": 44,
           "capsule_nodes": 10,
-          "capsule_edges": 8,
-          "new_nodes_this_turn": 4,
-          "overlap_with_previous_pct": 60.0
+          "capsule_edges": 5,
+          "new_nodes_this_turn": 6,
+          "overlap_with_previous_pct": 40.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 257
         },
         {
           "turn": 6,
           "query": "CLI memory commands",
-          "capsule_tokens": 261,
+          "capsule_tokens": 88,
           "capsule_nodes": 10,
           "capsule_edges": 12,
-          "new_nodes_this_turn": 4,
-          "overlap_with_previous_pct": 60.0
+          "new_nodes_this_turn": 2,
+          "overlap_with_previous_pct": 80.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 160
         }
       ]
     },
@@ -738,66 +910,81 @@
       "total_turns": 6,
       "total_nodes_in_graph": 61,
       "raw_tokens_all_files": 1558,
+      "cumulative_relevant_raw_tokens": 1533,
+      "unique_files_visited": 5,
       "raw_file_count": 7,
-      "cumulative_capsule_tokens": 1210,
-      "avg_tokens_per_turn": 201.7,
-      "savings_vs_raw_pct": 22.3,
-      "unique_nodes_visited": 31,
-      "graph_coverage_pct": 50.8,
+      "cumulative_capsule_tokens": 312,
+      "avg_tokens_per_turn": 52.0,
+      "savings_vs_raw_pct": 80.0,
+      "savings_vs_relevant_pct": 79.6,
+      "unique_nodes_visited": 32,
+      "graph_coverage_pct": 52.5,
       "turns": [
         {
           "turn": 1,
           "query": "expression parser tokenize",
-          "capsule_tokens": 115,
+          "capsule_tokens": 65,
           "capsule_nodes": 10,
           "capsule_edges": 12,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 3,
+          "relevant_raw_this_turn": 998
         },
         {
           "turn": 2,
           "query": "input validation sanitize",
-          "capsule_tokens": 281,
-          "capsule_nodes": 10,
-          "capsule_edges": 11,
-          "new_nodes_this_turn": 7,
-          "overlap_with_previous_pct": 30.0
+          "capsule_tokens": 19,
+          "capsule_nodes": 0,
+          "capsule_edges": 0,
+          "new_nodes_this_turn": 0,
+          "overlap_with_previous_pct": 100.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 3,
           "query": "parser error handling",
-          "capsule_tokens": 155,
+          "capsule_tokens": 60,
           "capsule_nodes": 10,
-          "capsule_edges": 14,
-          "new_nodes_this_turn": 1,
-          "overlap_with_previous_pct": 90.0
+          "capsule_edges": 16,
+          "new_nodes_this_turn": 3,
+          "overlap_with_previous_pct": 70.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 4,
           "query": "calculator safe eval",
-          "capsule_tokens": 322,
+          "capsule_tokens": 63,
           "capsule_nodes": 10,
-          "capsule_edges": 13,
-          "new_nodes_this_turn": 3,
-          "overlap_with_previous_pct": 70.0
+          "capsule_edges": 9,
+          "new_nodes_this_turn": 6,
+          "overlap_with_previous_pct": 40.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 375
         },
         {
           "turn": 5,
           "query": "test invalid input",
-          "capsule_tokens": 65,
+          "capsule_tokens": 16,
           "capsule_nodes": 10,
           "capsule_edges": 9,
-          "new_nodes_this_turn": 8,
-          "overlap_with_previous_pct": 20.0
+          "new_nodes_this_turn": 9,
+          "overlap_with_previous_pct": 10.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 6,
           "query": "main CLI input loop",
-          "capsule_tokens": 272,
+          "capsule_tokens": 89,
           "capsule_nodes": 10,
-          "capsule_edges": 13,
-          "new_nodes_this_turn": 2,
-          "overlap_with_previous_pct": 80.0
+          "capsule_edges": 12,
+          "new_nodes_this_turn": 4,
+          "overlap_with_previous_pct": 60.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 160
         }
       ]
     },
@@ -808,21 +995,26 @@
       "total_turns": 7,
       "total_nodes_in_graph": 171,
       "raw_tokens_all_files": 6567,
+      "cumulative_relevant_raw_tokens": 5904,
+      "unique_files_visited": 15,
       "raw_file_count": 23,
-      "cumulative_capsule_tokens": 1328,
-      "avg_tokens_per_turn": 189.7,
-      "savings_vs_raw_pct": 79.8,
-      "unique_nodes_visited": 52,
-      "graph_coverage_pct": 30.4,
+      "cumulative_capsule_tokens": 571,
+      "avg_tokens_per_turn": 81.6,
+      "savings_vs_raw_pct": 91.3,
+      "savings_vs_relevant_pct": 90.3,
+      "unique_nodes_visited": 51,
+      "graph_coverage_pct": 29.8,
       "turns": [
         {
           "turn": 1,
           "query": "auth service JWT token",
-          "capsule_tokens": 279,
+          "capsule_tokens": 94,
           "capsule_nodes": 10,
-          "capsule_edges": 7,
+          "capsule_edges": 4,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 5,
+          "relevant_raw_this_turn": 1929
         },
         {
           "turn": 2,
@@ -830,53 +1022,65 @@
           "capsule_tokens": 83,
           "capsule_nodes": 10,
           "capsule_edges": 1,
-          "new_nodes_this_turn": 8,
-          "overlap_with_previous_pct": 20.0
+          "new_nodes_this_turn": 7,
+          "overlap_with_previous_pct": 30.0,
+          "relevant_files_this_turn": 3,
+          "relevant_raw_this_turn": 1549
         },
         {
           "turn": 3,
           "query": "auth middleware validate",
-          "capsule_tokens": 250,
+          "capsule_tokens": 120,
           "capsule_nodes": 10,
-          "capsule_edges": 3,
-          "new_nodes_this_turn": 5,
-          "overlap_with_previous_pct": 50.0
+          "capsule_edges": 2,
+          "new_nodes_this_turn": 4,
+          "overlap_with_previous_pct": 60.0,
+          "relevant_files_this_turn": 2,
+          "relevant_raw_this_turn": 549
         },
         {
           "turn": 4,
           "query": "user session management",
-          "capsule_tokens": 170,
+          "capsule_tokens": 77,
           "capsule_nodes": 10,
           "capsule_edges": 4,
-          "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "new_nodes_this_turn": 9,
+          "overlap_with_previous_pct": 10.0,
+          "relevant_files_this_turn": 2,
+          "relevant_raw_this_turn": 449
         },
         {
           "turn": 5,
           "query": "login register routes",
-          "capsule_tokens": 154,
+          "capsule_tokens": 60,
           "capsule_nodes": 10,
           "capsule_edges": 4,
           "new_nodes_this_turn": 8,
-          "overlap_with_previous_pct": 20.0
+          "overlap_with_previous_pct": 20.0,
+          "relevant_files_this_turn": 2,
+          "relevant_raw_this_turn": 974
         },
         {
           "turn": 6,
           "query": "refresh token endpoint",
-          "capsule_tokens": 239,
+          "capsule_tokens": 84,
           "capsule_nodes": 10,
-          "capsule_edges": 6,
-          "new_nodes_this_turn": 4,
-          "overlap_with_previous_pct": 60.0
+          "capsule_edges": 9,
+          "new_nodes_this_turn": 6,
+          "overlap_with_previous_pct": 40.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 7,
           "query": "test auth refresh flow",
-          "capsule_tokens": 153,
+          "capsule_tokens": 53,
           "capsule_nodes": 10,
-          "capsule_edges": 7,
+          "capsule_edges": 6,
           "new_nodes_this_turn": 7,
-          "overlap_with_previous_pct": 30.0
+          "overlap_with_previous_pct": 30.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 454
         }
       ]
     },
@@ -887,66 +1091,81 @@
       "total_turns": 6,
       "total_nodes_in_graph": 171,
       "raw_tokens_all_files": 6567,
+      "cumulative_relevant_raw_tokens": 2469,
+      "unique_files_visited": 9,
       "raw_file_count": 23,
-      "cumulative_capsule_tokens": 1282,
-      "avg_tokens_per_turn": 213.7,
-      "savings_vs_raw_pct": 80.5,
-      "unique_nodes_visited": 29,
-      "graph_coverage_pct": 17.0,
+      "cumulative_capsule_tokens": 471,
+      "avg_tokens_per_turn": 78.5,
+      "savings_vs_raw_pct": 92.8,
+      "savings_vs_relevant_pct": 80.9,
+      "unique_nodes_visited": 30,
+      "graph_coverage_pct": 17.5,
       "turns": [
         {
           "turn": 1,
           "query": "rate limit middleware",
-          "capsule_tokens": 189,
+          "capsule_tokens": 98,
           "capsule_nodes": 10,
           "capsule_edges": 9,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 4,
+          "relevant_raw_this_turn": 1253
         },
         {
           "turn": 2,
           "query": "token bucket algorithm",
-          "capsule_tokens": 263,
+          "capsule_tokens": 67,
           "capsule_nodes": 10,
-          "capsule_edges": 5,
-          "new_nodes_this_turn": 6,
-          "overlap_with_previous_pct": 40.0
+          "capsule_edges": 11,
+          "new_nodes_this_turn": 4,
+          "overlap_with_previous_pct": 60.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 271
         },
         {
           "turn": 3,
           "query": "rate limit config settings",
-          "capsule_tokens": 162,
+          "capsule_tokens": 78,
           "capsule_nodes": 10,
           "capsule_edges": 12,
           "new_nodes_this_turn": 3,
-          "overlap_with_previous_pct": 70.0
+          "overlap_with_previous_pct": 70.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 128
         },
         {
           "turn": 4,
           "query": "middleware pipeline order",
-          "capsule_tokens": 298,
+          "capsule_tokens": 101,
           "capsule_nodes": 10,
-          "capsule_edges": 7,
-          "new_nodes_this_turn": 1,
-          "overlap_with_previous_pct": 90.0
+          "capsule_edges": 3,
+          "new_nodes_this_turn": 3,
+          "overlap_with_previous_pct": 70.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 5,
           "query": "test rate limiting",
-          "capsule_tokens": 257,
+          "capsule_tokens": 62,
           "capsule_nodes": 10,
-          "capsule_edges": 5,
-          "new_nodes_this_turn": 6,
-          "overlap_with_previous_pct": 40.0
+          "capsule_edges": 4,
+          "new_nodes_this_turn": 7,
+          "overlap_with_previous_pct": 30.0,
+          "relevant_files_this_turn": 3,
+          "relevant_raw_this_turn": 817
         },
         {
           "turn": 6,
           "query": "rate limit headers response",
-          "capsule_tokens": 113,
+          "capsule_tokens": 65,
           "capsule_nodes": 10,
           "capsule_edges": 11,
           "new_nodes_this_turn": 3,
-          "overlap_with_previous_pct": 70.0
+          "overlap_with_previous_pct": 70.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         }
       ]
     },
@@ -957,75 +1176,92 @@
       "total_turns": 7,
       "total_nodes_in_graph": 171,
       "raw_tokens_all_files": 6567,
+      "cumulative_relevant_raw_tokens": 5943,
+      "unique_files_visited": 16,
       "raw_file_count": 23,
-      "cumulative_capsule_tokens": 1344,
-      "avg_tokens_per_turn": 192.0,
-      "savings_vs_raw_pct": 79.5,
-      "unique_nodes_visited": 46,
-      "graph_coverage_pct": 26.9,
+      "cumulative_capsule_tokens": 458,
+      "avg_tokens_per_turn": 65.4,
+      "savings_vs_raw_pct": 93.0,
+      "savings_vs_relevant_pct": 92.3,
+      "unique_nodes_visited": 47,
+      "graph_coverage_pct": 27.5,
       "turns": [
         {
           "turn": 1,
           "query": "user model fields role",
-          "capsule_tokens": 168,
+          "capsule_tokens": 70,
           "capsule_nodes": 10,
           "capsule_edges": 6,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 4,
+          "relevant_raw_this_turn": 1388
         },
         {
           "turn": 2,
           "query": "user service create update",
-          "capsule_tokens": 214,
+          "capsule_tokens": 76,
           "capsule_nodes": 10,
-          "capsule_edges": 4,
-          "new_nodes_this_turn": 5,
-          "overlap_with_previous_pct": 50.0
+          "capsule_edges": 6,
+          "new_nodes_this_turn": 6,
+          "overlap_with_previous_pct": 40.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 558
         },
         {
           "turn": 3,
           "query": "auth middleware role check",
-          "capsule_tokens": 303,
+          "capsule_tokens": 101,
           "capsule_nodes": 10,
-          "capsule_edges": 4,
-          "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "capsule_edges": 2,
+          "new_nodes_this_turn": 9,
+          "overlap_with_previous_pct": 10.0,
+          "relevant_files_this_turn": 6,
+          "relevant_raw_this_turn": 1920
         },
         {
           "turn": 4,
           "query": "admin routes permission guard",
-          "capsule_tokens": 72,
+          "capsule_tokens": 34,
           "capsule_nodes": 10,
           "capsule_edges": 3,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 4,
+          "relevant_raw_this_turn": 2038
         },
         {
           "turn": 5,
           "query": "user routes role filter",
-          "capsule_tokens": 223,
+          "capsule_tokens": 77,
           "capsule_nodes": 10,
           "capsule_edges": 6,
           "new_nodes_this_turn": 1,
-          "overlap_with_previous_pct": 90.0
+          "overlap_with_previous_pct": 90.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 6,
           "query": "test role based access",
-          "capsule_tokens": 188,
+          "capsule_tokens": 44,
           "capsule_nodes": 10,
           "capsule_edges": 6,
           "new_nodes_this_turn": 6,
-          "overlap_with_previous_pct": 40.0
+          "overlap_with_previous_pct": 40.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 39
         },
         {
           "turn": 7,
           "query": "migration add role field",
-          "capsule_tokens": 176,
+          "capsule_tokens": 56,
           "capsule_nodes": 10,
-          "capsule_edges": 7,
-          "new_nodes_this_turn": 4,
-          "overlap_with_previous_pct": 60.0
+          "capsule_edges": 9,
+          "new_nodes_this_turn": 5,
+          "overlap_with_previous_pct": 50.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         }
       ]
     },
@@ -1036,66 +1272,81 @@
       "total_turns": 6,
       "total_nodes_in_graph": 171,
       "raw_tokens_all_files": 6567,
+      "cumulative_relevant_raw_tokens": 3466,
+      "unique_files_visited": 8,
       "raw_file_count": 23,
-      "cumulative_capsule_tokens": 1099,
-      "avg_tokens_per_turn": 183.2,
-      "savings_vs_raw_pct": 83.3,
-      "unique_nodes_visited": 32,
-      "graph_coverage_pct": 18.7,
+      "cumulative_capsule_tokens": 436,
+      "avg_tokens_per_turn": 72.7,
+      "savings_vs_raw_pct": 93.4,
+      "savings_vs_relevant_pct": 87.4,
+      "unique_nodes_visited": 36,
+      "graph_coverage_pct": 21.1,
       "turns": [
         {
           "turn": 1,
           "query": "post service list query",
-          "capsule_tokens": 217,
+          "capsule_tokens": 85,
           "capsule_nodes": 10,
-          "capsule_edges": 3,
+          "capsule_edges": 4,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 4,
+          "relevant_raw_this_turn": 2131
         },
         {
           "turn": 2,
           "query": "post model fields sort",
-          "capsule_tokens": 174,
+          "capsule_tokens": 95,
           "capsule_nodes": 10,
           "capsule_edges": 6,
-          "new_nodes_this_turn": 3,
-          "overlap_with_previous_pct": 70.0
+          "new_nodes_this_turn": 5,
+          "overlap_with_previous_pct": 50.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 120
         },
         {
           "turn": 3,
           "query": "post routes pagination",
-          "capsule_tokens": 206,
+          "capsule_tokens": 88,
           "capsule_nodes": 10,
           "capsule_edges": 6,
           "new_nodes_this_turn": 2,
-          "overlap_with_previous_pct": 80.0
+          "overlap_with_previous_pct": 80.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 4,
           "query": "user service author posts",
-          "capsule_tokens": 236,
+          "capsule_tokens": 77,
           "capsule_nodes": 10,
-          "capsule_edges": 5,
+          "capsule_edges": 4,
           "new_nodes_this_turn": 6,
-          "overlap_with_previous_pct": 40.0
+          "overlap_with_previous_pct": 40.0,
+          "relevant_files_this_turn": 2,
+          "relevant_raw_this_turn": 749
         },
         {
           "turn": 5,
           "query": "test post pagination",
-          "capsule_tokens": 73,
+          "capsule_tokens": 25,
           "capsule_nodes": 10,
           "capsule_edges": 9,
-          "new_nodes_this_turn": 6,
-          "overlap_with_previous_pct": 40.0
+          "new_nodes_this_turn": 7,
+          "overlap_with_previous_pct": 30.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 6,
           "query": "admin routes all posts",
-          "capsule_tokens": 193,
+          "capsule_tokens": 66,
           "capsule_nodes": 10,
-          "capsule_edges": 5,
-          "new_nodes_this_turn": 5,
-          "overlap_with_previous_pct": 50.0
+          "capsule_edges": 7,
+          "new_nodes_this_turn": 6,
+          "overlap_with_previous_pct": 40.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 466
         }
       ]
     },
@@ -1106,75 +1357,92 @@
       "total_turns": 7,
       "total_nodes_in_graph": 171,
       "raw_tokens_all_files": 6567,
+      "cumulative_relevant_raw_tokens": 4684,
+      "unique_files_visited": 13,
       "raw_file_count": 23,
-      "cumulative_capsule_tokens": 1284,
-      "avg_tokens_per_turn": 183.4,
-      "savings_vs_raw_pct": 80.4,
-      "unique_nodes_visited": 38,
-      "graph_coverage_pct": 22.2,
+      "cumulative_capsule_tokens": 533,
+      "avg_tokens_per_turn": 76.1,
+      "savings_vs_raw_pct": 91.9,
+      "savings_vs_relevant_pct": 88.6,
+      "unique_nodes_visited": 40,
+      "graph_coverage_pct": 23.4,
       "turns": [
         {
           "turn": 1,
           "query": "auth service password hash",
-          "capsule_tokens": 228,
+          "capsule_tokens": 89,
           "capsule_nodes": 10,
-          "capsule_edges": 8,
+          "capsule_edges": 5,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 4,
+          "relevant_raw_this_turn": 1534
         },
         {
           "turn": 2,
           "query": "user service find by email",
-          "capsule_tokens": 204,
+          "capsule_tokens": 80,
           "capsule_nodes": 10,
-          "capsule_edges": 6,
+          "capsule_edges": 5,
           "new_nodes_this_turn": 8,
-          "overlap_with_previous_pct": 20.0
+          "overlap_with_previous_pct": 20.0,
+          "relevant_files_this_turn": 4,
+          "relevant_raw_this_turn": 1388
         },
         {
           "turn": 3,
           "query": "reset token generate verify",
-          "capsule_tokens": 204,
+          "capsule_tokens": 82,
           "capsule_nodes": 10,
-          "capsule_edges": 5,
+          "capsule_edges": 8,
           "new_nodes_this_turn": 8,
-          "overlap_with_previous_pct": 20.0
+          "overlap_with_previous_pct": 20.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 366
         },
         {
           "turn": 4,
           "query": "auth routes reset password",
-          "capsule_tokens": 240,
+          "capsule_tokens": 93,
           "capsule_nodes": 10,
-          "capsule_edges": 7,
-          "new_nodes_this_turn": 2,
-          "overlap_with_previous_pct": 80.0
+          "capsule_edges": 4,
+          "new_nodes_this_turn": 3,
+          "overlap_with_previous_pct": 70.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 395
         },
         {
           "turn": 5,
           "query": "email notification service",
-          "capsule_tokens": 99,
+          "capsule_tokens": 72,
           "capsule_nodes": 10,
-          "capsule_edges": 4,
-          "new_nodes_this_turn": 3,
-          "overlap_with_previous_pct": 70.0
+          "capsule_edges": 3,
+          "new_nodes_this_turn": 4,
+          "overlap_with_previous_pct": 60.0,
+          "relevant_files_this_turn": 2,
+          "relevant_raw_this_turn": 962
         },
         {
           "turn": 6,
           "query": "test password reset",
-          "capsule_tokens": 187,
+          "capsule_tokens": 43,
           "capsule_nodes": 10,
           "capsule_edges": 6,
-          "new_nodes_this_turn": 2,
-          "overlap_with_previous_pct": 80.0
+          "new_nodes_this_turn": 3,
+          "overlap_with_previous_pct": 70.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 39
         },
         {
           "turn": 7,
           "query": "rate limit reset attempts",
-          "capsule_tokens": 122,
+          "capsule_tokens": 74,
           "capsule_nodes": 10,
           "capsule_edges": 16,
-          "new_nodes_this_turn": 5,
-          "overlap_with_previous_pct": 50.0
+          "new_nodes_this_turn": 4,
+          "overlap_with_previous_pct": 60.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         }
       ]
     },
@@ -1185,66 +1453,81 @@
       "total_turns": 6,
       "total_nodes_in_graph": 171,
       "raw_tokens_all_files": 6567,
+      "cumulative_relevant_raw_tokens": 5943,
+      "unique_files_visited": 16,
       "raw_file_count": 23,
-      "cumulative_capsule_tokens": 874,
-      "avg_tokens_per_turn": 145.7,
-      "savings_vs_raw_pct": 86.7,
-      "unique_nodes_visited": 39,
-      "graph_coverage_pct": 22.8,
+      "cumulative_capsule_tokens": 439,
+      "avg_tokens_per_turn": 73.2,
+      "savings_vs_raw_pct": 93.3,
+      "savings_vs_relevant_pct": 92.6,
+      "unique_nodes_visited": 41,
+      "graph_coverage_pct": 24.0,
       "turns": [
         {
           "turn": 1,
           "query": "admin routes dashboard",
-          "capsule_tokens": 71,
+          "capsule_tokens": 33,
           "capsule_nodes": 10,
           "capsule_edges": 3,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 7,
+          "relevant_raw_this_turn": 3271
         },
         {
           "turn": 2,
           "query": "user service stats count",
-          "capsule_tokens": 177,
+          "capsule_tokens": 85,
           "capsule_nodes": 10,
-          "capsule_edges": 5,
+          "capsule_edges": 4,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 4,
+          "relevant_raw_this_turn": 1617
         },
         {
           "turn": 3,
           "query": "post service analytics",
-          "capsule_tokens": 166,
+          "capsule_tokens": 84,
           "capsule_nodes": 10,
           "capsule_edges": 4,
-          "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "new_nodes_this_turn": 8,
+          "overlap_with_previous_pct": 20.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 4,
           "query": "auth service login history",
-          "capsule_tokens": 121,
+          "capsule_tokens": 93,
           "capsule_nodes": 10,
           "capsule_edges": 4,
           "new_nodes_this_turn": 5,
-          "overlap_with_previous_pct": 50.0
+          "overlap_with_previous_pct": 50.0,
+          "relevant_files_this_turn": 2,
+          "relevant_raw_this_turn": 467
         },
         {
           "turn": 5,
           "query": "middleware admin only",
-          "capsule_tokens": 122,
+          "capsule_tokens": 84,
           "capsule_nodes": 10,
           "capsule_edges": 2,
           "new_nodes_this_turn": 4,
-          "overlap_with_previous_pct": 60.0
+          "overlap_with_previous_pct": 60.0,
+          "relevant_files_this_turn": 2,
+          "relevant_raw_this_turn": 549
         },
         {
           "turn": 6,
           "query": "test admin analytics",
-          "capsule_tokens": 217,
+          "capsule_tokens": 60,
           "capsule_nodes": 10,
-          "capsule_edges": 6,
-          "new_nodes_this_turn": 0,
-          "overlap_with_previous_pct": 100.0
+          "capsule_edges": 5,
+          "new_nodes_this_turn": 4,
+          "overlap_with_previous_pct": 60.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 39
         }
       ]
     },
@@ -1255,66 +1538,81 @@
       "total_turns": 6,
       "total_nodes_in_graph": 171,
       "raw_tokens_all_files": 6567,
+      "cumulative_relevant_raw_tokens": 5633,
+      "unique_files_visited": 17,
       "raw_file_count": 23,
-      "cumulative_capsule_tokens": 1462,
-      "avg_tokens_per_turn": 243.7,
-      "savings_vs_raw_pct": 77.7,
+      "cumulative_capsule_tokens": 480,
+      "avg_tokens_per_turn": 80.0,
+      "savings_vs_raw_pct": 92.7,
+      "savings_vs_relevant_pct": 91.5,
       "unique_nodes_visited": 54,
       "graph_coverage_pct": 31.6,
       "turns": [
         {
           "turn": 1,
           "query": "routes version prefix",
-          "capsule_tokens": 166,
+          "capsule_tokens": 58,
           "capsule_nodes": 10,
-          "capsule_edges": 5,
+          "capsule_edges": 6,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 5,
+          "relevant_raw_this_turn": 2493
         },
         {
           "turn": 2,
           "query": "middleware accept header",
-          "capsule_tokens": 298,
+          "capsule_tokens": 101,
           "capsule_nodes": 10,
-          "capsule_edges": 7,
+          "capsule_edges": 3,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 3,
+          "relevant_raw_this_turn": 745
         },
         {
           "turn": 3,
           "query": "config api version",
-          "capsule_tokens": 316,
+          "capsule_tokens": 92,
           "capsule_nodes": 10,
-          "capsule_edges": 11,
-          "new_nodes_this_turn": 9,
-          "overlap_with_previous_pct": 10.0
+          "capsule_edges": 13,
+          "new_nodes_this_turn": 8,
+          "overlap_with_previous_pct": 20.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 128
         },
         {
           "turn": 4,
           "query": "user routes backward compat",
-          "capsule_tokens": 230,
+          "capsule_tokens": 86,
           "capsule_nodes": 10,
-          "capsule_edges": 7,
-          "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "capsule_edges": 5,
+          "new_nodes_this_turn": 9,
+          "overlap_with_previous_pct": 10.0,
+          "relevant_files_this_turn": 3,
+          "relevant_raw_this_turn": 874
         },
         {
           "turn": 5,
           "query": "post routes version check",
-          "capsule_tokens": 265,
+          "capsule_tokens": 100,
           "capsule_nodes": 10,
-          "capsule_edges": 7,
-          "new_nodes_this_turn": 7,
-          "overlap_with_previous_pct": 30.0
+          "capsule_edges": 6,
+          "new_nodes_this_turn": 9,
+          "overlap_with_previous_pct": 10.0,
+          "relevant_files_this_turn": 3,
+          "relevant_raw_this_turn": 1083
         },
         {
           "turn": 6,
           "query": "test versioned endpoints",
-          "capsule_tokens": 187,
+          "capsule_tokens": 43,
           "capsule_nodes": 10,
           "capsule_edges": 6,
           "new_nodes_this_turn": 8,
-          "overlap_with_previous_pct": 20.0
+          "overlap_with_previous_pct": 20.0,
+          "relevant_files_this_turn": 2,
+          "relevant_raw_this_turn": 310
         }
       ]
     },
@@ -1325,66 +1623,81 @@
       "total_turns": 6,
       "total_nodes_in_graph": 171,
       "raw_tokens_all_files": 6567,
+      "cumulative_relevant_raw_tokens": 6063,
+      "unique_files_visited": 17,
       "raw_file_count": 23,
-      "cumulative_capsule_tokens": 1011,
-      "avg_tokens_per_turn": 168.5,
-      "savings_vs_raw_pct": 84.6,
-      "unique_nodes_visited": 53,
-      "graph_coverage_pct": 31.0,
+      "cumulative_capsule_tokens": 407,
+      "avg_tokens_per_turn": 67.8,
+      "savings_vs_raw_pct": 93.8,
+      "savings_vs_relevant_pct": 93.3,
+      "unique_nodes_visited": 54,
+      "graph_coverage_pct": 31.6,
       "turns": [
         {
           "turn": 1,
           "query": "user model validation",
-          "capsule_tokens": 172,
+          "capsule_tokens": 77,
           "capsule_nodes": 10,
           "capsule_edges": 6,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 4,
+          "relevant_raw_this_turn": 1388
         },
         {
           "turn": 2,
           "query": "post model fields required",
-          "capsule_tokens": 174,
+          "capsule_tokens": 95,
           "capsule_nodes": 10,
           "capsule_edges": 6,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 4,
+          "relevant_raw_this_turn": 1693
         },
         {
           "turn": 3,
           "query": "services input sanitize",
-          "capsule_tokens": 121,
+          "capsule_tokens": 61,
           "capsule_nodes": 10,
-          "capsule_edges": 0,
+          "capsule_edges": 1,
           "new_nodes_this_turn": 8,
-          "overlap_with_previous_pct": 20.0
+          "overlap_with_previous_pct": 20.0,
+          "relevant_files_this_turn": 4,
+          "relevant_raw_this_turn": 1803
         },
         {
           "turn": 4,
           "query": "routes error response",
-          "capsule_tokens": 133,
+          "capsule_tokens": 41,
           "capsule_nodes": 10,
-          "capsule_edges": 0,
+          "capsule_edges": 2,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 4,
+          "relevant_raw_this_turn": 1140
         },
         {
           "turn": 5,
           "query": "middleware validation",
-          "capsule_tokens": 223,
+          "capsule_tokens": 89,
           "capsule_nodes": 10,
-          "capsule_edges": 3,
-          "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "capsule_edges": 0,
+          "new_nodes_this_turn": 9,
+          "overlap_with_previous_pct": 10.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 6,
           "query": "test invalid request body",
-          "capsule_tokens": 188,
+          "capsule_tokens": 44,
           "capsule_nodes": 10,
           "capsule_edges": 6,
-          "new_nodes_this_turn": 5,
-          "overlap_with_previous_pct": 50.0
+          "new_nodes_this_turn": 7,
+          "overlap_with_previous_pct": 30.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 39
         }
       ]
     },
@@ -1395,75 +1708,92 @@
       "total_turns": 7,
       "total_nodes_in_graph": 171,
       "raw_tokens_all_files": 6567,
+      "cumulative_relevant_raw_tokens": 6066,
+      "unique_files_visited": 17,
       "raw_file_count": 23,
-      "cumulative_capsule_tokens": 1605,
-      "avg_tokens_per_turn": 229.3,
-      "savings_vs_raw_pct": 75.6,
-      "unique_nodes_visited": 54,
-      "graph_coverage_pct": 31.6,
+      "cumulative_capsule_tokens": 509,
+      "avg_tokens_per_turn": 72.7,
+      "savings_vs_raw_pct": 92.2,
+      "savings_vs_relevant_pct": 91.6,
+      "unique_nodes_visited": 56,
+      "graph_coverage_pct": 32.7,
       "turns": [
         {
           "turn": 1,
           "query": "middleware logging request",
-          "capsule_tokens": 194,
+          "capsule_tokens": 81,
           "capsule_nodes": 10,
-          "capsule_edges": 6,
+          "capsule_edges": 5,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 4,
+          "relevant_raw_this_turn": 1253
         },
         {
           "turn": 2,
           "query": "auth service user context",
-          "capsule_tokens": 231,
+          "capsule_tokens": 92,
           "capsule_nodes": 10,
           "capsule_edges": 3,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 6,
+          "relevant_raw_this_turn": 2601
         },
         {
           "turn": 3,
           "query": "audit log model storage",
-          "capsule_tokens": 219,
+          "capsule_tokens": 91,
           "capsule_nodes": 10,
-          "capsule_edges": 4,
-          "new_nodes_this_turn": 8,
-          "overlap_with_previous_pct": 20.0
+          "capsule_edges": 2,
+          "new_nodes_this_turn": 7,
+          "overlap_with_previous_pct": 30.0,
+          "relevant_files_this_turn": 4,
+          "relevant_raw_this_turn": 1579
         },
         {
           "turn": 4,
           "query": "middleware pipeline order",
-          "capsule_tokens": 298,
+          "capsule_tokens": 101,
           "capsule_nodes": 10,
-          "capsule_edges": 7,
-          "new_nodes_this_turn": 3,
-          "overlap_with_previous_pct": 70.0
+          "capsule_edges": 3,
+          "new_nodes_this_turn": 4,
+          "overlap_with_previous_pct": 60.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 5,
           "query": "admin routes audit trail",
-          "capsule_tokens": 72,
+          "capsule_tokens": 34,
           "capsule_nodes": 10,
           "capsule_edges": 3,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 466
         },
         {
           "turn": 6,
           "query": "test audit entries",
-          "capsule_tokens": 187,
+          "capsule_tokens": 43,
           "capsule_nodes": 10,
           "capsule_edges": 6,
           "new_nodes_this_turn": 7,
-          "overlap_with_previous_pct": 30.0
+          "overlap_with_previous_pct": 30.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 39
         },
         {
           "turn": 7,
           "query": "config audit enabled",
-          "capsule_tokens": 404,
+          "capsule_tokens": 67,
           "capsule_nodes": 10,
-          "capsule_edges": 10,
-          "new_nodes_this_turn": 6,
-          "overlap_with_previous_pct": 40.0
+          "capsule_edges": 9,
+          "new_nodes_this_turn": 8,
+          "overlap_with_previous_pct": 20.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 128
         }
       ]
     },
@@ -1474,84 +1804,103 @@
       "total_turns": 8,
       "total_nodes_in_graph": 306,
       "raw_tokens_all_files": 10587,
+      "cumulative_relevant_raw_tokens": 5455,
+      "unique_files_visited": 9,
       "raw_file_count": 22,
-      "cumulative_capsule_tokens": 1031,
-      "avg_tokens_per_turn": 128.9,
-      "savings_vs_raw_pct": 90.3,
-      "unique_nodes_visited": 40,
-      "graph_coverage_pct": 13.1,
+      "cumulative_capsule_tokens": 204,
+      "avg_tokens_per_turn": 25.5,
+      "savings_vs_raw_pct": 98.1,
+      "savings_vs_relevant_pct": 96.3,
+      "unique_nodes_visited": 38,
+      "graph_coverage_pct": 12.4,
       "turns": [
         {
           "turn": 1,
           "query": "auth OAuth service",
-          "capsule_tokens": 68,
+          "capsule_tokens": 29,
           "capsule_nodes": 10,
           "capsule_edges": 11,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 769
         },
         {
           "turn": 2,
           "query": "auth JWT token create",
-          "capsule_tokens": 107,
+          "capsule_tokens": 14,
           "capsule_nodes": 10,
-          "capsule_edges": 6,
-          "new_nodes_this_turn": 6,
-          "overlap_with_previous_pct": 40.0
+          "capsule_edges": 0,
+          "new_nodes_this_turn": 7,
+          "overlap_with_previous_pct": 30.0,
+          "relevant_files_this_turn": 3,
+          "relevant_raw_this_turn": 1892
         },
         {
           "turn": 3,
           "query": "oauth authorize callback",
-          "capsule_tokens": 68,
+          "capsule_tokens": 29,
           "capsule_nodes": 10,
           "capsule_edges": 11,
           "new_nodes_this_turn": 0,
-          "overlap_with_previous_pct": 100.0
+          "overlap_with_previous_pct": 100.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 4,
           "query": "user model external id",
-          "capsule_tokens": 192,
+          "capsule_tokens": 14,
           "capsule_nodes": 10,
-          "capsule_edges": 8,
+          "capsule_edges": 0,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 2,
+          "relevant_raw_this_turn": 1310
         },
         {
           "turn": 5,
           "query": "auth server routes",
-          "capsule_tokens": 200,
+          "capsule_tokens": 17,
           "capsule_nodes": 10,
-          "capsule_edges": 3,
-          "new_nodes_this_turn": 4,
-          "overlap_with_previous_pct": 60.0
+          "capsule_edges": 1,
+          "new_nodes_this_turn": 1,
+          "overlap_with_previous_pct": 90.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 6,
           "query": "test OAuth flow",
-          "capsule_tokens": 68,
+          "capsule_tokens": 29,
           "capsule_nodes": 10,
           "capsule_edges": 11,
           "new_nodes_this_turn": 0,
-          "overlap_with_previous_pct": 100.0
+          "overlap_with_previous_pct": 100.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 7,
           "query": "config OAuth settings",
-          "capsule_tokens": 68,
+          "capsule_tokens": 29,
           "capsule_nodes": 10,
           "capsule_edges": 11,
           "new_nodes_this_turn": 0,
-          "overlap_with_previous_pct": 100.0
+          "overlap_with_previous_pct": 100.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 8,
           "query": "shared logger debug",
-          "capsule_tokens": 260,
+          "capsule_tokens": 43,
           "capsule_nodes": 10,
-          "capsule_edges": 7,
+          "capsule_edges": 9,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 3,
+          "relevant_raw_this_turn": 1484
         }
       ]
     },
@@ -1562,75 +1911,92 @@
       "total_turns": 7,
       "total_nodes_in_graph": 306,
       "raw_tokens_all_files": 10587,
+      "cumulative_relevant_raw_tokens": 6946,
+      "unique_files_visited": 11,
       "raw_file_count": 22,
-      "cumulative_capsule_tokens": 1502,
-      "avg_tokens_per_turn": 214.6,
-      "savings_vs_raw_pct": 85.8,
-      "unique_nodes_visited": 50,
-      "graph_coverage_pct": 16.3,
+      "cumulative_capsule_tokens": 159,
+      "avg_tokens_per_turn": 22.7,
+      "savings_vs_raw_pct": 98.5,
+      "savings_vs_relevant_pct": 97.7,
+      "unique_nodes_visited": 48,
+      "graph_coverage_pct": 15.7,
       "turns": [
         {
           "turn": 1,
           "query": "billing invoice generate",
-          "capsule_tokens": 146,
+          "capsule_tokens": 13,
           "capsule_nodes": 10,
-          "capsule_edges": 5,
+          "capsule_edges": 0,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 6,
+          "relevant_raw_this_turn": 4289
         },
         {
           "turn": 2,
           "query": "billing payment process",
-          "capsule_tokens": 151,
+          "capsule_tokens": 23,
           "capsule_nodes": 10,
-          "capsule_edges": 8,
-          "new_nodes_this_turn": 9,
-          "overlap_with_previous_pct": 10.0
+          "capsule_edges": 10,
+          "new_nodes_this_turn": 8,
+          "overlap_with_previous_pct": 20.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 3,
           "query": "billing plans pricing",
-          "capsule_tokens": 150,
+          "capsule_tokens": 24,
           "capsule_nodes": 10,
-          "capsule_edges": 7,
-          "new_nodes_this_turn": 3,
-          "overlap_with_previous_pct": 70.0
+          "capsule_edges": 4,
+          "new_nodes_this_turn": 5,
+          "overlap_with_previous_pct": 50.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 4,
           "query": "invoice model fields",
-          "capsule_tokens": 184,
+          "capsule_tokens": 33,
           "capsule_nodes": 10,
-          "capsule_edges": 7,
-          "new_nodes_this_turn": 9,
-          "overlap_with_previous_pct": 10.0
+          "capsule_edges": 8,
+          "new_nodes_this_turn": 10,
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 2,
+          "relevant_raw_this_turn": 1310
         },
         {
           "turn": 5,
           "query": "billing server routes",
-          "capsule_tokens": 200,
+          "capsule_tokens": 28,
           "capsule_nodes": 10,
-          "capsule_edges": 7,
+          "capsule_edges": 6,
           "new_nodes_this_turn": 5,
-          "overlap_with_previous_pct": 50.0
+          "overlap_with_previous_pct": 50.0,
+          "relevant_files_this_turn": 2,
+          "relevant_raw_this_turn": 1134
         },
         {
           "turn": 6,
           "query": "test invoice rounding",
-          "capsule_tokens": 518,
-          "capsule_nodes": 10,
-          "capsule_edges": 11,
-          "new_nodes_this_turn": 6,
-          "overlap_with_previous_pct": 40.0
+          "capsule_tokens": 19,
+          "capsule_nodes": 0,
+          "capsule_edges": 0,
+          "new_nodes_this_turn": 0,
+          "overlap_with_previous_pct": 100.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 7,
           "query": "shared events invoice created",
-          "capsule_tokens": 153,
+          "capsule_tokens": 19,
           "capsule_nodes": 10,
           "capsule_edges": 9,
-          "new_nodes_this_turn": 8,
-          "overlap_with_previous_pct": 20.0
+          "new_nodes_this_turn": 10,
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 213
         }
       ]
     },
@@ -1641,21 +2007,26 @@
       "total_turns": 6,
       "total_nodes_in_graph": 306,
       "raw_tokens_all_files": 10587,
+      "cumulative_relevant_raw_tokens": 6426,
+      "unique_files_visited": 10,
       "raw_file_count": 22,
-      "cumulative_capsule_tokens": 1190,
-      "avg_tokens_per_turn": 198.3,
-      "savings_vs_raw_pct": 88.8,
-      "unique_nodes_visited": 32,
-      "graph_coverage_pct": 10.5,
+      "cumulative_capsule_tokens": 218,
+      "avg_tokens_per_turn": 36.3,
+      "savings_vs_raw_pct": 97.9,
+      "savings_vs_relevant_pct": 96.6,
+      "unique_nodes_visited": 33,
+      "graph_coverage_pct": 10.8,
       "turns": [
         {
           "turn": 1,
           "query": "notification SMS send",
-          "capsule_tokens": 213,
+          "capsule_tokens": 47,
           "capsule_nodes": 10,
           "capsule_edges": 10,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 3,
+          "relevant_raw_this_turn": 1771
         },
         {
           "turn": 2,
@@ -1664,43 +2035,53 @@
           "capsule_nodes": 10,
           "capsule_edges": 1,
           "new_nodes_this_turn": 9,
-          "overlap_with_previous_pct": 10.0
+          "overlap_with_previous_pct": 10.0,
+          "relevant_files_this_turn": 5,
+          "relevant_raw_this_turn": 3441
         },
         {
           "turn": 3,
           "query": "notification email SMTP",
-          "capsule_tokens": 329,
+          "capsule_tokens": 23,
           "capsule_nodes": 10,
-          "capsule_edges": 13,
-          "new_nodes_this_turn": 5,
-          "overlap_with_previous_pct": 50.0
+          "capsule_edges": 14,
+          "new_nodes_this_turn": 6,
+          "overlap_with_previous_pct": 40.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 4,
           "query": "notification templates",
-          "capsule_tokens": 212,
+          "capsule_tokens": 46,
           "capsule_nodes": 10,
           "capsule_edges": 10,
           "new_nodes_this_turn": 0,
-          "overlap_with_previous_pct": 100.0
+          "overlap_with_previous_pct": 100.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 5,
           "query": "notification server routes",
-          "capsule_tokens": 206,
+          "capsule_tokens": 38,
           "capsule_nodes": 10,
           "capsule_edges": 9,
           "new_nodes_this_turn": 8,
-          "overlap_with_previous_pct": 20.0
+          "overlap_with_previous_pct": 20.0,
+          "relevant_files_this_turn": 2,
+          "relevant_raw_this_turn": 1214
         },
         {
           "turn": 6,
           "query": "test SMS notification",
-          "capsule_tokens": 213,
+          "capsule_tokens": 47,
           "capsule_nodes": 10,
           "capsule_edges": 10,
           "new_nodes_this_turn": 0,
-          "overlap_with_previous_pct": 100.0
+          "overlap_with_previous_pct": 100.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         }
       ]
     },
@@ -1711,75 +2092,92 @@
       "total_turns": 7,
       "total_nodes_in_graph": 306,
       "raw_tokens_all_files": 10587,
+      "cumulative_relevant_raw_tokens": 2952,
+      "unique_files_visited": 6,
       "raw_file_count": 22,
-      "cumulative_capsule_tokens": 1102,
-      "avg_tokens_per_turn": 157.4,
-      "savings_vs_raw_pct": 89.6,
-      "unique_nodes_visited": 36,
-      "graph_coverage_pct": 11.8,
+      "cumulative_capsule_tokens": 215,
+      "avg_tokens_per_turn": 30.7,
+      "savings_vs_raw_pct": 98.0,
+      "savings_vs_relevant_pct": 92.7,
+      "unique_nodes_visited": 34,
+      "graph_coverage_pct": 11.1,
       "turns": [
         {
           "turn": 1,
           "query": "circuit breaker pattern",
-          "capsule_tokens": 275,
+          "capsule_tokens": 26,
           "capsule_nodes": 10,
-          "capsule_edges": 10,
+          "capsule_edges": 11,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 389
         },
         {
           "turn": 2,
           "query": "circuit breaker state open closed",
-          "capsule_tokens": 87,
+          "capsule_tokens": 28,
           "capsule_nodes": 10,
           "capsule_edges": 11,
-          "new_nodes_this_turn": 3,
-          "overlap_with_previous_pct": 70.0
+          "new_nodes_this_turn": 1,
+          "overlap_with_previous_pct": 90.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 3,
           "query": "shared retry backoff",
-          "capsule_tokens": 195,
+          "capsule_tokens": 45,
           "capsule_nodes": 10,
           "capsule_edges": 11,
-          "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "new_nodes_this_turn": 9,
+          "overlap_with_previous_pct": 10.0,
+          "relevant_files_this_turn": 2,
+          "relevant_raw_this_turn": 894
         },
         {
           "turn": 4,
           "query": "shared metrics counter",
-          "capsule_tokens": 78,
+          "capsule_tokens": 32,
           "capsule_nodes": 10,
           "capsule_edges": 12,
           "new_nodes_this_turn": 8,
-          "overlap_with_previous_pct": 20.0
+          "overlap_with_previous_pct": 20.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 5,
           "query": "shared events circuit trip",
-          "capsule_tokens": 225,
+          "capsule_tokens": 29,
           "capsule_nodes": 10,
-          "capsule_edges": 9,
-          "new_nodes_this_turn": 2,
-          "overlap_with_previous_pct": 80.0
+          "capsule_edges": 8,
+          "new_nodes_this_turn": 3,
+          "overlap_with_previous_pct": 70.0,
+          "relevant_files_this_turn": 2,
+          "relevant_raw_this_turn": 976
         },
         {
           "turn": 6,
           "query": "test circuit breaker",
-          "capsule_tokens": 154,
+          "capsule_tokens": 26,
           "capsule_nodes": 10,
           "capsule_edges": 11,
           "new_nodes_this_turn": 0,
-          "overlap_with_previous_pct": 100.0
+          "overlap_with_previous_pct": 100.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 7,
           "query": "config circuit thresholds",
-          "capsule_tokens": 88,
+          "capsule_tokens": 29,
           "capsule_nodes": 10,
           "capsule_edges": 9,
           "new_nodes_this_turn": 3,
-          "overlap_with_previous_pct": 70.0
+          "overlap_with_previous_pct": 70.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 693
         }
       ]
     },
@@ -1790,30 +2188,37 @@
       "total_turns": 6,
       "total_nodes_in_graph": 306,
       "raw_tokens_all_files": 10587,
+      "cumulative_relevant_raw_tokens": 5238,
+      "unique_files_visited": 9,
       "raw_file_count": 22,
-      "cumulative_capsule_tokens": 630,
-      "avg_tokens_per_turn": 105.0,
-      "savings_vs_raw_pct": 94.0,
+      "cumulative_capsule_tokens": 211,
+      "avg_tokens_per_turn": 35.2,
+      "savings_vs_raw_pct": 98.0,
+      "savings_vs_relevant_pct": 96.0,
       "unique_nodes_visited": 30,
       "graph_coverage_pct": 9.8,
       "turns": [
         {
           "turn": 1,
           "query": "gateway service discovery",
-          "capsule_tokens": 280,
+          "capsule_tokens": 72,
           "capsule_nodes": 10,
           "capsule_edges": 9,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 5,
+          "relevant_raw_this_turn": 3441
         },
         {
           "turn": 2,
           "query": "discovery register heartbeat",
-          "capsule_tokens": 97,
+          "capsule_tokens": 36,
           "capsule_nodes": 10,
           "capsule_edges": 15,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 514
         },
         {
           "turn": 3,
@@ -1822,16 +2227,20 @@
           "capsule_nodes": 0,
           "capsule_edges": 0,
           "new_nodes_this_turn": 0,
-          "overlap_with_previous_pct": 100.0
+          "overlap_with_previous_pct": 100.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 4,
           "query": "shared retry health check",
-          "capsule_tokens": 196,
+          "capsule_tokens": 46,
           "capsule_nodes": 10,
           "capsule_edges": 11,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 3,
+          "relevant_raw_this_turn": 1283
         },
         {
           "turn": 5,
@@ -1840,7 +2249,9 @@
           "capsule_nodes": 0,
           "capsule_edges": 0,
           "new_nodes_this_turn": 0,
-          "overlap_with_previous_pct": 100.0
+          "overlap_with_previous_pct": 100.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 6,
@@ -1849,7 +2260,9 @@
           "capsule_nodes": 0,
           "capsule_edges": 0,
           "new_nodes_this_turn": 0,
-          "overlap_with_previous_pct": 100.0
+          "overlap_with_previous_pct": 100.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         }
       ]
     },
@@ -1860,84 +2273,103 @@
       "total_turns": 8,
       "total_nodes_in_graph": 306,
       "raw_tokens_all_files": 10587,
+      "cumulative_relevant_raw_tokens": 6800,
+      "unique_files_visited": 12,
       "raw_file_count": 22,
-      "cumulative_capsule_tokens": 1404,
-      "avg_tokens_per_turn": 175.5,
-      "savings_vs_raw_pct": 86.7,
-      "unique_nodes_visited": 56,
-      "graph_coverage_pct": 18.3,
+      "cumulative_capsule_tokens": 224,
+      "avg_tokens_per_turn": 28.0,
+      "savings_vs_raw_pct": 97.9,
+      "savings_vs_relevant_pct": 96.7,
+      "unique_nodes_visited": 59,
+      "graph_coverage_pct": 19.3,
       "turns": [
         {
           "turn": 1,
           "query": "shared events pub sub",
-          "capsule_tokens": 84,
+          "capsule_tokens": 19,
           "capsule_nodes": 10,
           "capsule_edges": 1,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 3,
+          "relevant_raw_this_turn": 1683
         },
         {
           "turn": 2,
           "query": "shared retry exponential backoff",
-          "capsule_tokens": 196,
+          "capsule_tokens": 46,
           "capsule_nodes": 10,
           "capsule_edges": 11,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 3,
+          "relevant_raw_this_turn": 1283
         },
         {
           "turn": 3,
           "query": "shared logger structured",
-          "capsule_tokens": 263,
+          "capsule_tokens": 46,
           "capsule_nodes": 10,
-          "capsule_edges": 8,
-          "new_nodes_this_turn": 7,
-          "overlap_with_previous_pct": 30.0
+          "capsule_edges": 10,
+          "new_nodes_this_turn": 8,
+          "overlap_with_previous_pct": 20.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 501
         },
         {
           "turn": 4,
           "query": "billing events invoice created",
-          "capsule_tokens": 220,
+          "capsule_tokens": 19,
           "capsule_nodes": 10,
-          "capsule_edges": 6,
+          "capsule_edges": 0,
           "new_nodes_this_turn": 9,
-          "overlap_with_previous_pct": 10.0
+          "overlap_with_previous_pct": 10.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 763
         },
         {
           "turn": 5,
           "query": "notification events user registered",
-          "capsule_tokens": 214,
+          "capsule_tokens": 14,
           "capsule_nodes": 10,
-          "capsule_edges": 5,
-          "new_nodes_this_turn": 9,
-          "overlap_with_previous_pct": 10.0
+          "capsule_edges": 0,
+          "new_nodes_this_turn": 10,
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 3,
+          "relevant_raw_this_turn": 1877
         },
         {
           "turn": 6,
           "query": "test event retry",
-          "capsule_tokens": 148,
+          "capsule_tokens": 25,
           "capsule_nodes": 10,
-          "capsule_edges": 9,
+          "capsule_edges": 8,
           "new_nodes_this_turn": 4,
-          "overlap_with_previous_pct": 60.0
+          "overlap_with_previous_pct": 60.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 7,
           "query": "config retry max attempts",
-          "capsule_tokens": 136,
+          "capsule_tokens": 28,
           "capsule_nodes": 10,
-          "capsule_edges": 11,
-          "new_nodes_this_turn": 4,
-          "overlap_with_previous_pct": 60.0
+          "capsule_edges": 9,
+          "new_nodes_this_turn": 3,
+          "overlap_with_previous_pct": 70.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 693
         },
         {
           "turn": 8,
           "query": "shared metrics event count",
-          "capsule_tokens": 143,
+          "capsule_tokens": 27,
           "capsule_nodes": 10,
-          "capsule_edges": 8,
-          "new_nodes_this_turn": 3,
-          "overlap_with_previous_pct": 70.0
+          "capsule_edges": 6,
+          "new_nodes_this_turn": 5,
+          "overlap_with_previous_pct": 50.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         }
       ]
     },
@@ -1948,21 +2380,26 @@
       "total_turns": 7,
       "total_nodes_in_graph": 306,
       "raw_tokens_all_files": 10587,
+      "cumulative_relevant_raw_tokens": 6409,
+      "unique_files_visited": 11,
       "raw_file_count": 22,
-      "cumulative_capsule_tokens": 823,
-      "avg_tokens_per_turn": 117.6,
-      "savings_vs_raw_pct": 92.2,
-      "unique_nodes_visited": 37,
-      "graph_coverage_pct": 12.1,
+      "cumulative_capsule_tokens": 188,
+      "avg_tokens_per_turn": 26.9,
+      "savings_vs_raw_pct": 98.2,
+      "savings_vs_relevant_pct": 97.1,
+      "unique_nodes_visited": 42,
+      "graph_coverage_pct": 13.7,
       "turns": [
         {
           "turn": 1,
           "query": "shared tracing trace id",
-          "capsule_tokens": 65,
+          "capsule_tokens": 27,
           "capsule_nodes": 10,
           "capsule_edges": 7,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 4,
+          "relevant_raw_this_turn": 2053
         },
         {
           "turn": 2,
@@ -1971,52 +2408,64 @@
           "capsule_nodes": 0,
           "capsule_edges": 0,
           "new_nodes_this_turn": 0,
-          "overlap_with_previous_pct": 100.0
+          "overlap_with_previous_pct": 100.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 3,
           "query": "auth server tracing",
-          "capsule_tokens": 200,
+          "capsule_tokens": 17,
           "capsule_nodes": 10,
-          "capsule_edges": 3,
+          "capsule_edges": 1,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 2,
+          "relevant_raw_this_turn": 1389
         },
         {
           "turn": 4,
           "query": "billing server tracing",
-          "capsule_tokens": 200,
+          "capsule_tokens": 28,
           "capsule_nodes": 10,
-          "capsule_edges": 7,
-          "new_nodes_this_turn": 6,
-          "overlap_with_previous_pct": 40.0
+          "capsule_edges": 6,
+          "new_nodes_this_turn": 9,
+          "overlap_with_previous_pct": 10.0,
+          "relevant_files_this_turn": 3,
+          "relevant_raw_this_turn": 1984
         },
         {
           "turn": 5,
           "query": "shared logger trace context",
-          "capsule_tokens": 137,
+          "capsule_tokens": 41,
           "capsule_nodes": 10,
-          "capsule_edges": 11,
-          "new_nodes_this_turn": 2,
-          "overlap_with_previous_pct": 80.0
+          "capsule_edges": 8,
+          "new_nodes_this_turn": 4,
+          "overlap_with_previous_pct": 60.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 594
         },
         {
           "turn": 6,
           "query": "test tracing propagation",
-          "capsule_tokens": 126,
+          "capsule_tokens": 26,
           "capsule_nodes": 10,
-          "capsule_edges": 9,
-          "new_nodes_this_turn": 6,
-          "overlap_with_previous_pct": 40.0
+          "capsule_edges": 11,
+          "new_nodes_this_turn": 7,
+          "overlap_with_previous_pct": 30.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 7,
           "query": "shared metrics trace duration",
-          "capsule_tokens": 76,
+          "capsule_tokens": 30,
           "capsule_nodes": 10,
           "capsule_edges": 4,
-          "new_nodes_this_turn": 3,
-          "overlap_with_previous_pct": 70.0
+          "new_nodes_this_turn": 2,
+          "overlap_with_previous_pct": 80.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 389
         }
       ]
     },
@@ -2027,87 +2476,106 @@
       "total_turns": 8,
       "total_nodes_in_graph": 306,
       "raw_tokens_all_files": 10587,
+      "cumulative_relevant_raw_tokens": 6608,
+      "unique_files_visited": 10,
       "raw_file_count": 22,
-      "cumulative_capsule_tokens": 1412,
-      "avg_tokens_per_turn": 176.5,
-      "savings_vs_raw_pct": 86.7,
-      "unique_nodes_visited": 37,
-      "graph_coverage_pct": 12.1,
+      "cumulative_capsule_tokens": 192,
+      "avg_tokens_per_turn": 24.0,
+      "savings_vs_raw_pct": 98.2,
+      "savings_vs_relevant_pct": 97.1,
+      "unique_nodes_visited": 35,
+      "graph_coverage_pct": 11.4,
       "turns": [
         {
           "turn": 1,
           "query": "shared metrics counter gauge",
-          "capsule_tokens": 85,
+          "capsule_tokens": 39,
           "capsule_nodes": 10,
           "capsule_edges": 14,
           "new_nodes_this_turn": 10,
-          "overlap_with_previous_pct": 0.0
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 2,
+          "relevant_raw_this_turn": 983
         },
         {
           "turn": 2,
           "query": "gateway metrics requests",
-          "capsule_tokens": 213,
+          "capsule_tokens": 22,
           "capsule_nodes": 10,
-          "capsule_edges": 8,
+          "capsule_edges": 10,
           "new_nodes_this_turn": 4,
-          "overlap_with_previous_pct": 60.0
+          "overlap_with_previous_pct": 60.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 3,
           "query": "auth metrics login count",
-          "capsule_tokens": 69,
+          "capsule_tokens": 14,
           "capsule_nodes": 10,
           "capsule_edges": 0,
-          "new_nodes_this_turn": 9,
-          "overlap_with_previous_pct": 10.0
+          "new_nodes_this_turn": 10,
+          "overlap_with_previous_pct": 0.0,
+          "relevant_files_this_turn": 3,
+          "relevant_raw_this_turn": 2169
         },
         {
           "turn": 4,
           "query": "billing metrics revenue",
-          "capsule_tokens": 207,
+          "capsule_tokens": 22,
           "capsule_nodes": 10,
-          "capsule_edges": 8,
-          "new_nodes_this_turn": 6,
-          "overlap_with_previous_pct": 40.0
+          "capsule_edges": 1,
+          "new_nodes_this_turn": 7,
+          "overlap_with_previous_pct": 30.0,
+          "relevant_files_this_turn": 3,
+          "relevant_raw_this_turn": 2233
         },
         {
           "turn": 5,
           "query": "shared metrics endpoint",
-          "capsule_tokens": 213,
+          "capsule_tokens": 22,
           "capsule_nodes": 10,
-          "capsule_edges": 8,
+          "capsule_edges": 10,
           "new_nodes_this_turn": 0,
-          "overlap_with_previous_pct": 100.0
+          "overlap_with_previous_pct": 100.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 6,
           "query": "test metrics output",
-          "capsule_tokens": 213,
+          "capsule_tokens": 22,
           "capsule_nodes": 10,
-          "capsule_edges": 8,
+          "capsule_edges": 10,
           "new_nodes_this_turn": 0,
-          "overlap_with_previous_pct": 100.0
+          "overlap_with_previous_pct": 100.0,
+          "relevant_files_this_turn": 0,
+          "relevant_raw_this_turn": 0
         },
         {
           "turn": 7,
           "query": "config metrics enabled",
-          "capsule_tokens": 195,
+          "capsule_tokens": 29,
           "capsule_nodes": 10,
-          "capsule_edges": 10,
-          "new_nodes_this_turn": 5,
-          "overlap_with_previous_pct": 50.0
+          "capsule_edges": 7,
+          "new_nodes_this_turn": 3,
+          "overlap_with_previous_pct": 70.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 693
         },
         {
           "turn": 8,
           "query": "notification metrics sent",
-          "capsule_tokens": 217,
+          "capsule_tokens": 22,
           "capsule_nodes": 10,
-          "capsule_edges": 7,
-          "new_nodes_this_turn": 3,
-          "overlap_with_previous_pct": 70.0
+          "capsule_edges": 8,
+          "new_nodes_this_turn": 1,
+          "overlap_with_previous_pct": 90.0,
+          "relevant_files_this_turn": 1,
+          "relevant_raw_this_turn": 530
         }
       ]
     }
   ],
-  "ollama": true
+  "ollama": false
 }

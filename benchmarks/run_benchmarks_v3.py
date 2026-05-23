@@ -88,6 +88,29 @@ def get_raw_tokens(project: str) -> tuple[int, int]:
     return total, count
 
 
+def raw_tokens_for_files(project: str, file_paths: set[str]) -> int:
+    """Count raw tokens of only the given files (realistic baseline: on-demand file loading)."""
+    proj_dir = PROJECTS_DIR / project
+    total = 0
+    for fp_rel in file_paths:
+        fpath = proj_dir / (fp_rel or "")
+        if fpath.is_file():
+            try:
+                total += count_tokens(fpath.read_text(encoding="utf-8", errors="replace"))
+            except Exception:
+                pass
+    return total
+
+
+def relevant_file_paths(nodes) -> set[str]:
+    """Extract unique file paths from a set of graph nodes."""
+    paths = set()
+    for n in nodes:
+        if n.path:
+            paths.add(n.path)
+    return paths
+
+
 # ─── 25 SINGLE-SHOT QUERIES ────────────────────────────────────────────────
 
 SINGLE_SHOT_QUERIES = {
@@ -432,6 +455,9 @@ def run_single_shot(storage, raw_total, raw_count, project: str, query: str) -> 
     capsule_tokens = count_tokens(capsule)
     nodes, edges = generate_context_subgraph(storage, query, max_nodes=max_nodes)
 
+    relevant_files = relevant_file_paths(nodes)
+    relevant_raw = raw_tokens_for_files(project, relevant_files)
+
     return {
         "type": "single_shot",
         "project": project,
@@ -440,8 +466,11 @@ def run_single_shot(storage, raw_total, raw_count, project: str, query: str) -> 
         "capsule_edges": len(edges),
         "capsule_tokens": capsule_tokens,
         "raw_tokens": raw_total,
+        "relevant_raw_tokens": relevant_raw,
+        "relevant_files": len(relevant_files),
         "raw_file_count": raw_count,
         "savings_pct": round((1 - capsule_tokens / max(raw_total, 1)) * 100, 1),
+        "savings_vs_relevant_pct": round((1 - capsule_tokens / max(relevant_raw, 1)) * 100, 1) if relevant_raw else 0.0,
     }
 
 
@@ -454,6 +483,8 @@ def run_multi_turn(storage, raw_total, raw_count, project: str, scenario: dict) 
     turns = []
     cumulative_capsule_tokens = 0
     seen_nodes: set[str] = set()
+    seen_files: set[str] = set()
+    cumulative_relevant_raw = 0
 
     for i, query in enumerate(scenario["turns"]):
         max_nodes = 10
@@ -469,6 +500,12 @@ def run_multi_turn(storage, raw_total, raw_count, project: str, scenario: dict) 
 
         cumulative_capsule_tokens += cap_tokens
 
+        # Track relevant files (on-demand loading simulation)
+        turn_files = relevant_file_paths(nodes)
+        new_files = turn_files - seen_files
+        seen_files.update(turn_files)
+        cumulative_relevant_raw += raw_tokens_for_files(project, new_files)
+
         turns.append({
             "turn": i + 1,
             "query": query,
@@ -477,11 +514,14 @@ def run_multi_turn(storage, raw_total, raw_count, project: str, scenario: dict) 
             "capsule_edges": len(edges),
             "new_nodes_this_turn": len(new_nodes),
             "overlap_with_previous_pct": overlap_pct,
+            "relevant_files_this_turn": len(new_files),
+            "relevant_raw_this_turn": raw_tokens_for_files(project, new_files),
         })
 
     total_turns = len(scenario["turns"])
     avg_tokens_per_turn = round(cumulative_capsule_tokens / total_turns, 1)
     savings_vs_raw = round((1 - cumulative_capsule_tokens / max(raw_total, 1)) * 100, 1)
+    savings_vs_relevant = round((1 - cumulative_capsule_tokens / max(cumulative_relevant_raw, 1)) * 100, 1) if cumulative_relevant_raw else 0.0
     unique_nodes_total = len(seen_nodes)
     node_coverage_pct = round(unique_nodes_total / max(total_graph_nodes, 1) * 100, 1)
 
@@ -492,10 +532,13 @@ def run_multi_turn(storage, raw_total, raw_count, project: str, scenario: dict) 
         "total_turns": total_turns,
         "total_nodes_in_graph": total_graph_nodes,
         "raw_tokens_all_files": raw_total,
+        "cumulative_relevant_raw_tokens": cumulative_relevant_raw,
+        "unique_files_visited": len(seen_files),
         "raw_file_count": raw_count,
         "cumulative_capsule_tokens": cumulative_capsule_tokens,
         "avg_tokens_per_turn": avg_tokens_per_turn,
         "savings_vs_raw_pct": savings_vs_raw,
+        "savings_vs_relevant_pct": savings_vs_relevant,
         "unique_nodes_visited": unique_nodes_total,
         "graph_coverage_pct": node_coverage_pct,
         "turns": turns,
@@ -554,9 +597,10 @@ def run_all(only_single: bool, only_multiturn: bool, project_filter: str | None,
 
         storage.close()
 
-    with open(RESULTS_DIR / "benchmark_results_v3.json", "w") as f:
+    fname = f"benchmark_results_v3{'_ollama' if use_ollama else ''}.json"
+    with open(RESULTS_DIR / fname, "w") as f:
         json.dump(output, f, indent=2)
-    print(f"\nResults saved to {RESULTS_DIR / 'benchmark_results_v3.json'}")
+    print(f"\nResults saved to {RESULTS_DIR / fname}")
     return output
 
 
@@ -570,36 +614,48 @@ def print_summary(output: dict):
 
     if ss:
         print(f"\n  SINGLE-SHOT (25 cases)")
-        print(f"  {'Project':<12} {'Query':<38} {'RawTok':<8} {'CapTok':<8} {'Saved%':<8}")
-        print(f"  {'-'*12} {'-'*38} {'-'*8} {'-'*8} {'-'*8}")
+        print(f"  {'Project':<12} {'Query':<38} {'RelRaw':<8} {'CapTok':<8} {'SavedvsRelevant':<16} {'SavedvsAll':<12}")
+        print(f"  {'-'*12} {'-'*38} {'-'*8} {'-'*8} {'-'*16} {'-'*12}")
         for r in ss:
-            print(f"  {r['project']:<12} {r['query'][:36]:<38} {r['raw_tokens']:<8} {r['capsule_tokens']:<8} {r['savings_pct']:<7}%")
+            rel = r.get("relevant_raw_tokens", r["raw_tokens"])
+            sv_rel = r.get("savings_vs_relevant_pct", r["savings_pct"])
+            rel_str = str(rel) if rel else "N/A"
+            sv_rel_str = f"{sv_rel}%" if rel else "N/A"
+            print(f"  {r['project']:<12} {r['query'][:36]:<38} {rel_str:<8} {r['capsule_tokens']:<8} {sv_rel_str:<15} {r['savings_pct']:<11}%")
         avg_ss = round(sum(r["savings_pct"] for r in ss) / len(ss), 1)
+        avg_ss_rel = round(sum(r.get("savings_vs_relevant_pct", r["savings_pct"]) for r in ss) / len(ss), 1)
         avg_tok = round(sum(r["capsule_tokens"] for r in ss) / len(ss), 1)
         avg_raw = round(sum(r["raw_tokens"] for r in ss) / len(ss), 1)
-        print(f"  {'-'*90}")
-        print(f"  Average: {avg_raw} raw -> {avg_tok} capsule tok/case, {avg_ss}% savings across {len(ss)} queries")
-        print(f"  {'-'*90}")
+        avg_rel = round(sum(r.get("relevant_raw_tokens", r["raw_tokens"]) for r in ss) / len(ss), 1)
+        print(f"  {'-'*100}")
+        print(f"  Average: {avg_rel} relevant raw -> {avg_tok} capsule tok/case, {avg_ss_rel}% vs relevant, {avg_ss}% vs all files")
+        print(f"  {'-'*100}")
 
     if mt:
         print(f"\n  MULTI-TURN (25 scenarios, 5-10 turns each)")
-        print(f"  {'Project':<12} {'Scenario':<35} {'Turns':<6} {'RawTok':<8} {'CapTok':<8} {'AvgTok':<8} {'Saved%':<8} {'Cover%':<8}")
-        print(f"  {'-'*12} {'-'*35} {'-'*6} {'-'*8} {'-'*8} {'-'*8} {'-'*8} {'-'*8}")
+        print(f"  {'Project':<12} {'Scenario':<35} {'Turns':<6} {'RelRaw':<8} {'CapTok':<8} {'AvgTok':<8} {'SavedRel':<10} {'SavedAll':<10} {'Cover%':<8}")
+        print(f"  {'-'*12} {'-'*35} {'-'*6} {'-'*8} {'-'*8} {'-'*8} {'-'*10} {'-'*10} {'-'*8}")
         for r in mt:
-            print(f"  {r['project']:<12} {r['scenario'][:33]:<35} {r['total_turns']:<6} {r['raw_tokens_all_files']:<8} {r['cumulative_capsule_tokens']:<8} {r['avg_tokens_per_turn']:<8} {r['savings_vs_raw_pct']:<7}% {r['graph_coverage_pct']:<7}%")
+            rel = r.get("cumulative_relevant_raw_tokens", r["raw_tokens_all_files"])
+            sv_rel = r.get("savings_vs_relevant_pct", r["savings_vs_raw_pct"])
+            print(f"  {r['project']:<12} {r['scenario'][:33]:<35} {r['total_turns']:<6} {rel:<8} {r['cumulative_capsule_tokens']:<8} {r['avg_tokens_per_turn']:<8} {sv_rel:<9}% {r['savings_vs_raw_pct']:<9}% {r['graph_coverage_pct']:<7}%")
         avg_mt_savings = round(sum(r["savings_vs_raw_pct"] for r in mt) / len(mt), 1)
+        avg_mt_savings_rel = round(sum(r.get("savings_vs_relevant_pct", r["savings_vs_raw_pct"]) for r in mt) / len(mt), 1)
         avg_mt_tok = round(sum(r["avg_tokens_per_turn"] for r in mt) / len(mt), 1)
         avg_mt_total = round(sum(r["cumulative_capsule_tokens"] for r in mt) / len(mt), 1)
         avg_mt_coverage = round(sum(r["graph_coverage_pct"] for r in mt) / len(mt), 1)
+        avg_rel = round(sum(r.get("cumulative_relevant_raw_tokens", r["raw_tokens_all_files"]) for r in mt) / len(mt), 1)
         avg_raw = round(sum(r["raw_tokens_all_files"] for r in mt) / len(mt), 1)
         avg_turns = round(sum(r["total_turns"] for r in mt) / len(mt), 1)
         total_capsule_all = sum(r["cumulative_capsule_tokens"] for r in mt)
         total_raw_all = sum(r["raw_tokens_all_files"] for r in mt)
+        total_rel_all = sum(r.get("cumulative_relevant_raw_tokens", r["raw_tokens_all_files"]) for r in mt)
         overall_savings = round((1 - total_capsule_all / max(total_raw_all, 1)) * 100, 1)
-        print(f"  {'-'*100}")
-        print(f"  Average ({len(mt)} scenarios, {avg_turns} turns/ea): {avg_raw} raw -> {avg_mt_total} capsule tot, {avg_mt_tok} tok/turn, {avg_mt_savings}% saved, {avg_mt_coverage}% graph covered")
-        print(f"  Overall: {total_capsule_all} capsule tokens vs {total_raw_all} raw tokens = {overall_savings}% savings")
-        print(f"  {'-'*100}")
+        overall_savings_rel = round((1 - total_capsule_all / max(total_rel_all, 1)) * 100, 1)
+        print(f"  {'-'*110}")
+        print(f"  Average ({len(mt)} scenarios, {avg_turns} turns/ea): {avg_rel} relevant raw -> {avg_mt_total} capsule tot, {avg_mt_tok} tok/turn, {avg_mt_savings_rel}% vs relevant, {avg_mt_savings}% vs all, {avg_mt_coverage}% graph covered")
+        print(f"  Overall: {total_capsule_all} capsule vs {total_rel_all} relevant raw = {overall_savings_rel}% savings (vs {total_raw_all} all raw = {overall_savings}%)")
+        print(f"  {'-'*110}")
 
     total_cases = len(ss) + len(mt)
     print(f"\n  Total test cases: {total_cases} ({len(ss)} single + {len(mt)} multi-turn)")

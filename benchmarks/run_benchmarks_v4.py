@@ -32,6 +32,24 @@ def get_raw_tokens():
                 pass
     return total, count
 
+def raw_tokens_for_files(file_paths):
+    total = 0
+    for fp_rel in file_paths:
+        fpath = PROJ_DIR / (fp_rel or "")
+        if fpath.is_file():
+            try:
+                total += count_tokens(fpath.read_text(encoding="utf-8", errors="replace"))
+            except Exception:
+                pass
+    return total
+
+def relevant_file_paths(nodes):
+    paths = set()
+    for n in nodes:
+        if n.path:
+            paths.add(n.path)
+    return paths
+
 SINGLE_QUERIES = [
     "order creation workflow payment",
     "user authentication login",
@@ -205,15 +223,21 @@ def run_single_shot(storage, raw_total, raw_count, label, enrich_time):
         cap_tok = count_tokens(capsule)
         nodes, edges = generate_context_subgraph(storage, query, max_nodes=10)
         savings = round((1 - cap_tok / max(raw_total, 1)) * 100, 1)
+        relevant_files = relevant_file_paths(nodes)
+        relevant_raw = raw_tokens_for_files(relevant_files)
+        sv_rel = round((1 - cap_tok / max(relevant_raw, 1)) * 100, 1) if relevant_raw else 0.0
         results.append({
             "label": label, "query": query,
             "capsule_tokens": cap_tok, "capsule_nodes": len(nodes),
             "capsule_edges": len(edges), "savings_pct": savings,
+            "savings_vs_relevant_pct": sv_rel,
+            "relevant_raw_tokens": relevant_raw,
             "raw_tokens": raw_total,
         })
     avg = round(sum(r["capsule_tokens"] for r in results) / len(results), 1)
     avg_sav = round(sum(r["savings_pct"] for r in results) / len(results), 1)
-    print(f"    Avg: {raw_total} raw -> {avg} capsule tok/case, {avg_sav}% saved")
+    avg_rel = round(sum(r.get("savings_vs_relevant_pct", 0) for r in results) / len(results), 1)
+    print(f"    Avg: {raw_total} raw ({avg_rel}% vs relevant) -> {avg} capsule tok/case, {avg_sav}% vs all")
     return results
 
 def run_multi_turn(storage, raw_total, raw_count, label):
@@ -223,6 +247,8 @@ def run_multi_turn(storage, raw_total, raw_count, label):
         turns = []
         cumulative = 0
         seen = set()
+        seen_files = set()
+        cumulative_relevant_raw = 0
         for i, q in enumerate(scenario["turns"]):
             capsule = render_capsule(storage, q, max_nodes=10)
             tok = count_tokens(capsule)
@@ -232,17 +258,25 @@ def run_multi_turn(storage, raw_total, raw_count, label):
             overlap = round((1 - len(new) / max(len(ids), 1)) * 100, 1) if ids else 100.0
             seen.update(ids)
             cumulative += tok
+            turn_files = relevant_file_paths(nodes)
+            new_files = turn_files - seen_files
+            seen_files.update(turn_files)
+            cumulative_relevant_raw += raw_tokens_for_files(new_files)
             turns.append({
                 "turn": i+1, "query": q, "capsule_tokens": tok,
                 "capsule_nodes": len(nodes), "new_nodes": len(new), "overlap_pct": overlap,
+                "relevant_raw_this_turn": raw_tokens_for_files(new_files),
             })
         savings = round((1 - cumulative / max(raw_total, 1)) * 100, 1)
+        sv_rel = round((1 - cumulative / max(cumulative_relevant_raw, 1)) * 100, 1) if cumulative_relevant_raw else 0.0
         results.append({
             "label": label, "scenario": scenario["name"],
             "total_turns": len(scenario["turns"]),
             "cumulative_tokens": cumulative,
             "avg_tokens_per_turn": round(cumulative / len(scenario["turns"]), 1),
             "savings_vs_raw_pct": savings,
+            "savings_vs_relevant_pct": sv_rel,
+            "cumulative_relevant_raw_tokens": cumulative_relevant_raw,
             "unique_nodes_visited": len(seen),
             "graph_coverage_pct": round(len(seen) / 230 * 100, 1),
             "raw_tokens_all_files": raw_total,
@@ -250,7 +284,8 @@ def run_multi_turn(storage, raw_total, raw_count, label):
         })
     avg_tot = round(sum(r["cumulative_tokens"] for r in results) / len(results), 1)
     avg_sav = round(sum(r["savings_vs_raw_pct"] for r in results) / len(results), 1)
-    print(f"    Avg: {raw_total} raw -> {avg_tot} capsule tot tok/scenario, {avg_sav}% saved")
+    avg_rel = round(sum(r.get("savings_vs_relevant_pct", 0) for r in results) / len(results), 1)
+    print(f"    Avg: {raw_total} raw ({avg_rel}% vs relevant) -> {avg_tot} capsule tot tok/scenario, {avg_sav}% vs all")
     return results
 
 def main():
@@ -308,28 +343,34 @@ def main():
     print(f"\nResults saved to {RESULTS_DIR / 'benchmark_results_v4.json'}")
 
     # Print comparison
-    print(f"\n{'='*80}")
+    print(f"\n{'='*95}")
     print(f"  complex_app — WITH vs WITHOUT OLLAMA")
-    print(f"{'='*80}")
-    print(f"  {'Metric':<35} {'Raw':<15} {'Base':<15} {'Ollama':<15}")
-    print(f"  {'-'*35} {'-'*15} {'-'*15} {'-'*15}")
+    print(f"{'='*95}")
+    print(f"  {'Metric':<35} {'RawAll':<12} {'Relevant':<12} {'Base':<12} {'Ollama':<12}")
+    print(f"  {'-'*35} {'-'*12} {'-'*12} {'-'*12} {'-'*12}")
     raw_total, _ = get_raw_tokens()
     b_ss_avg = round(sum(r["capsule_tokens"] for r in ss_base) / len(ss_base), 1)
     o_ss_avg = round(sum(r["capsule_tokens"] for r in ss_olla) / len(ss_olla), 1)
     b_ss_sav = round(sum(r["savings_pct"] for r in ss_base) / len(ss_base), 1)
     o_ss_sav = round(sum(r["savings_pct"] for r in ss_olla) / len(ss_olla), 1)
+    b_ss_rel = round(sum(r.get("savings_vs_relevant_pct", 0) for r in ss_base) / len(ss_base), 1)
+    o_ss_rel = round(sum(r.get("savings_vs_relevant_pct", 0) for r in ss_olla) / len(ss_olla), 1)
     b_mt_avg = round(sum(r["cumulative_tokens"] for r in mt_base) / len(mt_base), 1)
     o_mt_avg = round(sum(r["cumulative_tokens"] for r in mt_olla) / len(mt_olla), 1)
     b_mt_sav = round(sum(r["savings_vs_raw_pct"] for r in mt_base) / len(mt_base), 1)
     o_mt_sav = round(sum(r["savings_vs_raw_pct"] for r in mt_olla) / len(mt_olla), 1)
-    print(f"  {'Raw tokens total':<35} {raw_total:<15} {'-':<15} {'-':<15}")
-    print(f"  {'Single-shot avg tok':<35} {raw_total:<15} {b_ss_avg:<15} {o_ss_avg:<15}")
-    print(f"  {'Single-shot avg savings':<35} {'-':<15} {b_ss_sav:<14}% {o_ss_sav:<14}%")
-    print(f"  {'Multi-turn avg tot tok':<35} {raw_total:<15} {b_mt_avg:<15} {o_mt_avg:<15}")
-    print(f"  {'Multi-turn avg savings':<35} {'-':<15} {b_mt_sav:<14}% {o_mt_sav:<14}%")
-    print(f"  {'Build time':<35} {'-':<15} {stats_base['build_time_ms']:<14}ms {stats_ola['build_time_ms']:<14}ms")
-    print(f"  {'Graph nodes':<35} {'-':<15} {stats_base.get('total_nodes',0):<15} {stats_ola.get('total_nodes',0):<15}")
-    print(f"  {'Graph edges':<35} {'-':<15} {stats_base.get('total_edges',0):<15} {stats_ola.get('total_edges',0):<15}")
+    b_mt_rel = round(sum(r.get("savings_vs_relevant_pct", 0) for r in mt_base) / len(mt_base), 1)
+    o_mt_rel = round(sum(r.get("savings_vs_relevant_pct", 0) for r in mt_olla) / len(mt_olla), 1)
+    print(f"  {'Raw tokens total':<35} {raw_total:<12} {'-':<12} {'-':<12} {'-':<12}")
+    print(f"  {'SS avg capsule tok':<35} {'-':<12} {'-':<12} {b_ss_avg:<12} {o_ss_avg:<12}")
+    print(f"  {'SS savings vs all':<35} {'-':<12} {'-':<12} {b_ss_sav:<11}% {o_ss_sav:<11}%")
+    print(f"  {'SS savings vs relevant':<35} {'-':<12} {'-':<12} {b_ss_rel:<11}% {o_ss_rel:<11}%")
+    print(f"  {'MT avg cumul capsule':<35} {'-':<12} {'-':<12} {b_mt_avg:<12} {o_mt_avg:<12}")
+    print(f"  {'MT savings vs all':<35} {'-':<12} {'-':<12} {b_mt_sav:<11}% {o_mt_sav:<11}%")
+    print(f"  {'MT savings vs relevant':<35} {'-':<12} {'-':<12} {b_mt_rel:<11}% {o_mt_rel:<11}%")
+    print(f"  {'Build time':<35} {'-':<12} {'-':<12} {stats_base['build_time_ms']:<11}ms {stats_ola['build_time_ms']:<11}ms")
+    print(f"  {'Graph nodes':<35} {'-':<12} {'-':<12} {stats_base.get('total_nodes',0):<12} {stats_ola.get('total_nodes',0):<12}")
+    print(f"  {'Graph edges':<35} {'-':<12} {'-':<12} {stats_base.get('total_edges',0):<12} {stats_ola.get('total_edges',0):<12}")
 
 if __name__ == "__main__":
     main()
