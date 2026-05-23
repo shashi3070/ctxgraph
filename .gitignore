@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.ctxgraph/
+.pytest_cache/
+.env
+*.log
+benchmarks/results/
+benchmarks/projects/*/.ctxgraph/
+*.db
