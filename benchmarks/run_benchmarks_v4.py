@@ -213,7 +213,7 @@ def run_single_shot(storage, raw_total, raw_count, label, enrich_time):
         })
     avg = round(sum(r["capsule_tokens"] for r in results) / len(results), 1)
     avg_sav = round(sum(r["savings_pct"] for r in results) / len(results), 1)
-    print(f"    Avg: {avg} tok/case, {avg_sav}% saved")
+    print(f"    Avg: {raw_total} raw -> {avg} capsule tok/case, {avg_sav}% saved")
     return results
 
 def run_multi_turn(storage, raw_total, raw_count, label):
@@ -250,7 +250,7 @@ def run_multi_turn(storage, raw_total, raw_count, label):
         })
     avg_tot = round(sum(r["cumulative_tokens"] for r in results) / len(results), 1)
     avg_sav = round(sum(r["savings_vs_raw_pct"] for r in results) / len(results), 1)
-    print(f"    Avg: {avg_tot} tot tok/scenario, {avg_sav}% saved")
+    print(f"    Avg: {raw_total} raw -> {avg_tot} capsule tot tok/scenario, {avg_sav}% saved")
     return results
 
 def main():
@@ -308,11 +308,12 @@ def main():
     print(f"\nResults saved to {RESULTS_DIR / 'benchmark_results_v4.json'}")
 
     # Print comparison
-    print(f"\n{'='*70}")
+    print(f"\n{'='*80}")
     print(f"  complex_app — WITH vs WITHOUT OLLAMA")
-    print(f"{'='*70}")
-    print(f"  {'Metric':<35} {'Base':<15} {'Ollama':<15}")
-    print(f"  {'-'*35} {'-'*15} {'-'*15}")
+    print(f"{'='*80}")
+    print(f"  {'Metric':<35} {'Raw':<15} {'Base':<15} {'Ollama':<15}")
+    print(f"  {'-'*35} {'-'*15} {'-'*15} {'-'*15}")
+    raw_total, _ = get_raw_tokens()
     b_ss_avg = round(sum(r["capsule_tokens"] for r in ss_base) / len(ss_base), 1)
     o_ss_avg = round(sum(r["capsule_tokens"] for r in ss_olla) / len(ss_olla), 1)
     b_ss_sav = round(sum(r["savings_pct"] for r in ss_base) / len(ss_base), 1)
@@ -321,13 +322,14 @@ def main():
     o_mt_avg = round(sum(r["cumulative_tokens"] for r in mt_olla) / len(mt_olla), 1)
     b_mt_sav = round(sum(r["savings_vs_raw_pct"] for r in mt_base) / len(mt_base), 1)
     o_mt_sav = round(sum(r["savings_vs_raw_pct"] for r in mt_olla) / len(mt_olla), 1)
-    print(f"  {'Single-shot avg tok':<35} {b_ss_avg:<15} {o_ss_avg:<15}")
-    print(f"  {'Single-shot avg savings':<35} {b_ss_sav:<14}% {o_ss_sav:<14}%")
-    print(f"  {'Multi-turn avg tot tok':<35} {b_mt_avg:<15} {o_mt_avg:<15}")
-    print(f"  {'Multi-turn avg savings':<35} {b_mt_sav:<14}% {o_mt_sav:<14}%")
-    print(f"  {'Build time':<35} {stats_base['build_time_ms']:<14}ms {stats_ola['build_time_ms']:<14}ms")
-    print(f"  {'Graph nodes':<35} {stats_base.get('total_nodes',0):<15} {stats_ola.get('total_nodes',0):<15}")
-    print(f"  {'Graph edges':<35} {stats_base.get('total_edges',0):<15} {stats_ola.get('total_edges',0):<15}")
+    print(f"  {'Raw tokens total':<35} {raw_total:<15} {'-':<15} {'-':<15}")
+    print(f"  {'Single-shot avg tok':<35} {raw_total:<15} {b_ss_avg:<15} {o_ss_avg:<15}")
+    print(f"  {'Single-shot avg savings':<35} {'-':<15} {b_ss_sav:<14}% {o_ss_sav:<14}%")
+    print(f"  {'Multi-turn avg tot tok':<35} {raw_total:<15} {b_mt_avg:<15} {o_mt_avg:<15}")
+    print(f"  {'Multi-turn avg savings':<35} {'-':<15} {b_mt_sav:<14}% {o_mt_sav:<14}%")
+    print(f"  {'Build time':<35} {'-':<15} {stats_base['build_time_ms']:<14}ms {stats_ola['build_time_ms']:<14}ms")
+    print(f"  {'Graph nodes':<35} {'-':<15} {stats_base.get('total_nodes',0):<15} {stats_ola.get('total_nodes',0):<15}")
+    print(f"  {'Graph edges':<35} {'-':<15} {stats_base.get('total_edges',0):<15} {stats_ola.get('total_edges',0):<15}")
 
 if __name__ == "__main__":
     main()

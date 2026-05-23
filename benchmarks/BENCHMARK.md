@@ -68,21 +68,59 @@ Performance of on-demand code summarization via Ollama (local GPU).
 
 ## How to Re-run
 
+### Normal (no enrichment)
 ```bash
-# Run all benchmarks
-python benchmarks/run_benchmarks.py
+# Run all benchmarks (no LLM enrichment, AST-only summaries)
+python benchmarks/run_benchmarks_v3.py
 
 # Run a single project
-python benchmarks/run_benchmarks.py --project tiny_app
+python benchmarks/run_benchmarks_v3.py --project tiny_app
 
-# Run with specific mode
-python benchmarks/run_benchmarks.py --project web_api --mode deep
-
-# Test Ollama summarization (requires running Ollama)
-python benchmarks/run_benchmarks.py --ollama
-
-# Raw JSON results saved to:
-#   benchmarks/results/benchmark_results.json
+# Single-shot or multi-turn only
+python benchmarks/run_benchmarks_v3.py --single-only
+python benchmarks/run_benchmarks_v3.py --multiturn-only
 ```
 
-Results are cached per query in `benchmarks/results/*.db`. Delete `.db` files to force a fresh build.
+### With Ollama (local, requires Ollama running at http://localhost:11434)
+```bash
+# Enrich file summaries using qwen2.5-coder:7b
+python benchmarks/run_benchmarks_v3.py --ollama
+
+# Run a specific project with Ollama
+python benchmarks/run_benchmarks_v3.py --project web_api --ollama
+```
+
+### With Claude (requires ANTHROPIC_API_KEY)
+```bash
+# Configure Claude provider (via env vars)
+$env:CTXGRAPH_PROVIDER="claude"
+$env:CTXGRAPH_MODEL="claude-sonnet-4-20250514"
+$env:ANTHROPIC_API_KEY="sk-ant-..."
+
+# Then run benchmarks (Ollama flag uses configured provider)
+python benchmarks/run_benchmarks_v3.py --ollama
+```
+
+### Switching Providers (no code changes)
+Set these environment variables to switch without modifying files:
+
+| Variable | Example | Purpose |
+|----------|---------|---------|
+| `CTXGRAPH_PROVIDER` | `claude`, `openai`, `ollama` | Select provider |
+| `CTXGRAPH_MODEL` | `claude-sonnet-4-20250514`, `gpt-4o` | Override model |
+| `CTXGRAPH_ENDPOINT` | `http://custom:11434` | Override API endpoint |
+| `ANTHROPIC_API_KEY` | `sk-ant-...` | Claude API key |
+| `OPENAI_API_KEY` | `sk-...` | OpenAI API key |
+
+Or use a `.ctxgraph/config.toml` in the project root:
+```toml
+[ai]
+provider = "claude"
+model = "claude-sonnet-4-20250514"
+api_key = "sk-ant-..."
+temperature = 0.1
+```
+
+## Results
+
+Raw JSON results saved to `benchmarks/results/`. Delete `.db` files in that directory to force a fresh build.

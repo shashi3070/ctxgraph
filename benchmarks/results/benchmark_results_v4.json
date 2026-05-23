@@ -2,11 +2,11 @@
   "project": "complex_app",
   "files": 35,
   "raw_tokens": 7679,
-  "build_time_ms": 179.71,
-  "build_time_ollama_ms": 177.24,
-  "ollama_enrich_time_s": 129.0,
+  "build_time_ms": 236.68,
+  "build_time_ollama_ms": 187.33,
+  "ollama_enrich_time_s": 122.0,
   "ollama_enriched_files": 26,
-  "ollama_time_per_file_s": 5.0,
+  "ollama_time_per_file_s": 4.7,
   "total_nodes": 230,
   "total_edges": 422,
   "single_shot": {
@@ -122,19 +122,19 @@
       {
         "label": "base",
         "query": "cart checkout coupon discount",
-        "capsule_tokens": 25,
+        "capsule_tokens": 20,
         "capsule_nodes": 10,
-        "capsule_edges": 8,
+        "capsule_edges": 5,
         "savings_pct": 99.7,
         "raw_tokens": 7679
       },
       {
         "label": "base",
         "query": "shipment tracking delivery",
-        "capsule_tokens": 24,
+        "capsule_tokens": 28,
         "capsule_nodes": 10,
-        "capsule_edges": 6,
-        "savings_pct": 99.7,
+        "capsule_edges": 4,
+        "savings_pct": 99.6,
         "raw_tokens": 7679
       },
       {
@@ -149,10 +149,10 @@
       {
         "label": "base",
         "query": "password reset email",
-        "capsule_tokens": 23,
+        "capsule_tokens": 17,
         "capsule_nodes": 10,
         "capsule_edges": 12,
-        "savings_pct": 99.7,
+        "savings_pct": 99.8,
         "raw_tokens": 7679
       },
       {
@@ -185,9 +185,9 @@
       {
         "label": "base",
         "query": "error handling validation",
-        "capsule_tokens": 56,
+        "capsule_tokens": 55,
         "capsule_nodes": 10,
-        "capsule_edges": 14,
+        "capsule_edges": 12,
         "savings_pct": 99.3,
         "raw_tokens": 7679
       },
@@ -212,7 +212,7 @@
       {
         "label": "base",
         "query": "rate limit throttling",
-        "capsule_tokens": 37,
+        "capsule_tokens": 36,
         "capsule_nodes": 10,
         "capsule_edges": 11,
         "savings_pct": 99.5,
@@ -221,18 +221,18 @@
       {
         "label": "base",
         "query": "config environment settings",
-        "capsule_tokens": 65,
+        "capsule_tokens": 67,
         "capsule_nodes": 10,
         "capsule_edges": 17,
-        "savings_pct": 99.2,
+        "savings_pct": 99.1,
         "raw_tokens": 7679
       },
       {
         "label": "base",
         "query": "integration test full flow",
-        "capsule_tokens": 46,
+        "capsule_tokens": 43,
         "capsule_nodes": 10,
-        "capsule_edges": 11,
+        "capsule_edges": 10,
         "savings_pct": 99.4,
         "raw_tokens": 7679
       }
@@ -241,10 +241,10 @@
       {
         "label": "ollama",
         "query": "order creation workflow payment",
-        "capsule_tokens": 247,
+        "capsule_tokens": 126,
         "capsule_nodes": 10,
-        "capsule_edges": 8,
-        "savings_pct": 96.8,
+        "capsule_edges": 5,
+        "savings_pct": 98.4,
         "raw_tokens": 7679
       },
       {
@@ -259,70 +259,70 @@
       {
         "label": "ollama",
         "query": "inventory stock management",
-        "capsule_tokens": 137,
+        "capsule_tokens": 113,
         "capsule_nodes": 10,
-        "capsule_edges": 6,
-        "savings_pct": 98.2,
+        "capsule_edges": 7,
+        "savings_pct": 98.5,
         "raw_tokens": 7679
       },
       {
         "label": "ollama",
         "query": "billing subscription invoice",
-        "capsule_tokens": 126,
+        "capsule_tokens": 138,
         "capsule_nodes": 10,
         "capsule_edges": 9,
-        "savings_pct": 98.4,
+        "savings_pct": 98.2,
         "raw_tokens": 7679
       },
       {
         "label": "ollama",
         "query": "notification email push",
-        "capsule_tokens": 175,
+        "capsule_tokens": 186,
         "capsule_nodes": 10,
         "capsule_edges": 7,
-        "savings_pct": 97.7,
+        "savings_pct": 97.6,
         "raw_tokens": 7679
       },
       {
         "label": "ollama",
         "query": "analytics event tracking dashboard",
-        "capsule_tokens": 198,
+        "capsule_tokens": 137,
         "capsule_nodes": 10,
-        "capsule_edges": 10,
-        "savings_pct": 97.4,
+        "capsule_edges": 8,
+        "savings_pct": 98.2,
         "raw_tokens": 7679
       },
       {
         "label": "ollama",
         "query": "order state machine workflow",
-        "capsule_tokens": 205,
+        "capsule_tokens": 81,
         "capsule_nodes": 10,
-        "capsule_edges": 10,
-        "savings_pct": 97.3,
+        "capsule_edges": 8,
+        "savings_pct": 98.9,
         "raw_tokens": 7679
       },
       {
         "label": "ollama",
         "query": "warehouse transfer stock",
-        "capsule_tokens": 76,
+        "capsule_tokens": 54,
         "capsule_nodes": 10,
         "capsule_edges": 4,
-        "savings_pct": 99.0,
+        "savings_pct": 99.3,
         "raw_tokens": 7679
       },
       {
         "label": "ollama",
         "query": "payment gateway stripe paypal",
-        "capsule_tokens": 132,
+        "capsule_tokens": 138,
         "capsule_nodes": 10,
         "capsule_edges": 11,
-        "savings_pct": 98.3,
+        "savings_pct": 98.2,
         "raw_tokens": 7679
       },
       {
         "label": "ollama",
         "query": "auth middleware permission role",
-        "capsule_tokens": 86,
+        "capsule_tokens": 84,
         "capsule_nodes": 10,
         "capsule_edges": 9,
         "savings_pct": 98.9,
@@ -331,37 +331,37 @@
       {
         "label": "ollama",
         "query": "JWT token creation validation",
-        "capsule_tokens": 61,
+        "capsule_tokens": 80,
         "capsule_nodes": 10,
         "capsule_edges": 6,
-        "savings_pct": 99.2,
+        "savings_pct": 99.0,
         "raw_tokens": 7679
       },
       {
         "label": "ollama",
         "query": "product category inventory",
-        "capsule_tokens": 125,
+        "capsule_tokens": 119,
         "capsule_nodes": 10,
         "capsule_edges": 9,
-        "savings_pct": 98.4,
+        "savings_pct": 98.5,
         "raw_tokens": 7679
       },
       {
         "label": "ollama",
         "query": "cart checkout coupon discount",
-        "capsule_tokens": 311,
+        "capsule_tokens": 281,
         "capsule_nodes": 10,
-        "capsule_edges": 10,
-        "savings_pct": 95.9,
+        "capsule_edges": 9,
+        "savings_pct": 96.3,
         "raw_tokens": 7679
       },
       {
         "label": "ollama",
         "query": "shipment tracking delivery",
-        "capsule_tokens": 439,
+        "capsule_tokens": 432,
         "capsule_nodes": 10,
-        "capsule_edges": 15,
-        "savings_pct": 94.3,
+        "capsule_edges": 12,
+        "savings_pct": 94.4,
         "raw_tokens": 7679
       },
       {
@@ -376,16 +376,16 @@
       {
         "label": "ollama",
         "query": "password reset email",
-        "capsule_tokens": 105,
+        "capsule_tokens": 145,
         "capsule_nodes": 10,
-        "capsule_edges": 11,
-        "savings_pct": 98.6,
+        "capsule_edges": 9,
+        "savings_pct": 98.1,
         "raw_tokens": 7679
       },
       {
         "label": "ollama",
         "query": "service base class repository",
-        "capsule_tokens": 376,
+        "capsule_tokens": 375,
         "capsule_nodes": 10,
         "capsule_edges": 13,
         "savings_pct": 95.1,
@@ -394,73 +394,73 @@
       {
         "label": "ollama",
         "query": "cache TTL configuration",
-        "capsule_tokens": 236,
+        "capsule_tokens": 175,
         "capsule_nodes": 10,
         "capsule_edges": 19,
-        "savings_pct": 96.9,
+        "savings_pct": 97.7,
         "raw_tokens": 7679
       },
       {
         "label": "ollama",
         "query": "database transaction query",
-        "capsule_tokens": 299,
+        "capsule_tokens": 251,
         "capsule_nodes": 10,
-        "capsule_edges": 11,
-        "savings_pct": 96.1,
+        "capsule_edges": 10,
+        "savings_pct": 96.7,
         "raw_tokens": 7679
       },
       {
         "label": "ollama",
         "query": "error handling validation",
-        "capsule_tokens": 525,
+        "capsule_tokens": 490,
         "capsule_nodes": 10,
-        "capsule_edges": 18,
-        "savings_pct": 93.2,
+        "capsule_edges": 21,
+        "savings_pct": 93.6,
         "raw_tokens": 7679
       },
       {
         "label": "ollama",
         "query": "report generation metrics",
-        "capsule_tokens": 135,
+        "capsule_tokens": 202,
         "capsule_nodes": 10,
-        "capsule_edges": 9,
-        "savings_pct": 98.2,
-        "raw_tokens": 7679
-      },
-      {
-        "label": "ollama",
-        "query": "event bus publish subscribe",
-        "capsule_tokens": 199,
-        "capsule_nodes": 10,
-        "capsule_edges": 4,
+        "capsule_edges": 10,
         "savings_pct": 97.4,
         "raw_tokens": 7679
       },
       {
         "label": "ollama",
-        "query": "rate limit throttling",
-        "capsule_tokens": 272,
+        "query": "event bus publish subscribe",
+        "capsule_tokens": 175,
         "capsule_nodes": 10,
-        "capsule_edges": 12,
-        "savings_pct": 96.5,
+        "capsule_edges": 6,
+        "savings_pct": 97.7,
+        "raw_tokens": 7679
+      },
+      {
+        "label": "ollama",
+        "query": "rate limit throttling",
+        "capsule_tokens": 276,
+        "capsule_nodes": 10,
+        "capsule_edges": 13,
+        "savings_pct": 96.4,
         "raw_tokens": 7679
       },
       {
         "label": "ollama",
         "query": "config environment settings",
-        "capsule_tokens": 394,
+        "capsule_tokens": 319,
         "capsule_nodes": 10,
-        "capsule_edges": 16,
-        "savings_pct": 94.9,
+        "capsule_edges": 13,
+        "savings_pct": 95.8,
         "raw_tokens": 7679
       },
       {
         "label": "ollama",
         "query": "integration test full flow",
-        "capsule_tokens": 321,
+        "capsule_tokens": 310,
         "capsule_nodes": 10,
-        "capsule_edges": 11,
-        "savings_pct": 95.8,
+        "capsule_edges": 10,
+        "savings_pct": 96.0,
         "raw_tokens": 7679
       }
     ]
@@ -1017,17 +1017,17 @@
         "label": "ollama",
         "scenario": "Build complete order checkout flow",
         "total_turns": 6,
-        "cumulative_tokens": 1238,
-        "avg_tokens_per_turn": 206.3,
-        "savings_vs_raw_pct": 83.9,
-        "unique_nodes_visited": 52,
-        "graph_coverage_pct": 22.6,
+        "cumulative_tokens": 979,
+        "avg_tokens_per_turn": 163.2,
+        "savings_vs_raw_pct": 87.3,
+        "unique_nodes_visited": 54,
+        "graph_coverage_pct": 23.5,
         "raw_tokens_all_files": 7679,
         "turns": [
           {
             "turn": 1,
             "query": "auth service user authentication",
-            "capsule_tokens": 404,
+            "capsule_tokens": 387,
             "capsule_nodes": 10,
             "new_nodes": 10,
             "overlap_pct": 0.0
@@ -1035,7 +1035,7 @@
           {
             "turn": 2,
             "query": "inventory product stock check reserve",
-            "capsule_tokens": 72,
+            "capsule_tokens": 121,
             "capsule_nodes": 10,
             "new_nodes": 9,
             "overlap_pct": 10.0
@@ -1043,31 +1043,31 @@
           {
             "turn": 3,
             "query": "billing payment process charge",
-            "capsule_tokens": 132,
-            "capsule_nodes": 10,
-            "new_nodes": 10,
-            "overlap_pct": 0.0
-          },
-          {
-            "turn": 4,
-            "query": "notification order confirmation send",
-            "capsule_tokens": 174,
+            "capsule_tokens": 127,
             "capsule_nodes": 10,
             "new_nodes": 9,
             "overlap_pct": 10.0
           },
           {
+            "turn": 4,
+            "query": "notification order confirmation send",
+            "capsule_tokens": 88,
+            "capsule_nodes": 10,
+            "new_nodes": 10,
+            "overlap_pct": 0.0
+          },
+          {
             "turn": 5,
             "query": "analytics event tracking order creation",
-            "capsule_tokens": 254,
+            "capsule_tokens": 119,
             "capsule_nodes": 10,
-            "new_nodes": 7,
-            "overlap_pct": 30.0
+            "new_nodes": 9,
+            "overlap_pct": 10.0
           },
           {
             "turn": 6,
             "query": "order create cart checkout workflow",
-            "capsule_tokens": 202,
+            "capsule_tokens": 137,
             "capsule_nodes": 10,
             "new_nodes": 7,
             "overlap_pct": 30.0
@@ -1078,9 +1078,9 @@
         "label": "ollama",
         "scenario": "Debug subscription billing failure",
         "total_turns": 7,
-        "cumulative_tokens": 803,
-        "avg_tokens_per_turn": 114.7,
-        "savings_vs_raw_pct": 89.5,
+        "cumulative_tokens": 931,
+        "avg_tokens_per_turn": 133.0,
+        "savings_vs_raw_pct": 87.9,
         "unique_nodes_visited": 55,
         "graph_coverage_pct": 23.9,
         "raw_tokens_all_files": 7679,
@@ -1088,7 +1088,7 @@
           {
             "turn": 1,
             "query": "billing subscription plan payment method",
-            "capsule_tokens": 129,
+            "capsule_tokens": 195,
             "capsule_nodes": 10,
             "new_nodes": 10,
             "overlap_pct": 0.0
@@ -1096,7 +1096,7 @@
           {
             "turn": 2,
             "query": "billing payment gateway stripe",
-            "capsule_tokens": 128,
+            "capsule_tokens": 134,
             "capsule_nodes": 10,
             "new_nodes": 3,
             "overlap_pct": 70.0
@@ -1104,7 +1104,7 @@
           {
             "turn": 3,
             "query": "auth user lookup validation",
-            "capsule_tokens": 117,
+            "capsule_tokens": 114,
             "capsule_nodes": 10,
             "new_nodes": 10,
             "overlap_pct": 0.0
@@ -1112,7 +1112,7 @@
           {
             "turn": 4,
             "query": "notification send failure alert",
-            "capsule_tokens": 58,
+            "capsule_tokens": 88,
             "capsule_nodes": 10,
             "new_nodes": 10,
             "overlap_pct": 0.0
@@ -1120,7 +1120,7 @@
           {
             "turn": 5,
             "query": "analytics track payment failure event",
-            "capsule_tokens": 194,
+            "capsule_tokens": 181,
             "capsule_nodes": 10,
             "new_nodes": 9,
             "overlap_pct": 10.0
@@ -1128,7 +1128,7 @@
           {
             "turn": 6,
             "query": "billing invoice retry payment",
-            "capsule_tokens": 60,
+            "capsule_tokens": 66,
             "capsule_nodes": 10,
             "new_nodes": 3,
             "overlap_pct": 70.0
@@ -1136,7 +1136,7 @@
           {
             "turn": 7,
             "query": "shared database transaction rollback",
-            "capsule_tokens": 117,
+            "capsule_tokens": 153,
             "capsule_nodes": 10,
             "new_nodes": 10,
             "overlap_pct": 0.0
@@ -1147,9 +1147,9 @@
         "label": "ollama",
         "scenario": "Implement user permission system",
         "total_turns": 7,
-        "cumulative_tokens": 1555,
-        "avg_tokens_per_turn": 222.1,
-        "savings_vs_raw_pct": 79.7,
+        "cumulative_tokens": 1591,
+        "avg_tokens_per_turn": 227.3,
+        "savings_vs_raw_pct": 79.3,
         "unique_nodes_visited": 49,
         "graph_coverage_pct": 21.3,
         "raw_tokens_all_files": 7679,
@@ -1157,7 +1157,7 @@
           {
             "turn": 1,
             "query": "auth models role permission",
-            "capsule_tokens": 373,
+            "capsule_tokens": 343,
             "capsule_nodes": 10,
             "new_nodes": 10,
             "overlap_pct": 0.0
@@ -1165,7 +1165,7 @@
           {
             "turn": 2,
             "query": "auth middleware require role decorator",
-            "capsule_tokens": 87,
+            "capsule_tokens": 85,
             "capsule_nodes": 10,
             "new_nodes": 6,
             "overlap_pct": 40.0
@@ -1173,7 +1173,7 @@
           {
             "turn": 3,
             "query": "auth service has_permission check",
-            "capsule_tokens": 296,
+            "capsule_tokens": 288,
             "capsule_nodes": 10,
             "new_nodes": 5,
             "overlap_pct": 50.0
@@ -1181,7 +1181,7 @@
           {
             "turn": 4,
             "query": "shared errors authorization error",
-            "capsule_tokens": 69,
+            "capsule_tokens": 51,
             "capsule_nodes": 10,
             "new_nodes": 9,
             "overlap_pct": 10.0
@@ -1189,7 +1189,7 @@
           {
             "turn": 5,
             "query": "inventory service admin product create",
-            "capsule_tokens": 235,
+            "capsule_tokens": 287,
             "capsule_nodes": 10,
             "new_nodes": 6,
             "overlap_pct": 40.0
@@ -1197,7 +1197,7 @@
           {
             "turn": 6,
             "query": "orders service user order list",
-            "capsule_tokens": 367,
+            "capsule_tokens": 392,
             "capsule_nodes": 10,
             "new_nodes": 5,
             "overlap_pct": 50.0
@@ -1205,7 +1205,7 @@
           {
             "turn": 7,
             "query": "auth JWT token payload roles",
-            "capsule_tokens": 128,
+            "capsule_tokens": 145,
             "capsule_nodes": 10,
             "new_nodes": 8,
             "overlap_pct": 20.0
@@ -1216,9 +1216,9 @@
         "label": "ollama",
         "scenario": "Add product inventory management",
         "total_turns": 7,
-        "cumulative_tokens": 1203,
-        "avg_tokens_per_turn": 171.9,
-        "savings_vs_raw_pct": 84.3,
+        "cumulative_tokens": 1084,
+        "avg_tokens_per_turn": 154.9,
+        "savings_vs_raw_pct": 85.9,
         "unique_nodes_visited": 51,
         "graph_coverage_pct": 22.2,
         "raw_tokens_all_files": 7679,
@@ -1226,7 +1226,7 @@
           {
             "turn": 1,
             "query": "inventory product category create",
-            "capsule_tokens": 126,
+            "capsule_tokens": 120,
             "capsule_nodes": 10,
             "new_nodes": 10,
             "overlap_pct": 0.0
@@ -1234,7 +1234,7 @@
           {
             "turn": 2,
             "query": "inventory stock check reserve release",
-            "capsule_tokens": 139,
+            "capsule_tokens": 115,
             "capsule_nodes": 10,
             "new_nodes": 7,
             "overlap_pct": 30.0
@@ -1242,7 +1242,7 @@
           {
             "turn": 3,
             "query": "inventory warehouse transfer",
-            "capsule_tokens": 194,
+            "capsule_tokens": 166,
             "capsule_nodes": 10,
             "new_nodes": 4,
             "overlap_pct": 60.0
@@ -1250,7 +1250,7 @@
           {
             "turn": 4,
             "query": "shared cache product lookup",
-            "capsule_tokens": 140,
+            "capsule_tokens": 122,
             "capsule_nodes": 10,
             "new_nodes": 5,
             "overlap_pct": 50.0
@@ -1258,7 +1258,7 @@
           {
             "turn": 5,
             "query": "notification low stock alert",
-            "capsule_tokens": 115,
+            "capsule_tokens": 120,
             "capsule_nodes": 10,
             "new_nodes": 10,
             "overlap_pct": 0.0
@@ -1266,7 +1266,7 @@
           {
             "turn": 6,
             "query": "analytics track product view event",
-            "capsule_tokens": 148,
+            "capsule_tokens": 129,
             "capsule_nodes": 10,
             "new_nodes": 10,
             "overlap_pct": 0.0
@@ -1274,7 +1274,7 @@
           {
             "turn": 7,
             "query": "orders service use inventory reservation",
-            "capsule_tokens": 341,
+            "capsule_tokens": 312,
             "capsule_nodes": 10,
             "new_nodes": 5,
             "overlap_pct": 50.0
@@ -1285,11 +1285,11 @@
         "label": "ollama",
         "scenario": "Set up notification delivery pipeline",
         "total_turns": 7,
-        "cumulative_tokens": 1508,
-        "avg_tokens_per_turn": 215.4,
-        "savings_vs_raw_pct": 80.4,
-        "unique_nodes_visited": 52,
-        "graph_coverage_pct": 22.6,
+        "cumulative_tokens": 1197,
+        "avg_tokens_per_turn": 171.0,
+        "savings_vs_raw_pct": 84.4,
+        "unique_nodes_visited": 53,
+        "graph_coverage_pct": 23.0,
         "raw_tokens_all_files": 7679,
         "turns": [
           {
@@ -1303,7 +1303,7 @@
           {
             "turn": 2,
             "query": "notification email provider SMTP sendgrid",
-            "capsule_tokens": 177,
+            "capsule_tokens": 130,
             "capsule_nodes": 10,
             "new_nodes": 7,
             "overlap_pct": 30.0
@@ -1311,7 +1311,7 @@
           {
             "turn": 3,
             "query": "notification push provider FCM APNs",
-            "capsule_tokens": 177,
+            "capsule_tokens": 85,
             "capsule_nodes": 10,
             "new_nodes": 5,
             "overlap_pct": 50.0
@@ -1319,7 +1319,7 @@
           {
             "turn": 4,
             "query": "notification service send bulk",
-            "capsule_tokens": 413,
+            "capsule_tokens": 363,
             "capsule_nodes": 10,
             "new_nodes": 8,
             "overlap_pct": 20.0
@@ -1327,7 +1327,7 @@
           {
             "turn": 5,
             "query": "auth user preference lookup",
-            "capsule_tokens": 117,
+            "capsule_tokens": 114,
             "capsule_nodes": 10,
             "new_nodes": 10,
             "overlap_pct": 0.0
@@ -1335,7 +1335,7 @@
           {
             "turn": 6,
             "query": "analytics track notification sent",
-            "capsule_tokens": 120,
+            "capsule_tokens": 56,
             "capsule_nodes": 10,
             "new_nodes": 8,
             "overlap_pct": 20.0
@@ -1343,10 +1343,10 @@
           {
             "turn": 7,
             "query": "shared config email settings",
-            "capsule_tokens": 216,
+            "capsule_tokens": 161,
             "capsule_nodes": 10,
-            "new_nodes": 4,
-            "overlap_pct": 60.0
+            "new_nodes": 5,
+            "overlap_pct": 50.0
           }
         ]
       },
@@ -1354,17 +1354,17 @@
         "label": "ollama",
         "scenario": "Build analytics dashboard",
         "total_turns": 7,
-        "cumulative_tokens": 1535,
-        "avg_tokens_per_turn": 219.3,
-        "savings_vs_raw_pct": 80.0,
-        "unique_nodes_visited": 38,
-        "graph_coverage_pct": 16.5,
+        "cumulative_tokens": 1565,
+        "avg_tokens_per_turn": 223.6,
+        "savings_vs_raw_pct": 79.6,
+        "unique_nodes_visited": 39,
+        "graph_coverage_pct": 17.0,
         "raw_tokens_all_files": 7679,
         "turns": [
           {
             "turn": 1,
             "query": "analytics models event metric report",
-            "capsule_tokens": 314,
+            "capsule_tokens": 306,
             "capsule_nodes": 10,
             "new_nodes": 10,
             "overlap_pct": 0.0
@@ -1372,23 +1372,23 @@
           {
             "turn": 2,
             "query": "analytics service track event",
-            "capsule_tokens": 294,
+            "capsule_tokens": 321,
             "capsule_nodes": 10,
-            "new_nodes": 7,
-            "overlap_pct": 30.0
+            "new_nodes": 8,
+            "overlap_pct": 20.0
           },
           {
             "turn": 3,
             "query": "analytics event tracker specialized",
-            "capsule_tokens": 137,
+            "capsule_tokens": 118,
             "capsule_nodes": 10,
-            "new_nodes": 2,
-            "overlap_pct": 80.0
+            "new_nodes": 3,
+            "overlap_pct": 70.0
           },
           {
             "turn": 4,
             "query": "auth user context for events",
-            "capsule_tokens": 181,
+            "capsule_tokens": 183,
             "capsule_nodes": 10,
             "new_nodes": 8,
             "overlap_pct": 20.0
@@ -1396,15 +1396,15 @@
           {
             "turn": 5,
             "query": "orders service create track event",
-            "capsule_tokens": 295,
+            "capsule_tokens": 322,
             "capsule_nodes": 10,
-            "new_nodes": 3,
-            "overlap_pct": 70.0
+            "new_nodes": 2,
+            "overlap_pct": 80.0
           },
           {
             "turn": 6,
             "query": "billing payment track event",
-            "capsule_tokens": 116,
+            "capsule_tokens": 98,
             "capsule_nodes": 10,
             "new_nodes": 7,
             "overlap_pct": 30.0
@@ -1412,7 +1412,7 @@
           {
             "turn": 7,
             "query": "analytics report generation aggregation",
-            "capsule_tokens": 198,
+            "capsule_tokens": 217,
             "capsule_nodes": 10,
             "new_nodes": 1,
             "overlap_pct": 90.0
@@ -1423,9 +1423,9 @@
         "label": "ollama",
         "scenario": "Implement event-driven architecture",
         "total_turns": 7,
-        "cumulative_tokens": 1302,
-        "avg_tokens_per_turn": 186.0,
-        "savings_vs_raw_pct": 83.0,
+        "cumulative_tokens": 1301,
+        "avg_tokens_per_turn": 185.9,
+        "savings_vs_raw_pct": 83.1,
         "unique_nodes_visited": 59,
         "graph_coverage_pct": 25.7,
         "raw_tokens_all_files": 7679,
@@ -1433,7 +1433,7 @@
           {
             "turn": 1,
             "query": "shared base event handler",
-            "capsule_tokens": 195,
+            "capsule_tokens": 257,
             "capsule_nodes": 10,
             "new_nodes": 10,
             "overlap_pct": 0.0
@@ -1441,7 +1441,7 @@
           {
             "turn": 2,
             "query": "shared database transaction",
-            "capsule_tokens": 116,
+            "capsule_tokens": 152,
             "capsule_nodes": 10,
             "new_nodes": 7,
             "overlap_pct": 30.0
@@ -1449,23 +1449,23 @@
           {
             "turn": 3,
             "query": "shared cache TTL",
-            "capsule_tokens": 154,
+            "capsule_tokens": 106,
             "capsule_nodes": 10,
-            "new_nodes": 9,
-            "overlap_pct": 10.0
+            "new_nodes": 10,
+            "overlap_pct": 0.0
           },
           {
             "turn": 4,
             "query": "shared config environment",
-            "capsule_tokens": 207,
+            "capsule_tokens": 168,
             "capsule_nodes": 10,
-            "new_nodes": 6,
-            "overlap_pct": 40.0
+            "new_nodes": 5,
+            "overlap_pct": 50.0
           },
           {
             "turn": 5,
             "query": "auth events user registered",
-            "capsule_tokens": 180,
+            "capsule_tokens": 182,
             "capsule_nodes": 10,
             "new_nodes": 9,
             "overlap_pct": 10.0
@@ -1473,7 +1473,7 @@
           {
             "turn": 6,
             "query": "billing events invoice created",
-            "capsule_tokens": 249,
+            "capsule_tokens": 255,
             "capsule_nodes": 10,
             "new_nodes": 8,
             "overlap_pct": 20.0
@@ -1481,7 +1481,7 @@
           {
             "turn": 7,
             "query": "orders events order placed",
-            "capsule_tokens": 201,
+            "capsule_tokens": 181,
             "capsule_nodes": 10,
             "new_nodes": 10,
             "overlap_pct": 0.0
@@ -1492,17 +1492,17 @@
         "label": "ollama",
         "scenario": "Cross-cutting error handling refactor",
         "total_turns": 7,
-        "cumulative_tokens": 2069,
-        "avg_tokens_per_turn": 295.6,
-        "savings_vs_raw_pct": 73.1,
-        "unique_nodes_visited": 32,
-        "graph_coverage_pct": 13.9,
+        "cumulative_tokens": 1975,
+        "avg_tokens_per_turn": 282.1,
+        "savings_vs_raw_pct": 74.3,
+        "unique_nodes_visited": 31,
+        "graph_coverage_pct": 13.5,
         "raw_tokens_all_files": 7679,
         "turns": [
           {
             "turn": 1,
             "query": "shared errors all error types",
-            "capsule_tokens": 131,
+            "capsule_tokens": 99,
             "capsule_nodes": 10,
             "new_nodes": 10,
             "overlap_pct": 0.0
@@ -1510,7 +1510,7 @@
           {
             "turn": 2,
             "query": "auth service authentication error",
-            "capsule_tokens": 404,
+            "capsule_tokens": 387,
             "capsule_nodes": 10,
             "new_nodes": 9,
             "overlap_pct": 10.0
@@ -1518,7 +1518,7 @@
           {
             "turn": 3,
             "query": "billing service validation error",
-            "capsule_tokens": 234,
+            "capsule_tokens": 228,
             "capsule_nodes": 10,
             "new_nodes": 5,
             "overlap_pct": 50.0
@@ -1526,7 +1526,7 @@
           {
             "turn": 4,
             "query": "inventory service not found error",
-            "capsule_tokens": 344,
+            "capsule_tokens": 360,
             "capsule_nodes": 10,
             "new_nodes": 2,
             "overlap_pct": 80.0
@@ -1534,7 +1534,7 @@
           {
             "turn": 5,
             "query": "orders service authorization error",
-            "capsule_tokens": 234,
+            "capsule_tokens": 267,
             "capsule_nodes": 10,
             "new_nodes": 2,
             "overlap_pct": 80.0
@@ -1542,7 +1542,7 @@
           {
             "turn": 6,
             "query": "notification service service unavailable",
-            "capsule_tokens": 300,
+            "capsule_tokens": 286,
             "capsule_nodes": 10,
             "new_nodes": 1,
             "overlap_pct": 90.0
@@ -1550,10 +1550,10 @@
           {
             "turn": 7,
             "query": "analytics service database error",
-            "capsule_tokens": 422,
+            "capsule_tokens": 348,
             "capsule_nodes": 10,
-            "new_nodes": 3,
-            "overlap_pct": 70.0
+            "new_nodes": 2,
+            "overlap_pct": 80.0
           }
         ]
       }

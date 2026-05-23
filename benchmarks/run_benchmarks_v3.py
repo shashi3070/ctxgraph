@@ -23,6 +23,8 @@ from ctxgraph.graph.builder import build_graph
 from ctxgraph.graph.storage import Storage
 from ctxgraph.capsule.renderer import render_capsule
 from ctxgraph.graph.query import generate_context_subgraph
+from ctxgraph.config.settings import Settings
+from ctxgraph.config.providers import generate_summary
 
 PROJECTS_DIR = REPO_ROOT / "benchmarks" / "projects"
 RESULTS_DIR = REPO_ROOT / "benchmarks" / "results"
@@ -45,6 +47,31 @@ def build_once(project_name: str, db_name: str) -> tuple[dict, Storage]:
     storage = Storage(db_path)
     storage.connect()
     return stats, storage
+
+
+def enrich_with_ollama(storage, project_name):
+    proj_dir = PROJECTS_DIR / project_name
+    settings = Settings()
+    settings._data["ai"]["model"] = "qwen2.5-coder:7b"
+    settings._data["ai"]["temperature"] = 0.1
+    all_nodes = storage.get_all_nodes()
+    file_nodes = [n for n in all_nodes if n.type == "file"]
+    enriched = 0
+    skipped = 0
+    for fn in file_nodes:
+        fp = proj_dir / (fn.path or "")
+        if not fp.is_file():
+            skipped += 1
+            continue
+        code = fp.read_text(encoding="utf-8", errors="replace")
+        summary = generate_summary(settings, code, context=f"File: {fn.path} - {fn.name}")
+        if summary and len(summary.split()) > 3:
+            storage.update_node_summary(fn.id, summary.strip())
+            enriched += 1
+        else:
+            skipped += 1
+    print(f"    Ollama enriched {enriched} files, skipped {skipped}")
+    return enriched
 
 
 def get_raw_tokens(project: str) -> tuple[int, int]:
@@ -399,27 +426,16 @@ assert sum(len(v) for v in MULTI_TURN_SCENARIOS.values()) == 25, f"Expected 25 m
 
 # ─── SINGLE-SHOT RUNNER ────────────────────────────────────────────────────
 
-def run_single_shot(project: str, query: str, mode: str = "balanced") -> dict:
-    db_name = f"v3_single_{project}_{query.replace(' ', '_')[:30]}_{mode}.db"
-    stats, storage = build_once(project, db_name)
-    all_nodes = storage.get_all_nodes()
-    mode_configs = {"fast": 5, "balanced": 10, "deep": 20}
-    max_nodes = mode_configs.get(mode, 10)
-
+def run_single_shot(storage, raw_total, raw_count, project: str, query: str) -> dict:
+    max_nodes = 10
     capsule = render_capsule(storage, query, max_nodes=max_nodes)
     capsule_tokens = count_tokens(capsule)
     nodes, edges = generate_context_subgraph(storage, query, max_nodes=max_nodes)
 
-    raw_total, raw_count = get_raw_tokens(project)
-    storage.close()
     return {
         "type": "single_shot",
         "project": project,
         "query": query,
-        "mode": mode,
-        "build_time_ms": stats["build_time_ms"],
-        "total_nodes": stats.get("total_nodes", 0),
-        "total_edges": stats.get("total_edges", 0),
         "capsule_nodes": len(nodes),
         "capsule_edges": len(edges),
         "capsule_tokens": capsule_tokens,
@@ -431,17 +447,15 @@ def run_single_shot(project: str, query: str, mode: str = "balanced") -> dict:
 
 # ─── MULTI-TURN RUNNER ─────────────────────────────────────────────────────
 
-def run_multi_turn(project: str, scenario: dict) -> dict:
-    db_name = f"v3_multiturn_{project}_{scenario['name'].replace(' ', '_')[:30]}.db"
-    stats, storage = build_once(project, db_name)
-    raw_total, raw_count = get_raw_tokens(project)
+def run_multi_turn(storage, raw_total, raw_count, project: str, scenario: dict) -> dict:
+    all_nodes = storage.get_all_nodes()
+    total_graph_nodes = len(all_nodes) if all_nodes else 1
 
     turns = []
     cumulative_capsule_tokens = 0
     seen_nodes: set[str] = set()
 
     for i, query in enumerate(scenario["turns"]):
-        mode = "balanced"
         max_nodes = 10
 
         capsule = render_capsule(storage, query, max_nodes=max_nodes)
@@ -469,17 +483,14 @@ def run_multi_turn(project: str, scenario: dict) -> dict:
     avg_tokens_per_turn = round(cumulative_capsule_tokens / total_turns, 1)
     savings_vs_raw = round((1 - cumulative_capsule_tokens / max(raw_total, 1)) * 100, 1)
     unique_nodes_total = len(seen_nodes)
-    node_coverage_pct = round(unique_nodes_total / max(stats.get("total_nodes", 1), 1) * 100, 1)
+    node_coverage_pct = round(unique_nodes_total / max(total_graph_nodes, 1) * 100, 1)
 
-    storage.close()
     return {
         "type": "multi_turn",
         "project": project,
         "scenario": scenario["name"],
         "total_turns": total_turns,
-        "build_time_ms": stats["build_time_ms"],
-        "total_nodes_in_graph": stats.get("total_nodes", 0),
-        "total_edges_in_graph": stats.get("total_edges", 0),
+        "total_nodes_in_graph": total_graph_nodes,
         "raw_tokens_all_files": raw_total,
         "raw_file_count": raw_count,
         "cumulative_capsule_tokens": cumulative_capsule_tokens,
@@ -493,8 +504,9 @@ def run_multi_turn(project: str, scenario: dict) -> dict:
 
 # ─── MAIN ───────────────────────────────────────────────────────────────────
 
-def run_all(only_single: bool, only_multiturn: bool, project_filter: str | None):
-    output = {"single_shot": [], "multi_turn": []}
+def run_all(only_single: bool, only_multiturn: bool, project_filter: str | None, use_ollama: bool = False):
+    output = {"single_shot": [], "multi_turn": [], "ollama": use_ollama}
+    storages = {}
 
     for proj in ["tiny_app", "web_api", "microsvc"]:
         if project_filter and proj != project_filter:
@@ -502,8 +514,19 @@ def run_all(only_single: bool, only_multiturn: bool, project_filter: str | None)
 
         raw_total, raw_count = get_raw_tokens(proj)
         print(f"\n{'='*60}")
-        print(f"  {proj} ({raw_count} files, {raw_total} raw tokens)")
+        label = f" {proj} ({raw_count} files, {raw_total} raw tokens)"
+        if use_ollama:
+            label += " WITH OLLAMA"
+        print(label)
         print(f"{'='*60}")
+
+        # Build shared graph once per project
+        db_name = f"v3_{proj}_shared{'ollama' if use_ollama else 'base'}.db"
+        stats, storage = build_once(proj, db_name)
+        storages[proj] = (storage, stats, raw_total, raw_count)
+
+        if use_ollama:
+            enrich_with_ollama(storage, proj)
 
         # Single-shot
         if not only_multiturn:
@@ -511,7 +534,7 @@ def run_all(only_single: bool, only_multiturn: bool, project_filter: str | None)
             for query in SINGLE_SHOT_QUERIES[proj]:
                 print(f"    {query:<40} ... ", end="", flush=True)
                 try:
-                    r = run_single_shot(proj, query)
+                    r = run_single_shot(storage, raw_total, raw_count, proj, query)
                     output["single_shot"].append(r)
                     print(f"{r['capsule_tokens']:>4} tok, {r['savings_pct']}% saved")
                 except Exception as e:
@@ -523,11 +546,13 @@ def run_all(only_single: bool, only_multiturn: bool, project_filter: str | None)
             for scenario in MULTI_TURN_SCENARIOS[proj]:
                 print(f"    {scenario['name'][:40]:<40} ... ", end="", flush=True)
                 try:
-                    r = run_multi_turn(proj, scenario)
+                    r = run_multi_turn(storage, raw_total, raw_count, proj, scenario)
                     output["multi_turn"].append(r)
                     print(f"{r['total_turns']} turns, {r['cumulative_capsule_tokens']:>4} tot tok, {r['savings_vs_raw_pct']}% saved, {r['graph_coverage_pct']}% graph covered")
                 except Exception as e:
                     print(f"FAIL: {e}")
+
+        storage.close()
 
     with open(RESULTS_DIR / "benchmark_results_v3.json", "w") as f:
         json.dump(output, f, indent=2)
@@ -545,34 +570,36 @@ def print_summary(output: dict):
 
     if ss:
         print(f"\n  SINGLE-SHOT (25 cases)")
-        print(f"  {'Project':<12} {'Query':<38} {'Tok':<6} {'Saved%':<8}")
-        print(f"  {'-'*12} {'-'*38} {'-'*6} {'-'*8}")
+        print(f"  {'Project':<12} {'Query':<38} {'RawTok':<8} {'CapTok':<8} {'Saved%':<8}")
+        print(f"  {'-'*12} {'-'*38} {'-'*8} {'-'*8} {'-'*8}")
         for r in ss:
-            print(f"  {r['project']:<12} {r['query'][:36]:<38} {r['capsule_tokens']:<6} {r['savings_pct']:<7}%")
+            print(f"  {r['project']:<12} {r['query'][:36]:<38} {r['raw_tokens']:<8} {r['capsule_tokens']:<8} {r['savings_pct']:<7}%")
         avg_ss = round(sum(r["savings_pct"] for r in ss) / len(ss), 1)
         avg_tok = round(sum(r["capsule_tokens"] for r in ss) / len(ss), 1)
-        print(f"  {'-'*64}")
-        print(f"  Average: {avg_tok} tok/case, {avg_ss}% savings across {len(ss)} queries")
-        print(f"  {'-'*64}")
+        avg_raw = round(sum(r["raw_tokens"] for r in ss) / len(ss), 1)
+        print(f"  {'-'*90}")
+        print(f"  Average: {avg_raw} raw -> {avg_tok} capsule tok/case, {avg_ss}% savings across {len(ss)} queries")
+        print(f"  {'-'*90}")
 
     if mt:
         print(f"\n  MULTI-TURN (25 scenarios, 5-10 turns each)")
-        print(f"  {'Project':<12} {'Scenario':<35} {'Turns':<6} {'TotTok':<8} {'AvgTok':<8} {'Saved%':<8} {'Cover%':<8}")
-        print(f"  {'-'*12} {'-'*35} {'-'*6} {'-'*8} {'-'*8} {'-'*8} {'-'*8}")
+        print(f"  {'Project':<12} {'Scenario':<35} {'Turns':<6} {'RawTok':<8} {'CapTok':<8} {'AvgTok':<8} {'Saved%':<8} {'Cover%':<8}")
+        print(f"  {'-'*12} {'-'*35} {'-'*6} {'-'*8} {'-'*8} {'-'*8} {'-'*8} {'-'*8}")
         for r in mt:
-            print(f"  {r['project']:<12} {r['scenario'][:33]:<35} {r['total_turns']:<6} {r['cumulative_capsule_tokens']:<8} {r['avg_tokens_per_turn']:<8} {r['savings_vs_raw_pct']:<7}% {r['graph_coverage_pct']:<7}%")
+            print(f"  {r['project']:<12} {r['scenario'][:33]:<35} {r['total_turns']:<6} {r['raw_tokens_all_files']:<8} {r['cumulative_capsule_tokens']:<8} {r['avg_tokens_per_turn']:<8} {r['savings_vs_raw_pct']:<7}% {r['graph_coverage_pct']:<7}%")
         avg_mt_savings = round(sum(r["savings_vs_raw_pct"] for r in mt) / len(mt), 1)
         avg_mt_tok = round(sum(r["avg_tokens_per_turn"] for r in mt) / len(mt), 1)
         avg_mt_total = round(sum(r["cumulative_capsule_tokens"] for r in mt) / len(mt), 1)
         avg_mt_coverage = round(sum(r["graph_coverage_pct"] for r in mt) / len(mt), 1)
+        avg_raw = round(sum(r["raw_tokens_all_files"] for r in mt) / len(mt), 1)
         avg_turns = round(sum(r["total_turns"] for r in mt) / len(mt), 1)
         total_capsule_all = sum(r["cumulative_capsule_tokens"] for r in mt)
         total_raw_all = sum(r["raw_tokens_all_files"] for r in mt)
         overall_savings = round((1 - total_capsule_all / max(total_raw_all, 1)) * 100, 1)
-        print(f"  {'-'*90}")
-        print(f"  Average ({len(mt)} scenarios, {avg_turns} turns/ea): {avg_mt_total} tot tok, {avg_mt_tok} tok/turn, {avg_mt_savings}% saved, {avg_mt_coverage}% graph covered")
+        print(f"  {'-'*100}")
+        print(f"  Average ({len(mt)} scenarios, {avg_turns} turns/ea): {avg_raw} raw -> {avg_mt_total} capsule tot, {avg_mt_tok} tok/turn, {avg_mt_savings}% saved, {avg_mt_coverage}% graph covered")
         print(f"  Overall: {total_capsule_all} capsule tokens vs {total_raw_all} raw tokens = {overall_savings}% savings")
-        print(f"  {'-'*90}")
+        print(f"  {'-'*100}")
 
     total_cases = len(ss) + len(mt)
     print(f"\n  Total test cases: {total_cases} ({len(ss)} single + {len(mt)} multi-turn)")
@@ -583,11 +610,13 @@ if __name__ == "__main__":
     parser.add_argument("--single-only", action="store_true", help="25 single-shot only")
     parser.add_argument("--multiturn-only", action="store_true", help="25 multi-turn only")
     parser.add_argument("--project", help="Run only this project")
+    parser.add_argument("--ollama", action="store_true", help="Enrich with Ollama")
     args = parser.parse_args()
 
     output = run_all(
         only_single=args.single_only,
         only_multiturn=args.multiturn_only,
         project_filter=args.project,
+        use_ollama=args.ollama,
     )
     print_summary(output)

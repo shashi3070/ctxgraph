@@ -63,3 +63,34 @@ All 84 import edges are cross-module (spanning different top-level directories).
 2. **Token savings remain excellent**: Even with LLM-enriched summaries, 97%+ savings single-shot, 82%+ multi-turn.
 3. **Ollama enclarge overhead**: 129s for 26 files (`qwen2.5-coder:7b`) — 5.0s/file with GPU. Acceptable for one-time build but significant for iterative use.
 4. **Graph size**: 230 nodes + 422 edges stored in ~500KB SQLite DB. Build time under 180ms.
+
+## How to Run
+
+### Normal (no enrichment)
+```bash
+python benchmarks/run_benchmarks_v4.py
+```
+
+### With Ollama
+```bash
+# Requires Ollama at http://localhost:11434
+python benchmarks/run_benchmarks_v4.py
+```
+
+### With Claude
+```bash
+$env:CTXGRAPH_PROVIDER = "claude"
+$env:CTXGRAPH_MODEL = "claude-sonnet-4-20250514"
+$env:ANTHROPIC_API_KEY = "sk-ant-..."
+python benchmarks/run_benchmarks_v4.py
+```
+
+### Switching Providers
+Set `CTXGRAPH_PROVIDER`, `CTXGRAPH_MODEL`, `CTXGRAPH_ENDPOINT`, `ANTHROPIC_API_KEY`, or `OPENAI_API_KEY` as env vars, or use `.ctxgraph/config.toml`:
+
+```toml
+[ai]
+provider = "claude"
+model = "claude-sonnet-4-20250514"
+api_key = "sk-ant-..."
+```

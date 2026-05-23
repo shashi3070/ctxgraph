@@ -81,6 +81,7 @@
 
 ## How to Run
 
+### Normal (no enrichment, AST-only summaries)
 ```bash
 # Full v3 suite (all 50 cases)
 python benchmarks/run_benchmarks_v3.py
@@ -93,6 +94,45 @@ python benchmarks/run_benchmarks_v3.py --multiturn-only
 
 # Single project
 python benchmarks/run_benchmarks_v3.py --project web_api
+```
+
+### With Ollama (local LLM enrichment)
+```bash
+# Requires Ollama running at http://localhost:11434
+python benchmarks/run_benchmarks_v3.py --ollama
+
+# Single project with Ollama
+python benchmarks/run_benchmarks_v3.py --project web_api --ollama
+```
+
+### With Claude (cloud LLM enrichment)
+```bash
+# Set Claude provider via env vars
+$env:CTXGRAPH_PROVIDER = "claude"
+$env:CTXGRAPH_MODEL = "claude-sonnet-4-20250514"
+$env:ANTHROPIC_API_KEY = "sk-ant-..."
+
+# Run with --ollama flag (uses configured provider)
+python benchmarks/run_benchmarks_v3.py --ollama
+```
+
+### Switching Providers
+
+| Variable | Example | Purpose |
+|----------|---------|---------|
+| `CTXGRAPH_PROVIDER` | `claude`, `openai`, `ollama` | Select provider |
+| `CTXGRAPH_MODEL` | `claude-sonnet-4-20250514`, `gpt-4o` | Override model |
+| `CTXGRAPH_ENDPOINT` | `http://custom:11434` | Override API endpoint |
+| `ANTHROPIC_API_KEY` | `sk-ant-...` | Claude API key |
+| `OPENAI_API_KEY` | `sk-...` | OpenAI API key |
+
+Or create `.ctxgraph/config.toml` in the project root:
+```toml
+[ai]
+provider = "claude"
+model = "claude-sonnet-4-20250514"
+api_key = "sk-ant-..."
+temperature = 0.1
 ```
 
 ## How to Visualize
