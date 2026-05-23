@@ -1,0 +1,2675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ctxgraph - Knowledge Graph</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d1117; color: #c9d1d9; overflow: hidden; }
+#container { width: 100vw; height: 100vh; position: relative; }
+svg { width: 100%; height: 100%; }
+#toolbar { position: absolute; top: 16px; left: 16px; z-index: 10; display: flex; gap: 8px; align-items: center; background: #161b22; padding: 12px 16px; border-radius: 8px; border: 1px solid #30363d; }
+#toolbar input { background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; padding: 6px 12px; border-radius: 4px; width: 220px; font-size: 13px; }
+#toolbar select { background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; padding: 6px 8px; border-radius: 4px; font-size: 13px; }
+#toolbar label { font-size: 13px; color: #8b949e; }
+#legend { position: absolute; bottom: 16px; left: 16px; z-index: 10; background: #161b22; padding: 12px; border-radius: 8px; border: 1px solid #30363d; font-size: 12px; display: flex; gap: 16px; }
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+#tooltip { position: absolute; z-index: 20; background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px; font-size: 13px; max-width: 400px; pointer-events: none; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+#tooltip .tt-name { font-weight: 600; color: #58a6ff; margin-bottom: 4px; }
+#tooltip .tt-type { color: #8b949e; font-size: 11px; margin-bottom: 4px; }
+#tooltip .tt-summary { color: #c9d1d9; font-size: 12px; }
+#stats { position: absolute; bottom: 16px; right: 16px; z-index: 10; background: #161b22; padding: 8px 12px; border-radius: 8px; border: 1px solid #30363d; font-size: 11px; color: #8b949e; }
+.link { stroke-opacity: 0.4; }
+.link.imports { stroke: #58a6ff; }
+.link.calls { stroke: #3fb950; }
+.link.defines { stroke: #d29922; }
+.link.extends { stroke: #bc8cff; }
+.node { cursor: pointer; transition: opacity 0.2s; }
+.node:hover { opacity: 0.8; }
+.node-label { font-size: 11px; fill: #8b949e; pointer-events: none; text-shadow: 0 1px 2px #0d1117, 0 -1px 2px #0d1117, 1px 0 2px #0d1117, -1px 0 2px #0d1117; }
+.node.highlighted .node-label { fill: #c9d1d9; font-weight: 600; }
+.link.highlighted { stroke-opacity: 0.8; }
+</style>
+</head>
+<body>
+<div id="container">
+  <div id="toolbar">
+    <label>Search:</label>
+    <input type="text" id="search" placeholder="Search nodes..." oninput="filterGraph(this.value)">
+    <label>Filter:</label>
+    <select id="filterType" onchange="filterByType(this.value)">
+      <option value="all">All</option>
+      <option value="file">Files</option>
+      <option value="class">Classes</option>
+      <option value="function">Functions</option>
+    </select>
+  </div>
+  <div id="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#58a6ff"></div> File</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#d29922"></div> Class</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#3fb950"></div> Function</div>
+    <div class="legend-item"><svg width="20" height="2"><line x1="0" y1="1" x2="20" y2="1" stroke="#58a6ff" stroke-width="1.5" stroke-dasharray="4,2"/></svg> Import</div>
+    <div class="legend-item"><svg width="20" height="2"><line x1="0" y1="1" x2="20" y2="1" stroke="#3fb950" stroke-width="1.5" stroke-dasharray="2,2"/></svg> Call</div>
+  </div>
+  <div id="stats"></div>
+  <div id="tooltip">
+    <div class="tt-name"></div>
+    <div class="tt-type"></div>
+    <div class="tt-summary"></div>
+  </div>
+  <svg></svg>
+</div>
+<script>
+const graphData = {
+  "nodes": [
+    {
+      "id": "file:analytics/models.py",
+      "label": "analytics/models.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:shared/base.py",
+      "label": "shared/base.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.3
+    },
+    {
+      "id": "file:analytics/service.py",
+      "label": "analytics/service.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:shared/cache.py",
+      "label": "shared/cache.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.3
+    },
+    {
+      "id": "file:shared/database.py",
+      "label": "shared/database.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.3
+    },
+    {
+      "id": "file:shared/errors.py",
+      "label": "shared/errors.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.3
+    },
+    {
+      "id": "file:analytics/tracker.py",
+      "label": "analytics/tracker.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:auth/jwt.py",
+      "label": "auth/jwt.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:auth/models.py",
+      "label": "auth/models.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.3
+    },
+    {
+      "id": "file:shared/config.py",
+      "label": "shared/config.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.3
+    },
+    {
+      "id": "file:auth/middleware.py",
+      "label": "auth/middleware.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:auth/service.py",
+      "label": "auth/service.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.3
+    },
+    {
+      "id": "file:billing/models.py",
+      "label": "billing/models.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:billing/payment.py",
+      "label": "billing/payment.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:billing/service.py",
+      "label": "billing/service.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:notifications/service.py",
+      "label": "notifications/service.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.3
+    },
+    {
+      "id": "file:inventory/models.py",
+      "label": "inventory/models.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:inventory/service.py",
+      "label": "inventory/service.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:inventory/warehouse.py",
+      "label": "inventory/warehouse.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:notifications/email.py",
+      "label": "notifications/email.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:notifications/models.py",
+      "label": "notifications/models.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:notifications/push.py",
+      "label": "notifications/push.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:orders/models.py",
+      "label": "orders/models.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:orders/service.py",
+      "label": "orders/service.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:orders/workflow.py",
+      "label": "orders/workflow.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:tests/test_integration.py",
+      "label": "tests/test_integration.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:analytics/models.py::EventType",
+      "label": "EventType",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:analytics/models.py::MetricType",
+      "label": "MetricType",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:analytics/models.py::AnalyticsEvent",
+      "label": "AnalyticsEvent",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:analytics/models.py::MetricDefinition",
+      "label": "MetricDefinition",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:analytics/models.py::Report",
+      "label": "Report",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:analytics/models.py::Dashboard",
+      "label": "Dashboard",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:analytics/service.py::_now",
+      "label": "_now",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:analytics/service.py::AnalyticsService",
+      "label": "AnalyticsService",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:analytics/service.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:analytics/service.py::_validate",
+      "label": "_validate",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:analytics/service.py::_authorize",
+      "label": "_authorize",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:analytics/service.py::track_event",
+      "label": "track_event",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:analytics/service.py::get_user_events",
+      "label": "get_user_events",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:analytics/service.py::get_event_counts",
+      "label": "get_event_counts",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:analytics/service.py::generate_report",
+      "label": "generate_report",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:analytics/service.py::get_user_metrics",
+      "label": "get_user_metrics",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:analytics/service.py::get_dashboard_data",
+      "label": "get_dashboard_data",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:analytics/tracker.py::EventTracker",
+      "label": "EventTracker",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:analytics/tracker.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:analytics/tracker.py::track",
+      "label": "track",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:analytics/tracker.py::track_order_created",
+      "label": "track_order_created",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:analytics/tracker.py::track_user_login",
+      "label": "track_user_login",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:analytics/tracker.py::track_page_view",
+      "label": "track_page_view",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:auth/jwt.py::JWTManager",
+      "label": "JWTManager",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:auth/jwt.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/jwt.py::_base64url_encode",
+      "label": "_base64url_encode",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/jwt.py::_base64url_decode",
+      "label": "_base64url_decode",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/jwt.py::_sign",
+      "label": "_sign",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/jwt.py::create_token",
+      "label": "create_token",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/jwt.py::verify_token",
+      "label": "verify_token",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/jwt.py::decode_token",
+      "label": "decode_token",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/jwt.py::create_jwt_manager",
+      "label": "create_jwt_manager",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/middleware.py::get_current_user",
+      "label": "get_current_user",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/middleware.py::_get_auth_service",
+      "label": "_get_auth_service",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/middleware.py::require_auth",
+      "label": "require_auth",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/middleware.py::require_role",
+      "label": "require_role",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/middleware.py::require_permission",
+      "label": "require_permission",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:auth/models.py::TokenType",
+      "label": "TokenType",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:auth/models.py::Permission",
+      "label": "Permission",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:auth/models.py::User",
+      "label": "User",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:auth/models.py::Role",
+      "label": "Role",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:auth/models.py::Session",
+      "label": "Session",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:auth/models.py::TokenPayload",
+      "label": "TokenPayload",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:auth/service.py::AuthService",
+      "label": "AuthService",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:auth/service.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/service.py::_validate",
+      "label": "_validate",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/service.py::_authorize",
+      "label": "_authorize",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/service.py::_hash_password",
+      "label": "_hash_password",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/service.py::authenticate",
+      "label": "authenticate",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/service.py::validate_token",
+      "label": "validate_token",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/service.py::create_user",
+      "label": "create_user",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/service.py::get_user",
+      "label": "get_user",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/service.py::update_user",
+      "label": "update_user",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/service.py::delete_user",
+      "label": "delete_user",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/service.py::has_permission",
+      "label": "has_permission",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:auth/service.py::refresh_token",
+      "label": "refresh_token",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:billing/models.py::PaymentMethod",
+      "label": "PaymentMethod",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:billing/models.py::Invoice",
+      "label": "Invoice",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:billing/models.py::Subscription",
+      "label": "Subscription",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:billing/models.py::Plan",
+      "label": "Plan",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:billing/payment.py::PaymentGateway",
+      "label": "PaymentGateway",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:billing/payment.py::charge",
+      "label": "charge",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:billing/payment.py::refund",
+      "label": "refund",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:billing/payment.py::StripeGateway",
+      "label": "StripeGateway",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:billing/payment.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:billing/payment.py::PayPalGateway",
+      "label": "PayPalGateway",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:billing/payment.py::_authenticate",
+      "label": "_authenticate",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:billing/payment.py::PaymentRouter",
+      "label": "PaymentRouter",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:billing/payment.py::route_payment",
+      "label": "route_payment",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:billing/payment.py::process_refund",
+      "label": "process_refund",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:billing/service.py::_now",
+      "label": "_now",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:billing/service.py::BillingService",
+      "label": "BillingService",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:billing/service.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:billing/service.py::_validate",
+      "label": "_validate",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:billing/service.py::_authorize",
+      "label": "_authorize",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:billing/service.py::create_subscription",
+      "label": "create_subscription",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:billing/service.py::cancel_subscription",
+      "label": "cancel_subscription",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:billing/service.py::process_payment",
+      "label": "process_payment",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:billing/service.py::get_invoice",
+      "label": "get_invoice",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:billing/service.py::list_invoices",
+      "label": "list_invoices",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:billing/service.py::get_subscription",
+      "label": "get_subscription",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:billing/service.py::get_available_plans",
+      "label": "get_available_plans",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:inventory/models.py::Category",
+      "label": "Category",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:inventory/models.py::Product",
+      "label": "Product",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:inventory/models.py::StockItem",
+      "label": "StockItem",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:inventory/models.py::Warehouse",
+      "label": "Warehouse",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:inventory/models.py::TransactionType",
+      "label": "TransactionType",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:inventory/models.py::InventoryTransaction",
+      "label": "InventoryTransaction",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:inventory/service.py::InventoryService",
+      "label": "InventoryService",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:inventory/service.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:inventory/service.py::_validate",
+      "label": "_validate",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:inventory/service.py::_authorize",
+      "label": "_authorize",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:inventory/service.py::create_product",
+      "label": "create_product",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:inventory/service.py::get_product",
+      "label": "get_product",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:inventory/service.py::update_product",
+      "label": "update_product",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:inventory/service.py::check_stock",
+      "label": "check_stock",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:inventory/service.py::reserve_stock",
+      "label": "reserve_stock",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:inventory/service.py::release_stock",
+      "label": "release_stock",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:inventory/service.py::reorder_stock",
+      "label": "reorder_stock",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:inventory/service.py::list_products",
+      "label": "list_products",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:inventory/warehouse.py::WarehouseManager",
+      "label": "WarehouseManager",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:inventory/warehouse.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:inventory/warehouse.py::transfer_stock",
+      "label": "transfer_stock",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:inventory/warehouse.py::get_warehouse_capacity",
+      "label": "get_warehouse_capacity",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:inventory/warehouse.py::get_all_warehouses",
+      "label": "get_all_warehouses",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:notifications/email.py::EmailProvider",
+      "label": "EmailProvider",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:notifications/email.py::send",
+      "label": "send",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:notifications/email.py::SMTPEmailProvider",
+      "label": "SMTPEmailProvider",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:notifications/email.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:notifications/email.py::SendGridProvider",
+      "label": "SendGridProvider",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:notifications/email.py::MockEmailProvider",
+      "label": "MockEmailProvider",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:notifications/models.py::NotificationType",
+      "label": "NotificationType",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:notifications/models.py::NotificationPriority",
+      "label": "NotificationPriority",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:notifications/models.py::Notification",
+      "label": "Notification",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:notifications/models.py::NotificationTemplate",
+      "label": "NotificationTemplate",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:notifications/models.py::NotificationPreference",
+      "label": "NotificationPreference",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:notifications/push.py::PushProvider",
+      "label": "PushProvider",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:notifications/push.py::send_push",
+      "label": "send_push",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:notifications/push.py::FCMProvider",
+      "label": "FCMProvider",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:notifications/push.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:notifications/push.py::APNsProvider",
+      "label": "APNsProvider",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:notifications/service.py::_now",
+      "label": "_now",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:notifications/service.py::NotificationService",
+      "label": "NotificationService",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:notifications/service.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:notifications/service.py::_validate",
+      "label": "_validate",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:notifications/service.py::_authorize",
+      "label": "_authorize",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:notifications/service.py::_resolve_template",
+      "label": "_resolve_template",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:notifications/service.py::send_notification",
+      "label": "send_notification",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:notifications/service.py::send_bulk_notification",
+      "label": "send_bulk_notification",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:notifications/service.py::get_user_notifications",
+      "label": "get_user_notifications",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:notifications/service.py::mark_as_read",
+      "label": "mark_as_read",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:notifications/service.py::update_preference",
+      "label": "update_preference",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:notifications/service.py::get_preference",
+      "label": "get_preference",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:notifications/service.py::set_email_provider",
+      "label": "set_email_provider",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:notifications/service.py::set_push_provider",
+      "label": "set_push_provider",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:orders/models.py::OrderStatus",
+      "label": "OrderStatus",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:orders/models.py::CartItem",
+      "label": "CartItem",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:orders/models.py::Cart",
+      "label": "Cart",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:orders/models.py::Order",
+      "label": "Order",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:orders/models.py::Shipment",
+      "label": "Shipment",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:orders/models.py::Coupon",
+      "label": "Coupon",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:orders/service.py::OrderService",
+      "label": "OrderService",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:orders/service.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:orders/service.py::_validate",
+      "label": "_validate",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:orders/service.py::_authorize",
+      "label": "_authorize",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:orders/service.py::create_order",
+      "label": "create_order",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:orders/service.py::cancel_order",
+      "label": "cancel_order",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:orders/service.py::get_order",
+      "label": "get_order",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:orders/service.py::list_user_orders",
+      "label": "list_user_orders",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:orders/service.py::update_order_status",
+      "label": "update_order_status",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:orders/service.py::apply_coupon",
+      "label": "apply_coupon",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:orders/service.py::_is_valid_transition",
+      "label": "_is_valid_transition",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:orders/workflow.py::OrderWorkflow",
+      "label": "OrderWorkflow",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:orders/workflow.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:orders/workflow.py::validate_transition",
+      "label": "validate_transition",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:orders/workflow.py::execute_transition",
+      "label": "execute_transition",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/base.py::_now",
+      "label": "_now",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/base.py::BaseModel",
+      "label": "BaseModel",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/base.py::to_dict",
+      "label": "to_dict",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/base.py::from_dict",
+      "label": "from_dict",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/base.py::BaseService",
+      "label": "BaseService",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/base.py::_validate",
+      "label": "_validate",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/base.py::_authorize",
+      "label": "_authorize",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/base.py::Repository",
+      "label": "Repository",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/base.py::create",
+      "label": "create",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/base.py::read",
+      "label": "read",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/base.py::update",
+      "label": "update",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/base.py::delete",
+      "label": "delete",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/base.py::list",
+      "label": "list",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/base.py::EventHandler",
+      "label": "EventHandler",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/base.py::handle",
+      "label": "handle",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/cache.py::Cache",
+      "label": "Cache",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/cache.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/cache.py::get",
+      "label": "get",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/cache.py::set",
+      "label": "set",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/cache.py::delete",
+      "label": "delete",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/cache.py::exists",
+      "label": "exists",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/cache.py::clear",
+      "label": "clear",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/cache.py::TTLCache",
+      "label": "TTLCache",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/cache.py::get_cache",
+      "label": "get_cache",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/config.py::Config",
+      "label": "Config",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/config.py::load_config",
+      "label": "load_config",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/config.py::get_config",
+      "label": "get_config",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/database.py::Database",
+      "label": "Database",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/database.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/database.py::connect",
+      "label": "connect",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/database.py::disconnect",
+      "label": "disconnect",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/database.py::execute",
+      "label": "execute",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/database.py::fetch_one",
+      "label": "fetch_one",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/database.py::fetch_all",
+      "label": "fetch_all",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/database.py::Transaction",
+      "label": "Transaction",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/database.py::__enter__",
+      "label": "__enter__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/database.py::__exit__",
+      "label": "__exit__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/database.py::get_database",
+      "label": "get_database",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/errors.py::AppError",
+      "label": "AppError",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/errors.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/errors.py::NotFoundError",
+      "label": "NotFoundError",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:shared/errors.py::ValidationError",
+      "label": "ValidationError",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:shared/errors.py::AuthorizationError",
+      "label": "AuthorizationError",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:shared/errors.py::AuthenticationError",
+      "label": "AuthenticationError",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:shared/errors.py::TokenExpiredError",
+      "label": "TokenExpiredError",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:shared/errors.py::RateLimitError",
+      "label": "RateLimitError",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:shared/errors.py::ServiceUnavailableError",
+      "label": "ServiceUnavailableError",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:tests/test_integration.py::test_create_order_full_flow",
+      "label": "test_create_order_full_flow",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    }
+  ],
+  "links": [
+    {
+      "source": "file:analytics/models.py",
+      "target": "file:shared/base.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:analytics/models.py",
+      "target": "class:analytics/models.py::EventType",
+      "relation": "defines"
+    },
+    {
+      "source": "file:analytics/models.py",
+      "target": "class:analytics/models.py::MetricType",
+      "relation": "defines"
+    },
+    {
+      "source": "file:analytics/models.py",
+      "target": "class:analytics/models.py::AnalyticsEvent",
+      "relation": "defines"
+    },
+    {
+      "source": "file:analytics/models.py",
+      "target": "class:analytics/models.py::MetricDefinition",
+      "relation": "defines"
+    },
+    {
+      "source": "file:analytics/models.py",
+      "target": "class:analytics/models.py::Report",
+      "relation": "defines"
+    },
+    {
+      "source": "file:analytics/models.py",
+      "target": "class:analytics/models.py::Dashboard",
+      "relation": "defines"
+    },
+    {
+      "source": "file:analytics/service.py",
+      "target": "file:analytics/models.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:analytics/service.py",
+      "target": "file:shared/base.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:analytics/service.py",
+      "target": "file:shared/cache.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:analytics/service.py",
+      "target": "file:shared/database.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:analytics/service.py",
+      "target": "file:shared/errors.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:analytics/service.py",
+      "target": "func:analytics/service.py::_now",
+      "relation": "defines"
+    },
+    {
+      "source": "file:analytics/service.py",
+      "target": "class:analytics/service.py::AnalyticsService",
+      "relation": "defines"
+    },
+    {
+      "source": "file:analytics/tracker.py",
+      "target": "file:analytics/models.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:analytics/tracker.py",
+      "target": "file:analytics/service.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:analytics/tracker.py",
+      "target": "class:analytics/tracker.py::EventTracker",
+      "relation": "defines"
+    },
+    {
+      "source": "file:auth/jwt.py",
+      "target": "file:auth/models.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:auth/jwt.py",
+      "target": "file:shared/config.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:auth/jwt.py",
+      "target": "file:shared/errors.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:auth/jwt.py",
+      "target": "class:auth/jwt.py::JWTManager",
+      "relation": "defines"
+    },
+    {
+      "source": "file:auth/jwt.py",
+      "target": "func:auth/jwt.py::create_jwt_manager",
+      "relation": "defines"
+    },
+    {
+      "source": "file:auth/middleware.py",
+      "target": "file:auth/service.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:auth/middleware.py",
+      "target": "file:shared/errors.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:auth/middleware.py",
+      "target": "file:auth/jwt.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:auth/middleware.py",
+      "target": "file:shared/cache.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:auth/middleware.py",
+      "target": "file:shared/database.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:auth/middleware.py",
+      "target": "file:shared/config.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:auth/middleware.py",
+      "target": "func:auth/middleware.py::get_current_user",
+      "relation": "defines"
+    },
+    {
+      "source": "file:auth/middleware.py",
+      "target": "func:auth/middleware.py::_get_auth_service",
+      "relation": "defines"
+    },
+    {
+      "source": "file:auth/middleware.py",
+      "target": "func:auth/middleware.py::require_auth",
+      "relation": "defines"
+    },
+    {
+      "source": "file:auth/middleware.py",
+      "target": "func:auth/middleware.py::require_role",
+      "relation": "defines"
+    },
+    {
+      "source": "file:auth/middleware.py",
+      "target": "func:auth/middleware.py::require_permission",
+      "relation": "defines"
+    },
+    {
+      "source": "file:auth/models.py",
+      "target": "file:shared/base.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:auth/models.py",
+      "target": "class:auth/models.py::TokenType",
+      "relation": "defines"
+    },
+    {
+      "source": "file:auth/models.py",
+      "target": "class:auth/models.py::Permission",
+      "relation": "defines"
+    },
+    {
+      "source": "file:auth/models.py",
+      "target": "class:auth/models.py::User",
+      "relation": "defines"
+    },
+    {
+      "source": "file:auth/models.py",
+      "target": "class:auth/models.py::Role",
+      "relation": "defines"
+    },
+    {
+      "source": "file:auth/models.py",
+      "target": "class:auth/models.py::Session",
+      "relation": "defines"
+    },
+    {
+      "source": "file:auth/models.py",
+      "target": "class:auth/models.py::TokenPayload",
+      "relation": "defines"
+    },
+    {
+      "source": "file:auth/service.py",
+      "target": "file:auth/jwt.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:auth/service.py",
+      "target": "file:auth/models.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:auth/service.py",
+      "target": "file:shared/base.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:auth/service.py",
+      "target": "file:shared/cache.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:auth/service.py",
+      "target": "file:shared/config.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:auth/service.py",
+      "target": "file:shared/database.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:auth/service.py",
+      "target": "file:shared/errors.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:auth/service.py",
+      "target": "class:auth/service.py::AuthService",
+      "relation": "defines"
+    },
+    {
+      "source": "file:billing/models.py",
+      "target": "file:shared/base.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:billing/models.py",
+      "target": "class:billing/models.py::PaymentMethod",
+      "relation": "defines"
+    },
+    {
+      "source": "file:billing/models.py",
+      "target": "class:billing/models.py::Invoice",
+      "relation": "defines"
+    },
+    {
+      "source": "file:billing/models.py",
+      "target": "class:billing/models.py::Subscription",
+      "relation": "defines"
+    },
+    {
+      "source": "file:billing/models.py",
+      "target": "class:billing/models.py::Plan",
+      "relation": "defines"
+    },
+    {
+      "source": "file:billing/payment.py",
+      "target": "file:billing/models.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:billing/payment.py",
+      "target": "file:shared/errors.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:billing/payment.py",
+      "target": "class:billing/payment.py::PaymentGateway",
+      "relation": "defines"
+    },
+    {
+      "source": "file:billing/payment.py",
+      "target": "class:billing/payment.py::StripeGateway",
+      "relation": "defines"
+    },
+    {
+      "source": "file:billing/payment.py",
+      "target": "class:billing/payment.py::PayPalGateway",
+      "relation": "defines"
+    },
+    {
+      "source": "file:billing/payment.py",
+      "target": "class:billing/payment.py::PaymentRouter",
+      "relation": "defines"
+    },
+    {
+      "source": "file:billing/service.py",
+      "target": "file:auth/service.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:billing/service.py",
+      "target": "file:billing/models.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:billing/service.py",
+      "target": "file:notifications/service.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:billing/service.py",
+      "target": "file:shared/base.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:billing/service.py",
+      "target": "file:shared/config.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:billing/service.py",
+      "target": "file:shared/database.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:billing/service.py",
+      "target": "file:shared/errors.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:billing/service.py",
+      "target": "func:billing/service.py::_now",
+      "relation": "defines"
+    },
+    {
+      "source": "file:billing/service.py",
+      "target": "class:billing/service.py::BillingService",
+      "relation": "defines"
+    },
+    {
+      "source": "file:inventory/models.py",
+      "target": "file:shared/base.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:inventory/models.py",
+      "target": "class:inventory/models.py::Category",
+      "relation": "defines"
+    },
+    {
+      "source": "file:inventory/models.py",
+      "target": "class:inventory/models.py::Product",
+      "relation": "defines"
+    },
+    {
+      "source": "file:inventory/models.py",
+      "target": "class:inventory/models.py::StockItem",
+      "relation": "defines"
+    },
+    {
+      "source": "file:inventory/models.py",
+      "target": "class:inventory/models.py::Warehouse",
+      "relation": "defines"
+    },
+    {
+      "source": "file:inventory/models.py",
+      "target": "class:inventory/models.py::TransactionType",
+      "relation": "defines"
+    },
+    {
+      "source": "file:inventory/models.py",
+      "target": "class:inventory/models.py::InventoryTransaction",
+      "relation": "defines"
+    },
+    {
+      "source": "file:inventory/service.py",
+      "target": "file:auth/models.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:inventory/service.py",
+      "target": "file:auth/service.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:inventory/service.py",
+      "target": "file:inventory/models.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:inventory/service.py",
+      "target": "file:notifications/service.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:inventory/service.py",
+      "target": "file:shared/base.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:inventory/service.py",
+      "target": "file:shared/cache.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:inventory/service.py",
+      "target": "file:shared/config.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:inventory/service.py",
+      "target": "file:shared/database.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:inventory/service.py",
+      "target": "file:shared/errors.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:inventory/service.py",
+      "target": "class:inventory/service.py::InventoryService",
+      "relation": "defines"
+    },
+    {
+      "source": "file:inventory/warehouse.py",
+      "target": "file:inventory/models.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:inventory/warehouse.py",
+      "target": "file:inventory/service.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:inventory/warehouse.py",
+      "target": "file:shared/cache.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:inventory/warehouse.py",
+      "target": "file:shared/database.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:inventory/warehouse.py",
+      "target": "file:shared/errors.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:inventory/warehouse.py",
+      "target": "class:inventory/warehouse.py::WarehouseManager",
+      "relation": "defines"
+    },
+    {
+      "source": "file:notifications/email.py",
+      "target": "file:shared/config.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:notifications/email.py",
+      "target": "file:shared/errors.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:notifications/email.py",
+      "target": "class:notifications/email.py::EmailProvider",
+      "relation": "defines"
+    },
+    {
+      "source": "file:notifications/email.py",
+      "target": "class:notifications/email.py::SMTPEmailProvider",
+      "relation": "defines"
+    },
+    {
+      "source": "file:notifications/email.py",
+      "target": "class:notifications/email.py::SendGridProvider",
+      "relation": "defines"
+    },
+    {
+      "source": "file:notifications/email.py",
+      "target": "class:notifications/email.py::MockEmailProvider",
+      "relation": "defines"
+    },
+    {
+      "source": "file:notifications/models.py",
+      "target": "file:shared/base.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:notifications/models.py",
+      "target": "class:notifications/models.py::NotificationType",
+      "relation": "defines"
+    },
+    {
+      "source": "file:notifications/models.py",
+      "target": "class:notifications/models.py::NotificationPriority",
+      "relation": "defines"
+    },
+    {
+      "source": "file:notifications/models.py",
+      "target": "class:notifications/models.py::Notification",
+      "relation": "defines"
+    },
+    {
+      "source": "file:notifications/models.py",
+      "target": "class:notifications/models.py::NotificationTemplate",
+      "relation": "defines"
+    },
+    {
+      "source": "file:notifications/models.py",
+      "target": "class:notifications/models.py::NotificationPreference",
+      "relation": "defines"
+    },
+    {
+      "source": "file:notifications/push.py",
+      "target": "file:shared/config.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:notifications/push.py",
+      "target": "file:shared/errors.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:notifications/push.py",
+      "target": "class:notifications/push.py::PushProvider",
+      "relation": "defines"
+    },
+    {
+      "source": "file:notifications/push.py",
+      "target": "class:notifications/push.py::FCMProvider",
+      "relation": "defines"
+    },
+    {
+      "source": "file:notifications/push.py",
+      "target": "class:notifications/push.py::APNsProvider",
+      "relation": "defines"
+    },
+    {
+      "source": "file:notifications/service.py",
+      "target": "file:notifications/email.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:notifications/service.py",
+      "target": "file:notifications/models.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:notifications/service.py",
+      "target": "file:notifications/push.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:notifications/service.py",
+      "target": "file:shared/base.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:notifications/service.py",
+      "target": "file:shared/database.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:notifications/service.py",
+      "target": "file:shared/errors.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:notifications/service.py",
+      "target": "func:notifications/service.py::_now",
+      "relation": "defines"
+    },
+    {
+      "source": "file:notifications/service.py",
+      "target": "class:notifications/service.py::NotificationService",
+      "relation": "defines"
+    },
+    {
+      "source": "file:orders/models.py",
+      "target": "file:shared/base.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:orders/models.py",
+      "target": "class:orders/models.py::OrderStatus",
+      "relation": "defines"
+    },
+    {
+      "source": "file:orders/models.py",
+      "target": "class:orders/models.py::CartItem",
+      "relation": "defines"
+    },
+    {
+      "source": "file:orders/models.py",
+      "target": "class:orders/models.py::Cart",
+      "relation": "defines"
+    },
+    {
+      "source": "file:orders/models.py",
+      "target": "class:orders/models.py::Order",
+      "relation": "defines"
+    },
+    {
+      "source": "file:orders/models.py",
+      "target": "class:orders/models.py::Shipment",
+      "relation": "defines"
+    },
+    {
+      "source": "file:orders/models.py",
+      "target": "class:orders/models.py::Coupon",
+      "relation": "defines"
+    },
+    {
+      "source": "file:orders/service.py",
+      "target": "file:orders/models.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:orders/service.py",
+      "target": "file:shared/base.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:orders/service.py",
+      "target": "file:shared/config.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:orders/service.py",
+      "target": "file:shared/database.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:orders/service.py",
+      "target": "file:shared/errors.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:orders/service.py",
+      "target": "class:orders/service.py::OrderService",
+      "relation": "defines"
+    },
+    {
+      "source": "file:orders/workflow.py",
+      "target": "file:orders/models.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:orders/workflow.py",
+      "target": "file:shared/errors.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:orders/workflow.py",
+      "target": "class:orders/workflow.py::OrderWorkflow",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/base.py",
+      "target": "file:auth/models.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:shared/base.py",
+      "target": "func:shared/base.py::_now",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/base.py",
+      "target": "class:shared/base.py::BaseModel",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/base.py",
+      "target": "class:shared/base.py::BaseService",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/base.py",
+      "target": "class:shared/base.py::Repository",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/base.py",
+      "target": "class:shared/base.py::EventHandler",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/cache.py",
+      "target": "file:shared/config.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:shared/cache.py",
+      "target": "class:shared/cache.py::Cache",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/cache.py",
+      "target": "class:shared/cache.py::TTLCache",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/cache.py",
+      "target": "func:shared/cache.py::get_cache",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/config.py",
+      "target": "class:shared/config.py::Config",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/config.py",
+      "target": "func:shared/config.py::load_config",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/config.py",
+      "target": "func:shared/config.py::get_config",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/database.py",
+      "target": "file:shared/config.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:shared/database.py",
+      "target": "class:shared/database.py::Database",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/database.py",
+      "target": "class:shared/database.py::Transaction",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/database.py",
+      "target": "func:shared/database.py::get_database",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/errors.py",
+      "target": "class:shared/errors.py::AppError",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/errors.py",
+      "target": "class:shared/errors.py::NotFoundError",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/errors.py",
+      "target": "class:shared/errors.py::ValidationError",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/errors.py",
+      "target": "class:shared/errors.py::AuthorizationError",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/errors.py",
+      "target": "class:shared/errors.py::AuthenticationError",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/errors.py",
+      "target": "class:shared/errors.py::TokenExpiredError",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/errors.py",
+      "target": "class:shared/errors.py::RateLimitError",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/errors.py",
+      "target": "class:shared/errors.py::ServiceUnavailableError",
+      "relation": "defines"
+    },
+    {
+      "source": "file:tests/test_integration.py",
+      "target": "file:analytics/models.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:tests/test_integration.py",
+      "target": "file:analytics/service.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:tests/test_integration.py",
+      "target": "file:analytics/tracker.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:tests/test_integration.py",
+      "target": "file:auth/jwt.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:tests/test_integration.py",
+      "target": "file:auth/service.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:tests/test_integration.py",
+      "target": "file:billing/service.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:tests/test_integration.py",
+      "target": "file:inventory/models.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:tests/test_integration.py",
+      "target": "file:notifications/models.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:tests/test_integration.py",
+      "target": "file:notifications/service.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:tests/test_integration.py",
+      "target": "file:orders/models.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:tests/test_integration.py",
+      "target": "file:shared/cache.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:tests/test_integration.py",
+      "target": "file:shared/database.py",
+      "relation": "imports"
+    },
+    {
+      "source": "file:tests/test_integration.py",
+      "target": "func:tests/test_integration.py::test_create_order_full_flow",
+      "relation": "defines"
+    }
+  ]
+};
+const width = window.innerWidth;
+const height = window.innerHeight;
+
+const svg = d3.select("svg");
+const g = svg.append("g");
+
+const zoom = d3.zoom()
+  .scaleExtent([0.1, 4])
+  .on("zoom", (event) => g.attr("transform", event.transform));
+
+svg.call(zoom);
+
+const colorMap = { file: "#58a6ff", class: "#d29922", function: "#3fb950", module: "#bc8cff" };
+
+const simulation = d3.forceSimulation(graphData.nodes)
+  .force("link", d3.forceLink(graphData.links).id(d => d.id).distance(d => {
+    return d.relation === "imports" ? 100 : 80;
+  }))
+  .force("charge", d3.forceManyBody().strength(-200))
+  .force("center", d3.forceCenter(width / 2, height / 2))
+  .force("collision", d3.forceCollide(20));
+
+const link = g.append("g")
+  .selectAll("line")
+  .data(graphData.links)
+  .join("line")
+  .attr("class", d => `link ${d.relation}`)
+  .attr("stroke-width", 1.5);
+
+const node = g.append("g")
+  .selectAll("g")
+  .data(graphData.nodes)
+  .join("g")
+  .attr("class", "node")
+  .call(d3.drag()
+    .on("start", (event, d) => {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    })
+    .on("drag", (event, d) => {
+      d.fx = event.x;
+      d.fy = event.y;
+    })
+    .on("end", (event, d) => {
+      if (!event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    })
+  );
+
+node.append("circle")
+  .attr("r", d => 5 + (d.importance || 0.5) * 8)
+  .attr("fill", d => colorMap[d.type] || "#8b949e")
+  .attr("stroke", "#161b22")
+  .attr("stroke-width", 1.5);
+
+node.append("text")
+  .attr("class", "node-label")
+  .text(d => d.label)
+  .attr("dx", d => 10 + (d.importance || 0.5) * 5)
+  .attr("dy", 4);
+
+node.on("mouseover", function(event, d) {
+  const tt = d3.select("#tooltip");
+  tt.style("display", "block");
+  tt.select(".tt-name").text(d.label);
+  tt.select(".tt-type").text(`Type: ${d.type}`);
+  tt.select(".tt-summary").text(d.summary || "");
+
+  const connected = new Set();
+  graphData.links.forEach(l => {
+    const sid = typeof l.source === 'object' ? l.source.id : l.source;
+    const tid = typeof l.target === 'object' ? l.target.id : l.target;
+    if (sid === d.id) connected.add(tid);
+    if (tid === d.id) connected.add(sid);
+  });
+
+  d3.selectAll(".node").each(function(n) {
+    if (n.id === d.id || connected.has(n.id)) {
+      d3.select(this).classed("highlighted", true);
+      d3.select(this).select("circle").attr("opacity", 1);
+      d3.select(this).select("text").attr("opacity", 1);
+    } else {
+      d3.select(this).select("circle").attr("opacity", 0.15);
+      d3.select(this).select("text").attr("opacity", 0.15);
+    }
+  });
+
+  d3.selectAll(".link").each(function(l) {
+    const sid = typeof l.source === 'object' ? l.source.id : l.source;
+    const tid = typeof l.target === 'object' ? l.target.id : l.target;
+    if (sid === d.id || tid === d.id) {
+      d3.select(this).classed("highlighted", true);
+    }
+  });
+})
+.on("mousemove", function(event) {
+  d3.select("#tooltip")
+    .style("left", (event.pageX + 12) + "px")
+    .style("top", (event.pageY - 10) + "px");
+})
+.on("mouseout", function() {
+  d3.select("#tooltip").style("display", "none");
+  d3.selectAll(".node").each(function(n) {
+    d3.select(this).classed("highlighted", false);
+    d3.select(this).select("circle").attr("opacity", 1);
+    d3.select(this).select("text").attr("opacity", 1);
+  });
+  d3.selectAll(".link").classed("highlighted", false);
+});
+
+simulation.on("tick", () => {
+  link
+    .attr("x1", d => d.source.x)
+    .attr("y1", d => d.source.y)
+    .attr("x2", d => d.target.x)
+    .attr("y2", d => d.target.y);
+  node.attr("transform", d => `translate(${d.x},${d.y})`);
+});
+
+d3.select("#stats").text(`Nodes: ${graphData.nodes.length} | Edges: ${graphData.links.length}`);
+
+window.filterGraph = function(query) {
+  const q = query.toLowerCase();
+  d3.selectAll(".node").each(function(d) {
+    const match = !q || d.label.toLowerCase().includes(q) || (d.summary && d.summary.toLowerCase().includes(q));
+    d3.select(this).style("display", match ? null : "none");
+  });
+};
+
+window.filterByType = function(type) {
+  d3.selectAll(".node").each(function(d) {
+    const match = type === "all" || d.type === type;
+    d3.select(this).style("display", match ? null : "none");
+  });
+};
+
+window.addEventListener("resize", () => {
+  svg.attr("width", window.innerWidth).attr("height", window.innerHeight);
+});
+</script>
+</body>
+</html>

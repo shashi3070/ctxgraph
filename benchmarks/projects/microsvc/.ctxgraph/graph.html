@@ -1,0 +1,3057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ctxgraph - Knowledge Graph</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d1117; color: #c9d1d9; overflow: hidden; }
+#container { width: 100vw; height: 100vh; position: relative; }
+svg { width: 100%; height: 100%; }
+#toolbar { position: absolute; top: 16px; left: 16px; z-index: 10; display: flex; gap: 8px; align-items: center; background: #161b22; padding: 12px 16px; border-radius: 8px; border: 1px solid #30363d; }
+#toolbar input { background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; padding: 6px 12px; border-radius: 4px; width: 220px; font-size: 13px; }
+#toolbar select { background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; padding: 6px 8px; border-radius: 4px; font-size: 13px; }
+#toolbar label { font-size: 13px; color: #8b949e; }
+#legend { position: absolute; bottom: 16px; left: 16px; z-index: 10; background: #161b22; padding: 12px; border-radius: 8px; border: 1px solid #30363d; font-size: 12px; display: flex; gap: 16px; }
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+#tooltip { position: absolute; z-index: 20; background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px; font-size: 13px; max-width: 400px; pointer-events: none; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+#tooltip .tt-name { font-weight: 600; color: #58a6ff; margin-bottom: 4px; }
+#tooltip .tt-type { color: #8b949e; font-size: 11px; margin-bottom: 4px; }
+#tooltip .tt-summary { color: #c9d1d9; font-size: 12px; }
+#stats { position: absolute; bottom: 16px; right: 16px; z-index: 10; background: #161b22; padding: 8px 12px; border-radius: 8px; border: 1px solid #30363d; font-size: 11px; color: #8b949e; }
+.link { stroke-opacity: 0.4; }
+.link.imports { stroke: #58a6ff; }
+.link.calls { stroke: #3fb950; }
+.link.defines { stroke: #d29922; }
+.link.extends { stroke: #bc8cff; }
+.node { cursor: pointer; transition: opacity 0.2s; }
+.node:hover { opacity: 0.8; }
+.node-label { font-size: 11px; fill: #8b949e; pointer-events: none; text-shadow: 0 1px 2px #0d1117, 0 -1px 2px #0d1117, 1px 0 2px #0d1117, -1px 0 2px #0d1117; }
+.node.highlighted .node-label { fill: #c9d1d9; font-weight: 600; }
+.link.highlighted { stroke-opacity: 0.8; }
+</style>
+</head>
+<body>
+<div id="container">
+  <div id="toolbar">
+    <label>Search:</label>
+    <input type="text" id="search" placeholder="Search nodes..." oninput="filterGraph(this.value)">
+    <label>Filter:</label>
+    <select id="filterType" onchange="filterByType(this.value)">
+      <option value="all">All</option>
+      <option value="file">Files</option>
+      <option value="class">Classes</option>
+      <option value="function">Functions</option>
+    </select>
+  </div>
+  <div id="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#58a6ff"></div> File</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#d29922"></div> Class</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#3fb950"></div> Function</div>
+    <div class="legend-item"><svg width="20" height="2"><line x1="0" y1="1" x2="20" y2="1" stroke="#58a6ff" stroke-width="1.5" stroke-dasharray="4,2"/></svg> Import</div>
+    <div class="legend-item"><svg width="20" height="2"><line x1="0" y1="1" x2="20" y2="1" stroke="#3fb950" stroke-width="1.5" stroke-dasharray="2,2"/></svg> Call</div>
+  </div>
+  <div id="stats"></div>
+  <div id="tooltip">
+    <div class="tt-name"></div>
+    <div class="tt-type"></div>
+    <div class="tt-summary"></div>
+  </div>
+  <svg></svg>
+</div>
+<script>
+const graphData = {
+  "nodes": [
+    {
+      "id": "file:services/auth/jwt.py",
+      "label": "services/auth/jwt.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:services/auth/models.py",
+      "label": "services/auth/models.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:services/auth/oauth.py",
+      "label": "services/auth/oauth.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:services/auth/saml.py",
+      "label": "services/auth/saml.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:services/auth/server.py",
+      "label": "services/auth/server.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:services/billing/payments.py",
+      "label": "services/billing/payments.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:services/billing/plans.py",
+      "label": "services/billing/plans.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:services/billing/server.py",
+      "label": "services/billing/server.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:services/users/db.py",
+      "label": "services/users/db.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:services/users/handlers.py",
+      "label": "services/users/handlers.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:services/users/models.py",
+      "label": "services/users/models.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:services/users/server.py",
+      "label": "services/users/server.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:shared/circuit_breaker.py",
+      "label": "shared/circuit_breaker.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:shared/events.py",
+      "label": "shared/events.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:shared/logging.py",
+      "label": "shared/logging.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:shared/metrics.py",
+      "label": "shared/metrics.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:shared/retry.py",
+      "label": "shared/retry.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:shared/tracing.py",
+      "label": "shared/tracing.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/auth/jwt.py::Algorithm",
+      "label": "Algorithm",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/jwt.py::TokenType",
+      "label": "TokenType",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/jwt.py::TokenClaims",
+      "label": "TokenClaims",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/auth/jwt.py::to_dict",
+      "label": "to_dict",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/jwt.py::from_dict",
+      "label": "from_dict",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/auth/jwt.py::JWTError",
+      "label": "JWTError",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/jwt.py::TokenExpiredError",
+      "label": "TokenExpiredError",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/jwt.py::InvalidSignatureError",
+      "label": "InvalidSignatureError",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/jwt.py::InvalidClaimError",
+      "label": "InvalidClaimError",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/auth/jwt.py::base64url_encode",
+      "label": "base64url_encode",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/jwt.py::base64url_decode",
+      "label": "base64url_decode",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/auth/jwt.py::JWTEncoder",
+      "label": "JWTEncoder",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/auth/jwt.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/jwt.py::_sign",
+      "label": "_sign",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/jwt.py::encode",
+      "label": "encode",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/auth/jwt.py::JWTDecoder",
+      "label": "JWTDecoder",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/auth/jwt.py::_verify_signature",
+      "label": "_verify_signature",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/jwt.py::decode",
+      "label": "decode",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/auth/jwt.py::TokenValidator",
+      "label": "TokenValidator",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/auth/jwt.py::validate",
+      "label": "validate",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/jwt.py::validate_async",
+      "label": "validate_async",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/auth/models.py::UserStatus",
+      "label": "UserStatus",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/models.py::UserRole",
+      "label": "UserRole",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/models.py::Permission",
+      "label": "Permission",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/models.py::TokenStatus",
+      "label": "TokenStatus",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/models.py::TokenPurpose",
+      "label": "TokenPurpose",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/models.py::SessionStatus",
+      "label": "SessionStatus",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/models.py::AuthProvider",
+      "label": "AuthProvider",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/models.py::User",
+      "label": "User",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/auth/models.py::has_role",
+      "label": "has_role",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/models.py::has_permission",
+      "label": "has_permission",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/models.py::is_locked",
+      "label": "is_locked",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/models.py::full_name",
+      "label": "full_name",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/auth/models.py::Token",
+      "label": "Token",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/auth/models.py::is_valid",
+      "label": "is_valid",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/models.py::revoke",
+      "label": "revoke",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/models.py::use",
+      "label": "use",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/models.py::expires_in_seconds",
+      "label": "expires_in_seconds",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/auth/models.py::Session",
+      "label": "Session",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/auth/models.py::is_active",
+      "label": "is_active",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/models.py::record_activity",
+      "label": "record_activity",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/models.py::logout",
+      "label": "logout",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/models.py::duration_seconds",
+      "label": "duration_seconds",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/models.py::idle_seconds",
+      "label": "idle_seconds",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/auth/models.py::RefreshToken",
+      "label": "RefreshToken",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/models.py::UserInvite",
+      "label": "UserInvite",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/models.py::AuditEntry",
+      "label": "AuditEntry",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/oauth.py::OAuth2Flow",
+      "label": "OAuth2Flow",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/oauth.py::OAuth2ResponseType",
+      "label": "OAuth2ResponseType",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/oauth.py::OAuth2Client",
+      "label": "OAuth2Client",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/oauth.py::OAuth2AuthorizationCode",
+      "label": "OAuth2AuthorizationCode",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/oauth.py::OAuth2TokenResponse",
+      "label": "OAuth2TokenResponse",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/oauth.py::OAuth2ErrorResponse",
+      "label": "OAuth2ErrorResponse",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/oauth.py::OAuth2Provider",
+      "label": "OAuth2Provider",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/auth/oauth.py::get_authorization_url",
+      "label": "get_authorization_url",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/oauth.py::exchange_code_for_token",
+      "label": "exchange_code_for_token",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/oauth.py::refresh_access_token",
+      "label": "refresh_access_token",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/oauth.py::revoke_token",
+      "label": "revoke_token",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/oauth.py::introspect_token",
+      "label": "introspect_token",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/auth/oauth.py::InternalOAuth2Provider",
+      "label": "InternalOAuth2Provider",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/auth/oauth.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/oauth.py::_generate_code",
+      "label": "_generate_code",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/oauth.py::create_default_oauth_provider",
+      "label": "create_default_oauth_provider",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/auth/saml.py::SAMLBinding",
+      "label": "SAMLBinding",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/saml.py::SAMLStatus",
+      "label": "SAMLStatus",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/saml.py::NameIDFormat",
+      "label": "NameIDFormat",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/saml.py::SAMLIdentityProviderConfig",
+      "label": "SAMLIdentityProviderConfig",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/saml.py::SAMLServiceProviderConfig",
+      "label": "SAMLServiceProviderConfig",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/saml.py::SAMLRequest",
+      "label": "SAMLRequest",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/saml.py::SAMLAssertion",
+      "label": "SAMLAssertion",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/saml.py::SAMLResponse",
+      "label": "SAMLResponse",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/saml.py::SAMLIdentityProvider",
+      "label": "SAMLIdentityProvider",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/auth/saml.py::create_authn_request",
+      "label": "create_authn_request",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/saml.py::parse_and_validate_response",
+      "label": "parse_and_validate_response",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/saml.py::create_logout_request",
+      "label": "create_logout_request",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/saml.py::parse_logout_response",
+      "label": "parse_logout_response",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/auth/saml.py::SAMLSingleSignOn",
+      "label": "SAMLSingleSignOn",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/auth/saml.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/saml.py::_generate_id",
+      "label": "_generate_id",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/saml.py::_deflate_and_encode",
+      "label": "_deflate_and_encode",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/saml.py::_decode_and_inflate",
+      "label": "_decode_and_inflate",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/saml.py::create_default_saml_configs",
+      "label": "create_default_saml_configs",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/auth/server.py::AuthMethod",
+      "label": "AuthMethod",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/server.py::AuthRequest",
+      "label": "AuthRequest",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/server.py::AuthResponse",
+      "label": "AuthResponse",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth/server.py::AuthHandler",
+      "label": "AuthHandler",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/auth/server.py::authenticate",
+      "label": "authenticate",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/server.py::supports",
+      "label": "supports",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/auth/server.py::PasswordAuthHandler",
+      "label": "PasswordAuthHandler",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/auth/server.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/server.py::_verify_password",
+      "label": "_verify_password",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/auth/server.py::AuthServiceServer",
+      "label": "AuthServiceServer",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/auth/server.py::_get_handler",
+      "label": "_get_handler",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/server.py::validate_token",
+      "label": "validate_token",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth/server.py::create_auth_server",
+      "label": "create_auth_server",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/billing/payments.py::PaymentStatus",
+      "label": "PaymentStatus",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/billing/payments.py::PaymentMethodType",
+      "label": "PaymentMethodType",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/billing/payments.py::CardBrand",
+      "label": "CardBrand",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/billing/payments.py::CardDetails",
+      "label": "CardDetails",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/billing/payments.py::PaymentMethod",
+      "label": "PaymentMethod",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/billing/payments.py::PaymentResult",
+      "label": "PaymentResult",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/billing/payments.py::RefundResult",
+      "label": "RefundResult",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/billing/payments.py::PaymentProcessor",
+      "label": "PaymentProcessor",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/billing/payments.py::charge",
+      "label": "charge",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/payments.py::refund",
+      "label": "refund",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/payments.py::get_payment",
+      "label": "get_payment",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/payments.py::create_payment_method",
+      "label": "create_payment_method",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/payments.py::delete_payment_method",
+      "label": "delete_payment_method",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/payments.py::processor_name",
+      "label": "processor_name",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/billing/payments.py::StripeProcessor",
+      "label": "StripeProcessor",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/billing/payments.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/billing/payments.py::PayPalProcessor",
+      "label": "PayPalProcessor",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/billing/payments.py::_get_access_token",
+      "label": "_get_access_token",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/billing/plans.py::BillingCycle",
+      "label": "BillingCycle",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/billing/plans.py::PlanTier",
+      "label": "PlanTier",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/billing/plans.py::FeatureType",
+      "label": "FeatureType",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/billing/plans.py::Feature",
+      "label": "Feature",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/billing/plans.py::get_display_value",
+      "label": "get_display_value",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/billing/plans.py::PricingTier",
+      "label": "PricingTier",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/billing/plans.py::effective_price",
+      "label": "effective_price",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/plans.py::monthly_equivalent",
+      "label": "monthly_equivalent",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/billing/plans.py::SubscriptionPlan",
+      "label": "SubscriptionPlan",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/billing/plans.py::get_feature",
+      "label": "get_feature",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/plans.py::has_feature",
+      "label": "has_feature",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/plans.py::get_feature_value",
+      "label": "get_feature_value",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/plans.py::price_per_cycle",
+      "label": "price_per_cycle",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/plans.py::monthly_price",
+      "label": "monthly_price",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/plans.py::get_available_billing_cycles",
+      "label": "get_available_billing_cycles",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/plans.py::is_downgrade_from",
+      "label": "is_downgrade_from",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/plans.py::is_upgrade_from",
+      "label": "is_upgrade_from",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/billing/plans.py::PlanManager",
+      "label": "PlanManager",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/billing/plans.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/plans.py::_initialize_default_plans",
+      "label": "_initialize_default_plans",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/plans.py::get_plan",
+      "label": "get_plan",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/plans.py::list_plans",
+      "label": "list_plans",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/plans.py::create_plan",
+      "label": "create_plan",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/plans.py::update_plan",
+      "label": "update_plan",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/plans.py::deactivate_plan",
+      "label": "deactivate_plan",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/billing/server.py::BillingCommand",
+      "label": "BillingCommand",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/billing/server.py::BillingResponse",
+      "label": "BillingResponse",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/billing/server.py::BillingServiceServer",
+      "label": "BillingServiceServer",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/billing/server.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/server.py::get_payment_processor",
+      "label": "get_payment_processor",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/server.py::create_subscription",
+      "label": "create_subscription",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/server.py::cancel_subscription",
+      "label": "cancel_subscription",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/server.py::get_subscription",
+      "label": "get_subscription",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/server.py::list_customer_subscriptions",
+      "label": "list_customer_subscriptions",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/billing/server.py::create_billing_server",
+      "label": "create_billing_server",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/users/db.py::UserRepository",
+      "label": "UserRepository",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/users/db.py::find_by_id",
+      "label": "find_by_id",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/db.py::find_by_email",
+      "label": "find_by_email",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/db.py::find_by_username",
+      "label": "find_by_username",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/db.py::find_all",
+      "label": "find_all",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/db.py::create",
+      "label": "create",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/db.py::update",
+      "label": "update",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/db.py::delete",
+      "label": "delete",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/db.py::count",
+      "label": "count",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/users/db.py::InMemoryUserRepository",
+      "label": "InMemoryUserRepository",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/users/db.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/users/db.py::DatabaseUserRepository",
+      "label": "DatabaseUserRepository",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/handlers.py::HandlerResult",
+      "label": "HandlerResult",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/handlers.py::UserHandler",
+      "label": "UserHandler",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/users/handlers.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/handlers.py::handle",
+      "label": "handle",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/handlers.py::validate",
+      "label": "validate",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/users/handlers.py::CreateUserRequest",
+      "label": "CreateUserRequest",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/handlers.py::UpdateUserRequest",
+      "label": "UpdateUserRequest",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/handlers.py::DeleteUserRequest",
+      "label": "DeleteUserRequest",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/handlers.py::GetUserRequest",
+      "label": "GetUserRequest",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/handlers.py::ListUsersRequest",
+      "label": "ListUsersRequest",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/handlers.py::CreateUserHandler",
+      "label": "CreateUserHandler",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/handlers.py::UpdateUserHandler",
+      "label": "UpdateUserHandler",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/handlers.py::DeleteUserHandler",
+      "label": "DeleteUserHandler",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/handlers.py::GetUserHandler",
+      "label": "GetUserHandler",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/handlers.py::ListUsersHandler",
+      "label": "ListUsersHandler",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/models.py::UserStatus",
+      "label": "UserStatus",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/models.py::Timezone",
+      "label": "Timezone",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/models.py::Locale",
+      "label": "Locale",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/models.py::ContactInfo",
+      "label": "ContactInfo",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/models.py::UserNotificationSettings",
+      "label": "UserNotificationSettings",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/models.py::UserPreferences",
+      "label": "UserPreferences",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/models.py::UserSocialLinks",
+      "label": "UserSocialLinks",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/models.py::UserProfile",
+      "label": "UserProfile",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/users/models.py::full_name",
+      "label": "full_name",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/models.py::initials",
+      "label": "initials",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/models.py::is_active",
+      "label": "is_active",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/models.py::is_verified",
+      "label": "is_verified",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/models.py::is_locked",
+      "label": "is_locked",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/models.py::record_login",
+      "label": "record_login",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/models.py::record_failed_login",
+      "label": "record_failed_login",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/users/models.py::UserSearchResult",
+      "label": "UserSearchResult",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/models.py::UserActivity",
+      "label": "UserActivity",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/server.py::UserCommand",
+      "label": "UserCommand",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/server.py::UserServiceResponse",
+      "label": "UserServiceResponse",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/users/server.py::UserServiceServer",
+      "label": "UserServiceServer",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/users/server.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/server.py::register_handler",
+      "label": "register_handler",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/server.py::_get_handler",
+      "label": "_get_handler",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/server.py::create_user",
+      "label": "create_user",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/server.py::update_user",
+      "label": "update_user",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/server.py::delete_user",
+      "label": "delete_user",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/server.py::get_user",
+      "label": "get_user",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/users/server.py::create_user_server",
+      "label": "create_user_server",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/circuit_breaker.py::CircuitState",
+      "label": "CircuitState",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:shared/circuit_breaker.py::CircuitBreakerError",
+      "label": "CircuitBreakerError",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:shared/circuit_breaker.py::CircuitOpenError",
+      "label": "CircuitOpenError",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:shared/circuit_breaker.py::CircuitBreakerMetrics",
+      "label": "CircuitBreakerMetrics",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:shared/circuit_breaker.py::CircuitBreaker",
+      "label": "CircuitBreaker",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/circuit_breaker.py::state",
+      "label": "state",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/circuit_breaker.py::_try_auto_transition_from_open",
+      "label": "_try_auto_transition_from_open",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/circuit_breaker.py::_record_success",
+      "label": "_record_success",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/circuit_breaker.py::_record_failure",
+      "label": "_record_failure",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/circuit_breaker.py::_transition_to_open",
+      "label": "_transition_to_open",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/circuit_breaker.py::_transition_to_closed",
+      "label": "_transition_to_closed",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/circuit_breaker.py::execute",
+      "label": "execute",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/circuit_breaker.py::__call__",
+      "label": "__call__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/circuit_breaker.py::get_circuit_breaker",
+      "label": "get_circuit_breaker",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/events.py::EventType",
+      "label": "EventType",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:shared/events.py::Event",
+      "label": "Event",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:shared/events.py::EventHandler",
+      "label": "EventHandler",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/events.py::handle",
+      "label": "handle",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/events.py::EventBus",
+      "label": "EventBus",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/events.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/events.py::subscribe",
+      "label": "subscribe",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/events.py::unsubscribe",
+      "label": "unsubscribe",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/events.py::publish",
+      "label": "publish",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/events.py::_dispatch",
+      "label": "_dispatch",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/events.py::get_event_bus",
+      "label": "get_event_bus",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/logging.py::LogLevel",
+      "label": "LogLevel",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:shared/logging.py::LogEntry",
+      "label": "LogEntry",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/logging.py::to_dict",
+      "label": "to_dict",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/logging.py::LogFormatter",
+      "label": "LogFormatter",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/logging.py::format",
+      "label": "format",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/logging.py::JSONFormatter",
+      "label": "JSONFormatter",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:shared/logging.py::ConsoleFormatter",
+      "label": "ConsoleFormatter",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:shared/logging.py::Logger",
+      "label": "Logger",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/logging.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/logging.py::set_trace_context_getter",
+      "label": "set_trace_context_getter",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/logging.py::_get_trace_context",
+      "label": "_get_trace_context",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/logging.py::_should_log",
+      "label": "_should_log",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/logging.py::_log",
+      "label": "_log",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/logging.py::debug",
+      "label": "debug",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/logging.py::info",
+      "label": "info",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/logging.py::warning",
+      "label": "warning",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/logging.py::error",
+      "label": "error",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/logging.py::critical",
+      "label": "critical",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/logging.py::get_logger",
+      "label": "get_logger",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/logging.py::structured_log",
+      "label": "structured_log",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/metrics.py::MetricType",
+      "label": "MetricType",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:shared/metrics.py::MetricLabel",
+      "label": "MetricLabel",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:shared/metrics.py::Counter",
+      "label": "Counter",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/metrics.py::inc",
+      "label": "inc",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/metrics.py::value",
+      "label": "value",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/metrics.py::Gauge",
+      "label": "Gauge",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/metrics.py::dec",
+      "label": "dec",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/metrics.py::set",
+      "label": "set",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/metrics.py::Histogram",
+      "label": "Histogram",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/metrics.py::observe",
+      "label": "observe",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/metrics.py::sum",
+      "label": "sum",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/metrics.py::count",
+      "label": "count",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/metrics.py::MetricsCollector",
+      "label": "MetricsCollector",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/metrics.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/metrics.py::counter",
+      "label": "counter",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/metrics.py::gauge",
+      "label": "gauge",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/metrics.py::histogram",
+      "label": "histogram",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/metrics.py::increment_counter",
+      "label": "increment_counter",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/metrics.py::set_gauge",
+      "label": "set_gauge",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/metrics.py::observe_histogram",
+      "label": "observe_histogram",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/metrics.py::generate_report",
+      "label": "generate_report",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/metrics.py::get_collector",
+      "label": "get_collector",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/retry.py::BackoffStrategy",
+      "label": "BackoffStrategy",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:shared/retry.py::RetryPolicy",
+      "label": "RetryPolicy",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/retry.py::calculate_delay",
+      "label": "calculate_delay",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/retry.py::should_retry",
+      "label": "should_retry",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/retry.py::AsyncRetryPolicy",
+      "label": "AsyncRetryPolicy",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/retry.py::execute",
+      "label": "execute",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/retry.py::retry",
+      "label": "retry",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/tracing.py::SpanKind",
+      "label": "SpanKind",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:shared/tracing.py::TraceContext",
+      "label": "TraceContext",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "class:shared/tracing.py::Span",
+      "label": "Span",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/tracing.py::set_attribute",
+      "label": "set_attribute",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/tracing.py::end",
+      "label": "end",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/tracing.py::duration_ms",
+      "label": "duration_ms",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:shared/tracing.py::Tracer",
+      "label": "Tracer",
+      "type": "class",
+      "summary": "",
+      "importance": 0.6
+    },
+    {
+      "id": "func:shared/tracing.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/tracing.py::start_span",
+      "label": "start_span",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/tracing.py::trace",
+      "label": "trace",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:shared/tracing.py::get_trace_context",
+      "label": "get_trace_context",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    }
+  ],
+  "links": [
+    {
+      "source": "file:services/auth/jwt.py",
+      "target": "class:services/auth/jwt.py::Algorithm",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/jwt.py",
+      "target": "class:services/auth/jwt.py::TokenType",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/jwt.py",
+      "target": "class:services/auth/jwt.py::TokenClaims",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/jwt.py",
+      "target": "class:services/auth/jwt.py::JWTError",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/jwt.py",
+      "target": "class:services/auth/jwt.py::TokenExpiredError",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/jwt.py",
+      "target": "class:services/auth/jwt.py::InvalidSignatureError",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/jwt.py",
+      "target": "class:services/auth/jwt.py::InvalidClaimError",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/jwt.py",
+      "target": "func:services/auth/jwt.py::base64url_encode",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/jwt.py",
+      "target": "func:services/auth/jwt.py::base64url_decode",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/jwt.py",
+      "target": "class:services/auth/jwt.py::JWTEncoder",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/jwt.py",
+      "target": "class:services/auth/jwt.py::JWTDecoder",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/jwt.py",
+      "target": "class:services/auth/jwt.py::TokenValidator",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/models.py",
+      "target": "class:services/auth/models.py::UserStatus",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/models.py",
+      "target": "class:services/auth/models.py::UserRole",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/models.py",
+      "target": "class:services/auth/models.py::Permission",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/models.py",
+      "target": "class:services/auth/models.py::TokenStatus",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/models.py",
+      "target": "class:services/auth/models.py::TokenPurpose",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/models.py",
+      "target": "class:services/auth/models.py::SessionStatus",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/models.py",
+      "target": "class:services/auth/models.py::AuthProvider",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/models.py",
+      "target": "class:services/auth/models.py::User",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/models.py",
+      "target": "class:services/auth/models.py::Token",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/models.py",
+      "target": "class:services/auth/models.py::Session",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/models.py",
+      "target": "class:services/auth/models.py::RefreshToken",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/models.py",
+      "target": "class:services/auth/models.py::UserInvite",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/models.py",
+      "target": "class:services/auth/models.py::AuditEntry",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/oauth.py",
+      "target": "class:services/auth/oauth.py::OAuth2Flow",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/oauth.py",
+      "target": "class:services/auth/oauth.py::OAuth2ResponseType",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/oauth.py",
+      "target": "class:services/auth/oauth.py::OAuth2Client",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/oauth.py",
+      "target": "class:services/auth/oauth.py::OAuth2AuthorizationCode",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/oauth.py",
+      "target": "class:services/auth/oauth.py::OAuth2TokenResponse",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/oauth.py",
+      "target": "class:services/auth/oauth.py::OAuth2ErrorResponse",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/oauth.py",
+      "target": "class:services/auth/oauth.py::OAuth2Provider",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/oauth.py",
+      "target": "class:services/auth/oauth.py::InternalOAuth2Provider",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/oauth.py",
+      "target": "func:services/auth/oauth.py::create_default_oauth_provider",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/saml.py",
+      "target": "class:services/auth/saml.py::SAMLBinding",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/saml.py",
+      "target": "class:services/auth/saml.py::SAMLStatus",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/saml.py",
+      "target": "class:services/auth/saml.py::NameIDFormat",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/saml.py",
+      "target": "class:services/auth/saml.py::SAMLIdentityProviderConfig",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/saml.py",
+      "target": "class:services/auth/saml.py::SAMLServiceProviderConfig",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/saml.py",
+      "target": "class:services/auth/saml.py::SAMLRequest",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/saml.py",
+      "target": "class:services/auth/saml.py::SAMLAssertion",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/saml.py",
+      "target": "class:services/auth/saml.py::SAMLResponse",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/saml.py",
+      "target": "class:services/auth/saml.py::SAMLIdentityProvider",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/saml.py",
+      "target": "class:services/auth/saml.py::SAMLSingleSignOn",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/saml.py",
+      "target": "func:services/auth/saml.py::create_default_saml_configs",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/server.py",
+      "target": "class:services/auth/server.py::AuthMethod",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/server.py",
+      "target": "class:services/auth/server.py::AuthRequest",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/server.py",
+      "target": "class:services/auth/server.py::AuthResponse",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/server.py",
+      "target": "class:services/auth/server.py::AuthHandler",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/server.py",
+      "target": "class:services/auth/server.py::PasswordAuthHandler",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/server.py",
+      "target": "class:services/auth/server.py::AuthServiceServer",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth/server.py",
+      "target": "func:services/auth/server.py::create_auth_server",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/billing/payments.py",
+      "target": "class:services/billing/payments.py::PaymentStatus",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/billing/payments.py",
+      "target": "class:services/billing/payments.py::PaymentMethodType",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/billing/payments.py",
+      "target": "class:services/billing/payments.py::CardBrand",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/billing/payments.py",
+      "target": "class:services/billing/payments.py::CardDetails",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/billing/payments.py",
+      "target": "class:services/billing/payments.py::PaymentMethod",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/billing/payments.py",
+      "target": "class:services/billing/payments.py::PaymentResult",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/billing/payments.py",
+      "target": "class:services/billing/payments.py::RefundResult",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/billing/payments.py",
+      "target": "class:services/billing/payments.py::PaymentProcessor",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/billing/payments.py",
+      "target": "class:services/billing/payments.py::StripeProcessor",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/billing/payments.py",
+      "target": "class:services/billing/payments.py::PayPalProcessor",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/billing/plans.py",
+      "target": "class:services/billing/plans.py::BillingCycle",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/billing/plans.py",
+      "target": "class:services/billing/plans.py::PlanTier",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/billing/plans.py",
+      "target": "class:services/billing/plans.py::FeatureType",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/billing/plans.py",
+      "target": "class:services/billing/plans.py::Feature",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/billing/plans.py",
+      "target": "class:services/billing/plans.py::PricingTier",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/billing/plans.py",
+      "target": "class:services/billing/plans.py::SubscriptionPlan",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/billing/plans.py",
+      "target": "class:services/billing/plans.py::PlanManager",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/billing/server.py",
+      "target": "class:services/billing/server.py::BillingCommand",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/billing/server.py",
+      "target": "class:services/billing/server.py::BillingResponse",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/billing/server.py",
+      "target": "class:services/billing/server.py::BillingServiceServer",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/billing/server.py",
+      "target": "func:services/billing/server.py::create_billing_server",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/db.py",
+      "target": "class:services/users/db.py::UserRepository",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/db.py",
+      "target": "class:services/users/db.py::InMemoryUserRepository",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/db.py",
+      "target": "class:services/users/db.py::DatabaseUserRepository",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/handlers.py",
+      "target": "class:services/users/handlers.py::HandlerResult",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/handlers.py",
+      "target": "class:services/users/handlers.py::UserHandler",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/handlers.py",
+      "target": "class:services/users/handlers.py::CreateUserRequest",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/handlers.py",
+      "target": "class:services/users/handlers.py::UpdateUserRequest",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/handlers.py",
+      "target": "class:services/users/handlers.py::DeleteUserRequest",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/handlers.py",
+      "target": "class:services/users/handlers.py::GetUserRequest",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/handlers.py",
+      "target": "class:services/users/handlers.py::ListUsersRequest",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/handlers.py",
+      "target": "class:services/users/handlers.py::CreateUserHandler",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/handlers.py",
+      "target": "class:services/users/handlers.py::UpdateUserHandler",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/handlers.py",
+      "target": "class:services/users/handlers.py::DeleteUserHandler",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/handlers.py",
+      "target": "class:services/users/handlers.py::GetUserHandler",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/handlers.py",
+      "target": "class:services/users/handlers.py::ListUsersHandler",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/models.py",
+      "target": "class:services/users/models.py::UserStatus",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/models.py",
+      "target": "class:services/users/models.py::Timezone",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/models.py",
+      "target": "class:services/users/models.py::Locale",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/models.py",
+      "target": "class:services/users/models.py::ContactInfo",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/models.py",
+      "target": "class:services/users/models.py::UserNotificationSettings",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/models.py",
+      "target": "class:services/users/models.py::UserPreferences",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/models.py",
+      "target": "class:services/users/models.py::UserSocialLinks",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/models.py",
+      "target": "class:services/users/models.py::UserProfile",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/models.py",
+      "target": "class:services/users/models.py::UserSearchResult",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/models.py",
+      "target": "class:services/users/models.py::UserActivity",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/server.py",
+      "target": "class:services/users/server.py::UserCommand",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/server.py",
+      "target": "class:services/users/server.py::UserServiceResponse",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/server.py",
+      "target": "class:services/users/server.py::UserServiceServer",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/users/server.py",
+      "target": "func:services/users/server.py::create_user_server",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/circuit_breaker.py",
+      "target": "class:shared/circuit_breaker.py::CircuitState",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/circuit_breaker.py",
+      "target": "class:shared/circuit_breaker.py::CircuitBreakerError",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/circuit_breaker.py",
+      "target": "class:shared/circuit_breaker.py::CircuitOpenError",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/circuit_breaker.py",
+      "target": "class:shared/circuit_breaker.py::CircuitBreakerMetrics",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/circuit_breaker.py",
+      "target": "class:shared/circuit_breaker.py::CircuitBreaker",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/circuit_breaker.py",
+      "target": "func:shared/circuit_breaker.py::get_circuit_breaker",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/events.py",
+      "target": "class:shared/events.py::EventType",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/events.py",
+      "target": "class:shared/events.py::Event",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/events.py",
+      "target": "class:shared/events.py::EventHandler",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/events.py",
+      "target": "class:shared/events.py::EventBus",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/events.py",
+      "target": "func:shared/events.py::get_event_bus",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/logging.py",
+      "target": "class:shared/logging.py::LogLevel",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/logging.py",
+      "target": "class:shared/logging.py::LogEntry",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/logging.py",
+      "target": "class:shared/logging.py::LogFormatter",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/logging.py",
+      "target": "class:shared/logging.py::JSONFormatter",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/logging.py",
+      "target": "class:shared/logging.py::ConsoleFormatter",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/logging.py",
+      "target": "class:shared/logging.py::Logger",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/logging.py",
+      "target": "func:shared/logging.py::get_logger",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/logging.py",
+      "target": "func:shared/logging.py::structured_log",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/metrics.py",
+      "target": "class:shared/metrics.py::MetricType",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/metrics.py",
+      "target": "class:shared/metrics.py::MetricLabel",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/metrics.py",
+      "target": "class:shared/metrics.py::Counter",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/metrics.py",
+      "target": "class:shared/metrics.py::Gauge",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/metrics.py",
+      "target": "class:shared/metrics.py::Histogram",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/metrics.py",
+      "target": "class:shared/metrics.py::MetricsCollector",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/metrics.py",
+      "target": "func:shared/metrics.py::get_collector",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/metrics.py",
+      "target": "func:shared/metrics.py::counter",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/metrics.py",
+      "target": "func:shared/metrics.py::histogram",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/retry.py",
+      "target": "class:shared/retry.py::BackoffStrategy",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/retry.py",
+      "target": "class:shared/retry.py::RetryPolicy",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/retry.py",
+      "target": "class:shared/retry.py::AsyncRetryPolicy",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/retry.py",
+      "target": "func:shared/retry.py::retry",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/tracing.py",
+      "target": "class:shared/tracing.py::SpanKind",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/tracing.py",
+      "target": "class:shared/tracing.py::TraceContext",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/tracing.py",
+      "target": "class:shared/tracing.py::Span",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/tracing.py",
+      "target": "class:shared/tracing.py::Tracer",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/tracing.py",
+      "target": "func:shared/tracing.py::get_trace_context",
+      "relation": "defines"
+    },
+    {
+      "source": "file:shared/tracing.py",
+      "target": "func:shared/tracing.py::trace",
+      "relation": "defines"
+    }
+  ]
+};
+const width = window.innerWidth;
+const height = window.innerHeight;
+
+const svg = d3.select("svg");
+const g = svg.append("g");
+
+const zoom = d3.zoom()
+  .scaleExtent([0.1, 4])
+  .on("zoom", (event) => g.attr("transform", event.transform));
+
+svg.call(zoom);
+
+const colorMap = { file: "#58a6ff", class: "#d29922", function: "#3fb950", module: "#bc8cff" };
+
+const simulation = d3.forceSimulation(graphData.nodes)
+  .force("link", d3.forceLink(graphData.links).id(d => d.id).distance(d => {
+    return d.relation === "imports" ? 100 : 80;
+  }))
+  .force("charge", d3.forceManyBody().strength(-200))
+  .force("center", d3.forceCenter(width / 2, height / 2))
+  .force("collision", d3.forceCollide(20));
+
+const link = g.append("g")
+  .selectAll("line")
+  .data(graphData.links)
+  .join("line")
+  .attr("class", d => `link ${d.relation}`)
+  .attr("stroke-width", 1.5);
+
+const node = g.append("g")
+  .selectAll("g")
+  .data(graphData.nodes)
+  .join("g")
+  .attr("class", "node")
+  .call(d3.drag()
+    .on("start", (event, d) => {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    })
+    .on("drag", (event, d) => {
+      d.fx = event.x;
+      d.fy = event.y;
+    })
+    .on("end", (event, d) => {
+      if (!event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    })
+  );
+
+node.append("circle")
+  .attr("r", d => 5 + (d.importance || 0.5) * 8)
+  .attr("fill", d => colorMap[d.type] || "#8b949e")
+  .attr("stroke", "#161b22")
+  .attr("stroke-width", 1.5);
+
+node.append("text")
+  .attr("class", "node-label")
+  .text(d => d.label)
+  .attr("dx", d => 10 + (d.importance || 0.5) * 5)
+  .attr("dy", 4);
+
+node.on("mouseover", function(event, d) {
+  const tt = d3.select("#tooltip");
+  tt.style("display", "block");
+  tt.select(".tt-name").text(d.label);
+  tt.select(".tt-type").text(`Type: ${d.type}`);
+  tt.select(".tt-summary").text(d.summary || "");
+
+  const connected = new Set();
+  graphData.links.forEach(l => {
+    const sid = typeof l.source === 'object' ? l.source.id : l.source;
+    const tid = typeof l.target === 'object' ? l.target.id : l.target;
+    if (sid === d.id) connected.add(tid);
+    if (tid === d.id) connected.add(sid);
+  });
+
+  d3.selectAll(".node").each(function(n) {
+    if (n.id === d.id || connected.has(n.id)) {
+      d3.select(this).classed("highlighted", true);
+      d3.select(this).select("circle").attr("opacity", 1);
+      d3.select(this).select("text").attr("opacity", 1);
+    } else {
+      d3.select(this).select("circle").attr("opacity", 0.15);
+      d3.select(this).select("text").attr("opacity", 0.15);
+    }
+  });
+
+  d3.selectAll(".link").each(function(l) {
+    const sid = typeof l.source === 'object' ? l.source.id : l.source;
+    const tid = typeof l.target === 'object' ? l.target.id : l.target;
+    if (sid === d.id || tid === d.id) {
+      d3.select(this).classed("highlighted", true);
+    }
+  });
+})
+.on("mousemove", function(event) {
+  d3.select("#tooltip")
+    .style("left", (event.pageX + 12) + "px")
+    .style("top", (event.pageY - 10) + "px");
+})
+.on("mouseout", function() {
+  d3.select("#tooltip").style("display", "none");
+  d3.selectAll(".node").each(function(n) {
+    d3.select(this).classed("highlighted", false);
+    d3.select(this).select("circle").attr("opacity", 1);
+    d3.select(this).select("text").attr("opacity", 1);
+  });
+  d3.selectAll(".link").classed("highlighted", false);
+});
+
+simulation.on("tick", () => {
+  link
+    .attr("x1", d => d.source.x)
+    .attr("y1", d => d.source.y)
+    .attr("x2", d => d.target.x)
+    .attr("y2", d => d.target.y);
+  node.attr("transform", d => `translate(${d.x},${d.y})`);
+});
+
+d3.select("#stats").text(`Nodes: ${graphData.nodes.length} | Edges: ${graphData.links.length}`);
+
+window.filterGraph = function(query) {
+  const q = query.toLowerCase();
+  d3.selectAll(".node").each(function(d) {
+    const match = !q || d.label.toLowerCase().includes(q) || (d.summary && d.summary.toLowerCase().includes(q));
+    d3.select(this).style("display", match ? null : "none");
+  });
+};
+
+window.filterByType = function(type) {
+  d3.selectAll(".node").each(function(d) {
+    const match = type === "all" || d.type === type;
+    d3.select(this).style("display", match ? null : "none");
+  });
+};
+
+window.addEventListener("resize", () => {
+  svg.attr("width", window.innerWidth).attr("height", window.innerHeight);
+});
+</script>
+</body>
+</html>

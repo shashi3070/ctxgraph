@@ -1,0 +1,12 @@
+[graph]
+exclude = ["legacy", "vendor"]
+
+[ai]
+provider = "ollama"
+model = "llama3.2"
+endpoint = "http://localhost:11434"
+
+[context]
+mode = "balanced"
+max_nodes = 20
+max_depth = 2

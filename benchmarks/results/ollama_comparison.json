@@ -1,0 +1,44 @@
+{
+  "tiny_app": {
+    "project": "tiny_app",
+    "file_count": 5,
+    "raw_tokens": 1533,
+    "build_time_ms": 64.6,
+    "base_capsule_tokens": 26,
+    "base_savings_pct": 98.3,
+    "enriched_capsule_tokens": 67,
+    "enriched_savings_pct": 95.6,
+    "token_overhead_pct": 157.7,
+    "ollama_enriched_count": 5,
+    "ollama_time_total_s": 23.0,
+    "ollama_time_per_file_s": 4.6
+  },
+  "web_api": {
+    "project": "web_api",
+    "file_count": 18,
+    "raw_tokens": 6191,
+    "build_time_ms": 186.2,
+    "base_capsule_tokens": 141,
+    "base_savings_pct": 97.7,
+    "enriched_capsule_tokens": 260,
+    "enriched_savings_pct": 95.8,
+    "token_overhead_pct": 84.4,
+    "ollama_enriched_count": 18,
+    "ollama_time_total_s": 82.5,
+    "ollama_time_per_file_s": 4.6
+  },
+  "microsvc": {
+    "project": "microsvc",
+    "file_count": 18,
+    "raw_tokens": 10342,
+    "build_time_ms": 595.9,
+    "base_capsule_tokens": 17,
+    "base_savings_pct": 99.8,
+    "enriched_capsule_tokens": 17,
+    "enriched_savings_pct": 99.8,
+    "token_overhead_pct": 0.0,
+    "ollama_enriched_count": 18,
+    "ollama_time_total_s": 83.9,
+    "ollama_time_per_file_s": 4.7
+  }
+}

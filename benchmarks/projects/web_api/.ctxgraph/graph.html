@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ctxgraph - Knowledge Graph</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d1117; color: #c9d1d9; overflow: hidden; }
+#container { width: 100vw; height: 100vh; position: relative; }
+svg { width: 100%; height: 100%; }
+#toolbar { position: absolute; top: 16px; left: 16px; z-index: 10; display: flex; gap: 8px; align-items: center; background: #161b22; padding: 12px 16px; border-radius: 8px; border: 1px solid #30363d; }
+#toolbar input { background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; padding: 6px 12px; border-radius: 4px; width: 220px; font-size: 13px; }
+#toolbar select { background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; padding: 6px 8px; border-radius: 4px; font-size: 13px; }
+#toolbar label { font-size: 13px; color: #8b949e; }
+#legend { position: absolute; bottom: 16px; left: 16px; z-index: 10; background: #161b22; padding: 12px; border-radius: 8px; border: 1px solid #30363d; font-size: 12px; display: flex; gap: 16px; }
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+#tooltip { position: absolute; z-index: 20; background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 12px; font-size: 13px; max-width: 400px; pointer-events: none; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+#tooltip .tt-name { font-weight: 600; color: #58a6ff; margin-bottom: 4px; }
+#tooltip .tt-type { color: #8b949e; font-size: 11px; margin-bottom: 4px; }
+#tooltip .tt-summary { color: #c9d1d9; font-size: 12px; }
+#stats { position: absolute; bottom: 16px; right: 16px; z-index: 10; background: #161b22; padding: 8px 12px; border-radius: 8px; border: 1px solid #30363d; font-size: 11px; color: #8b949e; }
+.link { stroke-opacity: 0.4; }
+.link.imports { stroke: #58a6ff; }
+.link.calls { stroke: #3fb950; }
+.link.defines { stroke: #d29922; }
+.link.extends { stroke: #bc8cff; }
+.node { cursor: pointer; transition: opacity 0.2s; }
+.node:hover { opacity: 0.8; }
+.node-label { font-size: 11px; fill: #8b949e; pointer-events: none; text-shadow: 0 1px 2px #0d1117, 0 -1px 2px #0d1117, 1px 0 2px #0d1117, -1px 0 2px #0d1117; }
+.node.highlighted .node-label { fill: #c9d1d9; font-weight: 600; }
+.link.highlighted { stroke-opacity: 0.8; }
+</style>
+</head>
+<body>
+<div id="container">
+  <div id="toolbar">
+    <label>Search:</label>
+    <input type="text" id="search" placeholder="Search nodes..." oninput="filterGraph(this.value)">
+    <label>Filter:</label>
+    <select id="filterType" onchange="filterByType(this.value)">
+      <option value="all">All</option>
+      <option value="file">Files</option>
+      <option value="class">Classes</option>
+      <option value="function">Functions</option>
+    </select>
+  </div>
+  <div id="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#58a6ff"></div> File</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#d29922"></div> Class</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#3fb950"></div> Function</div>
+    <div class="legend-item"><svg width="20" height="2"><line x1="0" y1="1" x2="20" y2="1" stroke="#58a6ff" stroke-width="1.5" stroke-dasharray="4,2"/></svg> Import</div>
+    <div class="legend-item"><svg width="20" height="2"><line x1="0" y1="1" x2="20" y2="1" stroke="#3fb950" stroke-width="1.5" stroke-dasharray="2,2"/></svg> Call</div>
+  </div>
+  <div id="stats"></div>
+  <div id="tooltip">
+    <div class="tt-name"></div>
+    <div class="tt-type"></div>
+    <div class="tt-summary"></div>
+  </div>
+  <svg></svg>
+</div>
+<script>
+const graphData = {
+  "nodes": [
+    {
+      "id": "file:config.py",
+      "label": "config.py",
+      "type": "file",
+      "summary": "Defines classes: Settings",
+      "importance": 0.5
+    },
+    {
+      "id": "file:main.py",
+      "label": "main.py",
+      "type": "file",
+      "summary": "Defines classes: Application; Defines functions: main",
+      "importance": 0.5
+    },
+    {
+      "id": "file:middleware/auth.py",
+      "label": "middleware/auth.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:middleware/logging.py",
+      "label": "middleware/logging.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:middleware/rate_limit.py",
+      "label": "middleware/rate_limit.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:models/post.py",
+      "label": "models/post.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:models/user.py",
+      "label": "models/user.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:routes/admin.py",
+      "label": "routes/admin.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:routes/auth.py",
+      "label": "routes/auth.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:routes/posts.py",
+      "label": "routes/posts.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:routes/users.py",
+      "label": "routes/users.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:services/auth_service.py",
+      "label": "services/auth_service.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:services/post_service.py",
+      "label": "services/post_service.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:services/user_service.py",
+      "label": "services/user_service.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:tests/conftest.py",
+      "label": "tests/conftest.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:tests/test_auth.py",
+      "label": "tests/test_auth.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:tests/test_posts.py",
+      "label": "tests/test_posts.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "file:tests/test_users.py",
+      "label": "tests/test_users.py",
+      "type": "file",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:config.py::Settings",
+      "label": "Settings",
+      "type": "class",
+      "summary": "Application configuration sourced from environment variables with sensible defaults.",
+      "importance": 0.6
+    },
+    {
+      "id": "class:main.py::Application",
+      "label": "Application",
+      "type": "class",
+      "summary": "Minimal web framework that simulates a FastAPI-like request lifecycle.",
+      "importance": 0.6
+    },
+    {
+      "id": "func:main.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "Args: self",
+      "importance": 0.5
+    },
+    {
+      "id": "func:main.py::_setup_logging",
+      "label": "_setup_logging",
+      "type": "function",
+      "summary": "Args: self",
+      "importance": 0.5
+    },
+    {
+      "id": "func:main.py::_init_services",
+      "label": "_init_services",
+      "type": "function",
+      "summary": "Args: self",
+      "importance": 0.5
+    },
+    {
+      "id": "func:main.py::_init_middleware",
+      "label": "_init_middleware",
+      "type": "function",
+      "summary": "Args: self",
+      "importance": 0.5
+    },
+    {
+      "id": "func:main.py::_init_routes",
+      "label": "_init_routes",
+      "type": "function",
+      "summary": "Args: self",
+      "importance": 0.5
+    },
+    {
+      "id": "func:main.py::startup",
+      "label": "startup",
+      "type": "function",
+      "summary": "Initialize all registered services.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:main.py::_apply_middleware_chain",
+      "label": "_apply_middleware_chain",
+      "type": "function",
+      "summary": "Build a call chain by nesting middleware around the route handler.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:main.py::handle_request",
+      "label": "handle_request",
+      "type": "function",
+      "summary": "Dispatch a single request through the middleware + route handler.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:main.py::shutdown",
+      "label": "shutdown",
+      "type": "function",
+      "summary": "Clean up services and middleware.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:main.py::main",
+      "label": "main",
+      "type": "function",
+      "summary": "Entry point: bootstrap the app and demo a sample request.",
+      "importance": 0.5
+    },
+    {
+      "id": "class:middleware/auth.py::AuthMiddleware",
+      "label": "AuthMiddleware",
+      "type": "class",
+      "summary": "Middleware that validates JWT tokens from the Authorization header.",
+      "importance": 0.6
+    },
+    {
+      "id": "func:middleware/auth.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:middleware/auth.py::process_request",
+      "label": "process_request",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:middleware/auth.py::process_response",
+      "label": "process_response",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:middleware/logging.py::LoggingMiddleware",
+      "label": "LoggingMiddleware",
+      "type": "class",
+      "summary": "Middleware that logs every request with HTTP method, path, status code,\nand elapsed time. Optionally",
+      "importance": 0.6
+    },
+    {
+      "id": "func:middleware/logging.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:middleware/logging.py::process_request",
+      "label": "process_request",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:middleware/logging.py::process_response",
+      "label": "process_response",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:middleware/rate_limit.py::TokenBucket",
+      "label": "TokenBucket",
+      "type": "class",
+      "summary": "Token bucket rate limiter.",
+      "importance": 0.6
+    },
+    {
+      "id": "func:middleware/rate_limit.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:middleware/rate_limit.py::consume",
+      "label": "consume",
+      "type": "function",
+      "summary": "Try to consume *tokens* from the bucket for *key*.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:middleware/rate_limit.py::get_remaining",
+      "label": "get_remaining",
+      "type": "function",
+      "summary": "Return the current token count for *key* without consuming.",
+      "importance": 0.5
+    },
+    {
+      "id": "class:middleware/rate_limit.py::RateLimitMiddleware",
+      "label": "RateLimitMiddleware",
+      "type": "class",
+      "summary": "Middleware that enforces a token-bucket rate limit per client IP.",
+      "importance": 0.6
+    },
+    {
+      "id": "func:middleware/rate_limit.py::_get_client_key",
+      "label": "_get_client_key",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:middleware/rate_limit.py::process_request",
+      "label": "process_request",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:middleware/rate_limit.py::process_response",
+      "label": "process_response",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:middleware/rate_limit.py::RateLimitExceededError",
+      "label": "RateLimitExceededError",
+      "type": "class",
+      "summary": "Raised when a client exceeds the allowed rate limit.",
+      "importance": 0.6
+    },
+    {
+      "id": "class:models/post.py::Post",
+      "label": "Post",
+      "type": "class",
+      "summary": "Represents a blog post created by a user.",
+      "importance": 0.6
+    },
+    {
+      "id": "func:models/post.py::to_dict",
+      "label": "to_dict",
+      "type": "function",
+      "summary": "Serialize the post to a dictionary suitable for JSON responses.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:models/post.py::from_dict",
+      "label": "from_dict",
+      "type": "function",
+      "summary": "Create a Post instance from a dictionary (e.g., from database).",
+      "importance": 0.5
+    },
+    {
+      "id": "class:models/user.py::User",
+      "label": "User",
+      "type": "class",
+      "summary": "Represents a registered user in the system.",
+      "importance": 0.6
+    },
+    {
+      "id": "func:models/user.py::to_dict",
+      "label": "to_dict",
+      "type": "function",
+      "summary": "Serialize the user to a dictionary suitable for JSON responses.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:models/user.py::from_dict",
+      "label": "from_dict",
+      "type": "function",
+      "summary": "Create a User instance from a dictionary (e.g., from database).",
+      "importance": 0.5
+    },
+    {
+      "id": "class:routes/admin.py::AdminRouter",
+      "label": "AdminRouter",
+      "type": "class",
+      "summary": "Route handlers for admin-only operations: system stats, user management,\naccount deactivation, and f",
+      "importance": 0.6
+    },
+    {
+      "id": "func:routes/admin.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/admin.py::_require_admin",
+      "label": "_require_admin",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/admin.py::handle_get_stats",
+      "label": "handle_get_stats",
+      "type": "function",
+      "summary": "Return health/diagnostic stats for all services.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/admin.py::handle_list_all_users",
+      "label": "handle_list_all_users",
+      "type": "function",
+      "summary": "List all users with enriched data (e.g., post count).",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/admin.py::handle_force_delete_user",
+      "label": "handle_force_delete_user",
+      "type": "function",
+      "summary": "Admin-only: delete a user and all of their posts.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/admin.py::handle_deactivate_user",
+      "label": "handle_deactivate_user",
+      "type": "function",
+      "summary": "Admin-only: deactivate a user account.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/admin.py::register_routes",
+      "label": "register_routes",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:routes/auth.py::AuthRouter",
+      "label": "AuthRouter",
+      "type": "class",
+      "summary": "Route handlers for public authentication endpoints (register, login, refresh).",
+      "importance": 0.6
+    },
+    {
+      "id": "func:routes/auth.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/auth.py::handle_register",
+      "label": "handle_register",
+      "type": "function",
+      "summary": "Register a new user account.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/auth.py::handle_login",
+      "label": "handle_login",
+      "type": "function",
+      "summary": "Authenticate with email/password and receive a JWT.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/auth.py::handle_refresh",
+      "label": "handle_refresh",
+      "type": "function",
+      "summary": "Issue a new JWT in exchange for a valid, non-expired one.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/auth.py::register_routes",
+      "label": "register_routes",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:routes/posts.py::PostRouter",
+      "label": "PostRouter",
+      "type": "class",
+      "summary": "Route handlers for blog-post CRUD and publishing.",
+      "importance": 0.6
+    },
+    {
+      "id": "func:routes/posts.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/posts.py::handle_get_posts",
+      "label": "handle_get_posts",
+      "type": "function",
+      "summary": "List posts with pagination.  Unpublished posts are visible only to admins.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/posts.py::handle_get_post",
+      "label": "handle_get_post",
+      "type": "function",
+      "summary": "Get a single post by ID.  Unpublished posts return 404 for non-authors/admins.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/posts.py::handle_create_post",
+      "label": "handle_create_post",
+      "type": "function",
+      "summary": "Create a new blog post as the authenticated user.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/posts.py::handle_update_post",
+      "label": "handle_update_post",
+      "type": "function",
+      "summary": "Update a post's title, content, or published status.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/posts.py::handle_delete_post",
+      "label": "handle_delete_post",
+      "type": "function",
+      "summary": "Delete a post.  Admins may delete any post.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/posts.py::handle_publish_post",
+      "label": "handle_publish_post",
+      "type": "function",
+      "summary": "Publish an unpublished post (author only).",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/posts.py::register_routes",
+      "label": "register_routes",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:routes/users.py::UserRouter",
+      "label": "UserRouter",
+      "type": "class",
+      "summary": "Route handlers for user CRUD operations.",
+      "importance": 0.6
+    },
+    {
+      "id": "func:routes/users.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/users.py::handle_get_users",
+      "label": "handle_get_users",
+      "type": "function",
+      "summary": "List all users with pagination.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/users.py::handle_get_user",
+      "label": "handle_get_user",
+      "type": "function",
+      "summary": "Get a single user by ID.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/users.py::handle_create_user",
+      "label": "handle_create_user",
+      "type": "function",
+      "summary": "Admin-only: create a new user.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/users.py::handle_update_user",
+      "label": "handle_update_user",
+      "type": "function",
+      "summary": "Update a user's profile.  Users may update themselves; admins may update anyone.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/users.py::handle_delete_user",
+      "label": "handle_delete_user",
+      "type": "function",
+      "summary": "Admin-only: delete a user.  Admins cannot delete themselves.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:routes/users.py::register_routes",
+      "label": "register_routes",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/auth_service.py::Session",
+      "label": "Session",
+      "type": "class",
+      "summary": "Represents an authenticated user session backed by a JWT.",
+      "importance": 0.6
+    },
+    {
+      "id": "class:services/auth_service.py::AuthService",
+      "label": "AuthService",
+      "type": "class",
+      "summary": "Handles user authentication: password hashing, JWT creation/validation,\nand session lifecycle manage",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/auth_service.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth_service.py::initialize",
+      "label": "initialize",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth_service.py::health_check",
+      "label": "health_check",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth_service.py::set_user_service",
+      "label": "set_user_service",
+      "type": "function",
+      "summary": "Inject or replace the user-service dependency.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth_service.py::_base64url_encode",
+      "label": "_base64url_encode",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth_service.py::_base64url_decode",
+      "label": "_base64url_decode",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth_service.py::_sign",
+      "label": "_sign",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth_service.py::create_jwt",
+      "label": "create_jwt",
+      "type": "function",
+      "summary": "Create a signed JWT with standard and optional custom claims.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth_service.py::decode_jwt",
+      "label": "decode_jwt",
+      "type": "function",
+      "summary": "Decode and verify a JWT.  Raises ValueError on failure.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth_service.py::hash_password",
+      "label": "hash_password",
+      "type": "function",
+      "summary": "Hash a plaintext password with a random salt and return\na 'salt$hash' string for storage.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth_service.py::verify_password",
+      "label": "verify_password",
+      "type": "function",
+      "summary": "Verify a plaintext password against a 'salt$hash' string.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth_service.py::create_session",
+      "label": "create_session",
+      "type": "function",
+      "summary": "Create a new session for *user_id* and return it.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth_service.py::validate_session",
+      "label": "validate_session",
+      "type": "function",
+      "summary": "Look up and validate a session.  Returns None if invalid/expired.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth_service.py::invalidate_session",
+      "label": "invalidate_session",
+      "type": "function",
+      "summary": "Mark a session as invalid.  Returns True if the session existed.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/auth_service.py::get_user_by_id",
+      "label": "get_user_by_id",
+      "type": "function",
+      "summary": "Convenience: delegate to the injected user service if available.",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/post_service.py::PostService",
+      "label": "PostService",
+      "type": "class",
+      "summary": "Business-logic layer for blog post management.",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/post_service.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/post_service.py::initialize",
+      "label": "initialize",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/post_service.py::health_check",
+      "label": "health_check",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/post_service.py::_index_post",
+      "label": "_index_post",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/post_service.py::_deindex_post",
+      "label": "_deindex_post",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/post_service.py::create",
+      "label": "create",
+      "type": "function",
+      "summary": "Create a new post after basic validation.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/post_service.py::get_by_id",
+      "label": "get_by_id",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/post_service.py::get_by_author",
+      "label": "get_by_author",
+      "type": "function",
+      "summary": "Return posts by a specific author, newest first.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/post_service.py::get_all",
+      "label": "get_all",
+      "type": "function",
+      "summary": "Return a paginated list of posts, newest first.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/post_service.py::update",
+      "label": "update",
+      "type": "function",
+      "summary": "Update a post's title, content, or published status.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/post_service.py::delete",
+      "label": "delete",
+      "type": "function",
+      "summary": "Delete a post.  The author, or an admin when *is_admin* is True, may delete.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/post_service.py::publish_post",
+      "label": "publish_post",
+      "type": "function",
+      "summary": "Publish a post.  Only the author may publish.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/post_service.py::get_posts_count_by_author",
+      "label": "get_posts_count_by_author",
+      "type": "function",
+      "summary": "Return the total number of posts authored by *author_id*.",
+      "importance": 0.5
+    },
+    {
+      "id": "class:services/user_service.py::UserService",
+      "label": "UserService",
+      "type": "class",
+      "summary": "Business-logic layer for user management.",
+      "importance": 0.6
+    },
+    {
+      "id": "func:services/user_service.py::__init__",
+      "label": "__init__",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/user_service.py::initialize",
+      "label": "initialize",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/user_service.py::health_check",
+      "label": "health_check",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/user_service.py::_check_unique_constraints",
+      "label": "_check_unique_constraints",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/user_service.py::create",
+      "label": "create",
+      "type": "function",
+      "summary": "Create a new user after validating uniqueness constraints.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/user_service.py::get_by_id",
+      "label": "get_by_id",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/user_service.py::get_by_email",
+      "label": "get_by_email",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/user_service.py::get_by_username",
+      "label": "get_by_username",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/user_service.py::get_all",
+      "label": "get_all",
+      "type": "function",
+      "summary": "Return a paginated, newest-first list of users.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/user_service.py::update",
+      "label": "update",
+      "type": "function",
+      "summary": "Update allowed fields on a user.  Returns None if not found.",
+      "importance": 0.5
+    },
+    {
+      "id": "func:services/user_service.py::delete",
+      "label": "delete",
+      "type": "function",
+      "summary": "Remove a user and its index entries.  Returns False if not found.",
+      "importance": 0.5
+    },
+    {
+      "id": "class:tests/test_auth.py::TestAuthService",
+      "label": "TestAuthService",
+      "type": "class",
+      "summary": "Tests for password hashing, JWT creation/validation, and session management.",
+      "importance": 0.6
+    },
+    {
+      "id": "func:tests/test_auth.py::services",
+      "label": "services",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_auth.py::test_password_hashing_and_verification",
+      "label": "test_password_hashing_and_verification",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_auth.py::test_jwt_token_creation_and_decoding",
+      "label": "test_jwt_token_creation_and_decoding",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_auth.py::test_invalid_jwt_signature_rejected",
+      "label": "test_invalid_jwt_signature_rejected",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_auth.py::test_malformed_jwt_rejected",
+      "label": "test_malformed_jwt_rejected",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_auth.py::test_session_creation_and_validation",
+      "label": "test_session_creation_and_validation",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_auth.py::test_session_invalidation",
+      "label": "test_session_invalidation",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_auth.py::test_multiple_sessions_for_same_user",
+      "label": "test_multiple_sessions_for_same_user",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_auth.py::test_password_hash_format",
+      "label": "test_password_hash_format",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:tests/test_posts.py::TestPostService",
+      "label": "TestPostService",
+      "type": "class",
+      "summary": "Tests for blog post CRUD, publishing workflow, and author-based access control.",
+      "importance": 0.6
+    },
+    {
+      "id": "func:tests/test_posts.py::service",
+      "label": "service",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_posts.py::test_create_and_get_post",
+      "label": "test_create_and_get_post",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_posts.py::test_create_post_empty_title_raises_error",
+      "label": "test_create_post_empty_title_raises_error",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_posts.py::test_create_post_empty_content_raises_error",
+      "label": "test_create_post_empty_content_raises_error",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_posts.py::test_get_posts_by_author",
+      "label": "test_get_posts_by_author",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_posts.py::test_get_all_posts_excludes_unpublished_by_default",
+      "label": "test_get_all_posts_excludes_unpublished_by_default",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_posts.py::test_get_all_posts_pagination",
+      "label": "test_get_all_posts_pagination",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_posts.py::test_update_post",
+      "label": "test_update_post",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_posts.py::test_update_nonexistent_post",
+      "label": "test_update_nonexistent_post",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_posts.py::test_update_post_by_non_author_raises_error",
+      "label": "test_update_post_by_non_author_raises_error",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_posts.py::test_delete_post",
+      "label": "test_delete_post",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_posts.py::test_delete_post_by_admin",
+      "label": "test_delete_post_by_admin",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_posts.py::test_delete_post_by_non_author_raises_error",
+      "label": "test_delete_post_by_non_author_raises_error",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_posts.py::test_delete_nonexistent_post",
+      "label": "test_delete_nonexistent_post",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_posts.py::test_publish_post",
+      "label": "test_publish_post",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_posts.py::test_publish_nonexistent_post",
+      "label": "test_publish_nonexistent_post",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_posts.py::test_publish_post_by_non_author_raises_error",
+      "label": "test_publish_post_by_non_author_raises_error",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_posts.py::test_get_posts_count_by_author",
+      "label": "test_get_posts_count_by_author",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_posts.py::test_health_check",
+      "label": "test_health_check",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "class:tests/test_users.py::TestUserService",
+      "label": "TestUserService",
+      "type": "class",
+      "summary": "Tests for user CRUD operations, uniqueness constraints, and pagination.",
+      "importance": 0.6
+    },
+    {
+      "id": "func:tests/test_users.py::service",
+      "label": "service",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_users.py::test_create_and_get_user",
+      "label": "test_create_and_get_user",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_users.py::test_duplicate_email_raises_error",
+      "label": "test_duplicate_email_raises_error",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_users.py::test_duplicate_username_raises_error",
+      "label": "test_duplicate_username_raises_error",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_users.py::test_get_all_users_pagination",
+      "label": "test_get_all_users_pagination",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_users.py::test_update_user",
+      "label": "test_update_user",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_users.py::test_update_nonexistent_user",
+      "label": "test_update_nonexistent_user",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_users.py::test_update_role",
+      "label": "test_update_role",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_users.py::test_update_is_active",
+      "label": "test_update_is_active",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_users.py::test_delete_user",
+      "label": "test_delete_user",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_users.py::test_delete_nonexistent_user",
+      "label": "test_delete_nonexistent_user",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_users.py::test_admin_user_exists_after_init",
+      "label": "test_admin_user_exists_after_init",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    },
+    {
+      "id": "func:tests/test_users.py::test_create_user_with_invalid_role_defaults_to_user",
+      "label": "test_create_user_with_invalid_role_defaults_to_user",
+      "type": "function",
+      "summary": "",
+      "importance": 0.5
+    }
+  ],
+  "links": [
+    {
+      "source": "file:config.py",
+      "target": "class:config.py::Settings",
+      "relation": "defines"
+    },
+    {
+      "source": "file:main.py",
+      "target": "class:main.py::Application",
+      "relation": "defines"
+    },
+    {
+      "source": "file:main.py",
+      "target": "func:main.py::main",
+      "relation": "defines"
+    },
+    {
+      "source": "file:middleware/auth.py",
+      "target": "class:middleware/auth.py::AuthMiddleware",
+      "relation": "defines"
+    },
+    {
+      "source": "file:middleware/logging.py",
+      "target": "class:middleware/logging.py::LoggingMiddleware",
+      "relation": "defines"
+    },
+    {
+      "source": "file:middleware/rate_limit.py",
+      "target": "class:middleware/rate_limit.py::TokenBucket",
+      "relation": "defines"
+    },
+    {
+      "source": "file:middleware/rate_limit.py",
+      "target": "class:middleware/rate_limit.py::RateLimitMiddleware",
+      "relation": "defines"
+    },
+    {
+      "source": "file:middleware/rate_limit.py",
+      "target": "class:middleware/rate_limit.py::RateLimitExceededError",
+      "relation": "defines"
+    },
+    {
+      "source": "file:models/post.py",
+      "target": "class:models/post.py::Post",
+      "relation": "defines"
+    },
+    {
+      "source": "file:models/user.py",
+      "target": "class:models/user.py::User",
+      "relation": "defines"
+    },
+    {
+      "source": "file:routes/admin.py",
+      "target": "class:routes/admin.py::AdminRouter",
+      "relation": "defines"
+    },
+    {
+      "source": "file:routes/auth.py",
+      "target": "class:routes/auth.py::AuthRouter",
+      "relation": "defines"
+    },
+    {
+      "source": "file:routes/posts.py",
+      "target": "class:routes/posts.py::PostRouter",
+      "relation": "defines"
+    },
+    {
+      "source": "file:routes/users.py",
+      "target": "class:routes/users.py::UserRouter",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth_service.py",
+      "target": "class:services/auth_service.py::Session",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/auth_service.py",
+      "target": "class:services/auth_service.py::AuthService",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/post_service.py",
+      "target": "class:services/post_service.py::PostService",
+      "relation": "defines"
+    },
+    {
+      "source": "file:services/user_service.py",
+      "target": "class:services/user_service.py::UserService",
+      "relation": "defines"
+    },
+    {
+      "source": "file:tests/test_auth.py",
+      "target": "class:tests/test_auth.py::TestAuthService",
+      "relation": "defines"
+    },
+    {
+      "source": "file:tests/test_posts.py",
+      "target": "class:tests/test_posts.py::TestPostService",
+      "relation": "defines"
+    },
+    {
+      "source": "file:tests/test_users.py",
+      "target": "class:tests/test_users.py::TestUserService",
+      "relation": "defines"
+    }
+  ]
+};
+const width = window.innerWidth;
+const height = window.innerHeight;
+
+const svg = d3.select("svg");
+const g = svg.append("g");
+
+const zoom = d3.zoom()
+  .scaleExtent([0.1, 4])
+  .on("zoom", (event) => g.attr("transform", event.transform));
+
+svg.call(zoom);
+
+const colorMap = { file: "#58a6ff", class: "#d29922", function: "#3fb950", module: "#bc8cff" };
+
+const simulation = d3.forceSimulation(graphData.nodes)
+  .force("link", d3.forceLink(graphData.links).id(d => d.id).distance(d => {
+    return d.relation === "imports" ? 100 : 80;
+  }))
+  .force("charge", d3.forceManyBody().strength(-200))
+  .force("center", d3.forceCenter(width / 2, height / 2))
+  .force("collision", d3.forceCollide(20));
+
+const link = g.append("g")
+  .selectAll("line")
+  .data(graphData.links)
+  .join("line")
+  .attr("class", d => `link ${d.relation}`)
+  .attr("stroke-width", 1.5);
+
+const node = g.append("g")
+  .selectAll("g")
+  .data(graphData.nodes)
+  .join("g")
+  .attr("class", "node")
+  .call(d3.drag()
+    .on("start", (event, d) => {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      d.fx = d.x;
+      d.fy = d.y;
+    })
+    .on("drag", (event, d) => {
+      d.fx = event.x;
+      d.fy = event.y;
+    })
+    .on("end", (event, d) => {
+      if (!event.active) simulation.alphaTarget(0);
+      d.fx = null;
+      d.fy = null;
+    })
+  );
+
+node.append("circle")
+  .attr("r", d => 5 + (d.importance || 0.5) * 8)
+  .attr("fill", d => colorMap[d.type] || "#8b949e")
+  .attr("stroke", "#161b22")
+  .attr("stroke-width", 1.5);
+
+node.append("text")
+  .attr("class", "node-label")
+  .text(d => d.label)
+  .attr("dx", d => 10 + (d.importance || 0.5) * 5)
+  .attr("dy", 4);
+
+node.on("mouseover", function(event, d) {
+  const tt = d3.select("#tooltip");
+  tt.style("display", "block");
+  tt.select(".tt-name").text(d.label);
+  tt.select(".tt-type").text(`Type: ${d.type}`);
+  tt.select(".tt-summary").text(d.summary || "");
+
+  const connected = new Set();
+  graphData.links.forEach(l => {
+    const sid = typeof l.source === 'object' ? l.source.id : l.source;
+    const tid = typeof l.target === 'object' ? l.target.id : l.target;
+    if (sid === d.id) connected.add(tid);
+    if (tid === d.id) connected.add(sid);
+  });
+
+  d3.selectAll(".node").each(function(n) {
+    if (n.id === d.id || connected.has(n.id)) {
+      d3.select(this).classed("highlighted", true);
+      d3.select(this).select("circle").attr("opacity", 1);
+      d3.select(this).select("text").attr("opacity", 1);
+    } else {
+      d3.select(this).select("circle").attr("opacity", 0.15);
+      d3.select(this).select("text").attr("opacity", 0.15);
+    }
+  });
+
+  d3.selectAll(".link").each(function(l) {
+    const sid = typeof l.source === 'object' ? l.source.id : l.source;
+    const tid = typeof l.target === 'object' ? l.target.id : l.target;
+    if (sid === d.id || tid === d.id) {
+      d3.select(this).classed("highlighted", true);
+    }
+  });
+})
+.on("mousemove", function(event) {
+  d3.select("#tooltip")
+    .style("left", (event.pageX + 12) + "px")
+    .style("top", (event.pageY - 10) + "px");
+})
+.on("mouseout", function() {
+  d3.select("#tooltip").style("display", "none");
+  d3.selectAll(".node").each(function(n) {
+    d3.select(this).classed("highlighted", false);
+    d3.select(this).select("circle").attr("opacity", 1);
+    d3.select(this).select("text").attr("opacity", 1);
+  });
+  d3.selectAll(".link").classed("highlighted", false);
+});
+
+simulation.on("tick", () => {
+  link
+    .attr("x1", d => d.source.x)
+    .attr("y1", d => d.source.y)
+    .attr("x2", d => d.target.x)
+    .attr("y2", d => d.target.y);
+  node.attr("transform", d => `translate(${d.x},${d.y})`);
+});
+
+d3.select("#stats").text(`Nodes: ${graphData.nodes.length} | Edges: ${graphData.links.length}`);
+
+window.filterGraph = function(query) {
+  const q = query.toLowerCase();
+  d3.selectAll(".node").each(function(d) {
+    const match = !q || d.label.toLowerCase().includes(q) || (d.summary && d.summary.toLowerCase().includes(q));
+    d3.select(this).style("display", match ? null : "none");
+  });
+};
+
+window.filterByType = function(type) {
+  d3.selectAll(".node").each(function(d) {
+    const match = type === "all" || d.type === type;
+    d3.select(this).style("display", match ? null : "none");
+  });
+};
+
+window.addEventListener("resize", () => {
+  svg.attr("width", window.innerWidth).attr("height", window.innerHeight);
+});
+</script>
+</body>
+</html>

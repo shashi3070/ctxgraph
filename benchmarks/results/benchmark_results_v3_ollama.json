@@ -1,0 +1,1978 @@
+{
+  "single_shot": [
+    {
+      "type": "ollama_single_shot",
+      "project": "tiny_app",
+      "query": "calculator add subtract multiply",
+      "capsule_tokens": 233,
+      "capsule_nodes": 10,
+      "capsule_edges": 6,
+      "savings_pct": 85.0,
+      "raw_tokens": 1558,
+      "build_time_ms": 63.72,
+      "ollama_time_s": 26.6
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "tiny_app",
+      "query": "expression parser tokenize",
+      "capsule_tokens": 103,
+      "capsule_nodes": 10,
+      "capsule_edges": 12,
+      "savings_pct": 93.4,
+      "raw_tokens": 1558,
+      "build_time_ms": 63.72,
+      "ollama_time_s": 26.6
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "tiny_app",
+      "query": "plugin system history logging",
+      "capsule_tokens": 172,
+      "capsule_nodes": 10,
+      "capsule_edges": 9,
+      "savings_pct": 89.0,
+      "raw_tokens": 1558,
+      "build_time_ms": 63.72,
+      "ollama_time_s": 26.6
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "tiny_app",
+      "query": "math operations core functions",
+      "capsule_tokens": 244,
+      "capsule_nodes": 10,
+      "capsule_edges": 6,
+      "savings_pct": 84.3,
+      "raw_tokens": 1558,
+      "build_time_ms": 63.72,
+      "ollama_time_s": 26.6
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "tiny_app",
+      "query": "main entry point CLI",
+      "capsule_tokens": 69,
+      "capsule_nodes": 4,
+      "capsule_edges": 5,
+      "savings_pct": 95.6,
+      "raw_tokens": 1558,
+      "build_time_ms": 63.72,
+      "ollama_time_s": 26.6
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "tiny_app",
+      "query": "error handling division",
+      "capsule_tokens": 183,
+      "capsule_nodes": 10,
+      "capsule_edges": 7,
+      "savings_pct": 88.3,
+      "raw_tokens": 1558,
+      "build_time_ms": 63.72,
+      "ollama_time_s": 26.6
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "tiny_app",
+      "query": "test calculator functions",
+      "capsule_tokens": 73,
+      "capsule_nodes": 10,
+      "capsule_edges": 9,
+      "savings_pct": 95.3,
+      "raw_tokens": 1558,
+      "build_time_ms": 63.72,
+      "ollama_time_s": 26.6
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "tiny_app",
+      "query": "import dependencies",
+      "capsule_tokens": 18,
+      "capsule_nodes": 0,
+      "capsule_edges": 0,
+      "savings_pct": 98.8,
+      "raw_tokens": 1558,
+      "build_time_ms": 63.72,
+      "ollama_time_s": 26.6
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "web_api",
+      "query": "user management CRUD",
+      "capsule_tokens": 265,
+      "capsule_nodes": 10,
+      "capsule_edges": 6,
+      "savings_pct": 96.0,
+      "raw_tokens": 6567,
+      "build_time_ms": 200.52,
+      "ollama_time_s": 82.3
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "web_api",
+      "query": "JWT auth login register",
+      "capsule_tokens": 243,
+      "capsule_nodes": 10,
+      "capsule_edges": 6,
+      "savings_pct": 96.3,
+      "raw_tokens": 6567,
+      "build_time_ms": 200.52,
+      "ollama_time_s": 82.3
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "web_api",
+      "query": "rate limit middleware",
+      "capsule_tokens": 158,
+      "capsule_nodes": 10,
+      "capsule_edges": 9,
+      "savings_pct": 97.6,
+      "raw_tokens": 6567,
+      "build_time_ms": 200.52,
+      "ollama_time_s": 82.3
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "web_api",
+      "query": "blog posts publish",
+      "capsule_tokens": 213,
+      "capsule_nodes": 10,
+      "capsule_edges": 5,
+      "savings_pct": 96.8,
+      "raw_tokens": 6567,
+      "build_time_ms": 200.52,
+      "ollama_time_s": 82.3
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "web_api",
+      "query": "admin routes permission",
+      "capsule_tokens": 86,
+      "capsule_nodes": 10,
+      "capsule_edges": 3,
+      "savings_pct": 98.7,
+      "raw_tokens": 6567,
+      "build_time_ms": 200.52,
+      "ollama_time_s": 82.3
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "web_api",
+      "query": "password hashing auth service",
+      "capsule_tokens": 271,
+      "capsule_nodes": 10,
+      "capsule_edges": 5,
+      "savings_pct": 95.9,
+      "raw_tokens": 6567,
+      "build_time_ms": 200.52,
+      "ollama_time_s": 82.3
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "web_api",
+      "query": "middleware pipeline",
+      "capsule_tokens": 239,
+      "capsule_nodes": 10,
+      "capsule_edges": 5,
+      "savings_pct": 96.4,
+      "raw_tokens": 6567,
+      "build_time_ms": 200.52,
+      "ollama_time_s": 82.3
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "web_api",
+      "query": "user model fields",
+      "capsule_tokens": 265,
+      "capsule_nodes": 10,
+      "capsule_edges": 6,
+      "savings_pct": 96.0,
+      "raw_tokens": 6567,
+      "build_time_ms": 200.52,
+      "ollama_time_s": 82.3
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "web_api",
+      "query": "post service pagination",
+      "capsule_tokens": 291,
+      "capsule_nodes": 10,
+      "capsule_edges": 4,
+      "savings_pct": 95.6,
+      "raw_tokens": 6567,
+      "build_time_ms": 200.52,
+      "ollama_time_s": 82.3
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "microsvc",
+      "query": "auth service JWT OAuth",
+      "capsule_tokens": 75,
+      "capsule_nodes": 10,
+      "capsule_edges": 11,
+      "savings_pct": 99.3,
+      "raw_tokens": 10587,
+      "build_time_ms": 663.11,
+      "ollama_time_s": 86.1
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "microsvc",
+      "query": "billing payment stripe",
+      "capsule_tokens": 105,
+      "capsule_nodes": 10,
+      "capsule_edges": 13,
+      "savings_pct": 99.0,
+      "raw_tokens": 10587,
+      "build_time_ms": 663.11,
+      "ollama_time_s": 86.1
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "microsvc",
+      "query": "notification email push",
+      "capsule_tokens": 119,
+      "capsule_nodes": 10,
+      "capsule_edges": 10,
+      "savings_pct": 98.9,
+      "raw_tokens": 10587,
+      "build_time_ms": 663.11,
+      "ollama_time_s": 86.1
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "microsvc",
+      "query": "circuit breaker pattern",
+      "capsule_tokens": 97,
+      "capsule_nodes": 10,
+      "capsule_edges": 12,
+      "savings_pct": 99.1,
+      "raw_tokens": 10587,
+      "build_time_ms": 663.11,
+      "ollama_time_s": 86.1
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "microsvc",
+      "query": "service registry discovery",
+      "capsule_tokens": 314,
+      "capsule_nodes": 10,
+      "capsule_edges": 5,
+      "savings_pct": 97.0,
+      "raw_tokens": 10587,
+      "build_time_ms": 663.11,
+      "ollama_time_s": 86.1
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "microsvc",
+      "query": "event bus pub sub",
+      "capsule_tokens": 70,
+      "capsule_nodes": 10,
+      "capsule_edges": 9,
+      "savings_pct": 99.3,
+      "raw_tokens": 10587,
+      "build_time_ms": 663.11,
+      "ollama_time_s": 86.1
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "microsvc",
+      "query": "distributed tracing",
+      "capsule_tokens": 64,
+      "capsule_nodes": 10,
+      "capsule_edges": 14,
+      "savings_pct": 99.4,
+      "raw_tokens": 10587,
+      "build_time_ms": 663.11,
+      "ollama_time_s": 86.1
+    },
+    {
+      "type": "ollama_single_shot",
+      "project": "microsvc",
+      "query": "retry backoff timeout",
+      "capsule_tokens": 122,
+      "capsule_nodes": 10,
+      "capsule_edges": 12,
+      "savings_pct": 98.8,
+      "raw_tokens": 10587,
+      "build_time_ms": 663.11,
+      "ollama_time_s": 86.1
+    }
+  ],
+  "multi_turn": [
+    {
+      "type": "ollama_multi_turn",
+      "project": "tiny_app",
+      "scenario": "Fix divide-by-zero in calculator",
+      "total_turns": 5,
+      "cumulative_capsule_tokens": 919,
+      "avg_tokens_per_turn": 183.8,
+      "savings_vs_raw_pct": 41.0,
+      "raw_tokens_all_files": 1558,
+      "build_time_ms": 63.72,
+      "ollama_time_s": 26.6,
+      "unique_nodes_visited": 29,
+      "graph_coverage_pct": 47.5,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "calculator divide math error",
+          "capsule_tokens": 233,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "core division function",
+          "capsule_tokens": 207,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 6,
+          "overlap_pct": 40.0
+        },
+        {
+          "turn": 3,
+          "query": "error handling try except",
+          "capsule_tokens": 233,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 3,
+          "overlap_pct": 70.0
+        },
+        {
+          "turn": 4,
+          "query": "plugin error logging",
+          "capsule_tokens": 172,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 4,
+          "overlap_pct": 60.0
+        },
+        {
+          "turn": 5,
+          "query": "test division edge cases",
+          "capsule_tokens": 74,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 6,
+          "overlap_pct": 40.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "tiny_app",
+      "scenario": "Add new square root plugin",
+      "total_turns": 6,
+      "cumulative_capsule_tokens": 1015,
+      "avg_tokens_per_turn": 169.2,
+      "savings_vs_raw_pct": 34.9,
+      "raw_tokens_all_files": 1558,
+      "build_time_ms": 63.72,
+      "ollama_time_s": 26.6,
+      "unique_nodes_visited": 25,
+      "graph_coverage_pct": 41.0,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "plugin system load dispatch",
+          "capsule_tokens": 166,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "calculator core math operations",
+          "capsule_tokens": 285,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 7,
+          "overlap_pct": 30.0
+        },
+        {
+          "turn": 3,
+          "query": "plugin base class interface",
+          "capsule_tokens": 171,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 1,
+          "overlap_pct": 90.0
+        },
+        {
+          "turn": 4,
+          "query": "history plugin example",
+          "capsule_tokens": 172,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 2,
+          "overlap_pct": 80.0
+        },
+        {
+          "turn": 5,
+          "query": "test plugin registration",
+          "capsule_tokens": 152,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 3,
+          "overlap_pct": 70.0
+        },
+        {
+          "turn": 6,
+          "query": "main entry CLI args",
+          "capsule_tokens": 69,
+          "capsule_nodes": 4,
+          "new_nodes_this_turn": 2,
+          "overlap_pct": 50.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "tiny_app",
+      "scenario": "Fix expression parser bug",
+      "total_turns": 5,
+      "cumulative_capsule_tokens": 634,
+      "avg_tokens_per_turn": 126.8,
+      "savings_vs_raw_pct": 59.3,
+      "raw_tokens_all_files": 1558,
+      "build_time_ms": 63.72,
+      "ollama_time_s": 26.6,
+      "unique_nodes_visited": 29,
+      "graph_coverage_pct": 47.5,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "expression parser tokenize",
+          "capsule_tokens": 103,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "parser token types regex",
+          "capsule_tokens": 108,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 3,
+          "overlap_pct": 70.0
+        },
+        {
+          "turn": 3,
+          "query": "parse error handling",
+          "capsule_tokens": 90,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 4,
+          "overlap_pct": 60.0
+        },
+        {
+          "turn": 4,
+          "query": "calculator evaluate expression",
+          "capsule_tokens": 214,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 5,
+          "overlap_pct": 50.0
+        },
+        {
+          "turn": 5,
+          "query": "test parser expressions",
+          "capsule_tokens": 119,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 7,
+          "overlap_pct": 30.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "tiny_app",
+      "scenario": "Refactor calculator error handling",
+      "total_turns": 6,
+      "cumulative_capsule_tokens": 741,
+      "avg_tokens_per_turn": 123.5,
+      "savings_vs_raw_pct": 52.4,
+      "raw_tokens_all_files": 1558,
+      "build_time_ms": 63.72,
+      "ollama_time_s": 26.6,
+      "unique_nodes_visited": 40,
+      "graph_coverage_pct": 65.6,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "error handling calculator",
+          "capsule_tokens": 232,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "core math exceptions",
+          "capsule_tokens": 97,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 8,
+          "overlap_pct": 20.0
+        },
+        {
+          "turn": 3,
+          "query": "parser validation errors",
+          "capsule_tokens": 98,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 9,
+          "overlap_pct": 10.0
+        },
+        {
+          "turn": 4,
+          "query": "plugin error callback",
+          "capsule_tokens": 172,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 6,
+          "overlap_pct": 40.0
+        },
+        {
+          "turn": 5,
+          "query": "main CLI error messages",
+          "capsule_tokens": 69,
+          "capsule_nodes": 4,
+          "new_nodes_this_turn": 2,
+          "overlap_pct": 50.0
+        },
+        {
+          "turn": 6,
+          "query": "test error cases",
+          "capsule_tokens": 73,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 5,
+          "overlap_pct": 50.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "tiny_app",
+      "scenario": "Add power function to calculator",
+      "total_turns": 5,
+      "cumulative_capsule_tokens": 818,
+      "avg_tokens_per_turn": 163.6,
+      "savings_vs_raw_pct": 47.5,
+      "raw_tokens_all_files": 1558,
+      "build_time_ms": 63.72,
+      "ollama_time_s": 26.6,
+      "unique_nodes_visited": 30,
+      "graph_coverage_pct": 49.2,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "calculator core functions",
+          "capsule_tokens": 246,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "add power exponent",
+          "capsule_tokens": 176,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 5,
+          "overlap_pct": 50.0
+        },
+        {
+          "turn": 3,
+          "query": "expression parser power operator",
+          "capsule_tokens": 155,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 5,
+          "overlap_pct": 50.0
+        },
+        {
+          "turn": 4,
+          "query": "test power edge cases",
+          "capsule_tokens": 74,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 5,
+          "overlap_pct": 50.0
+        },
+        {
+          "turn": 5,
+          "query": "plugin history log power",
+          "capsule_tokens": 167,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 5,
+          "overlap_pct": 50.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "tiny_app",
+      "scenario": "Improve CLI help and usage",
+      "total_turns": 5,
+      "cumulative_capsule_tokens": 740,
+      "avg_tokens_per_turn": 148.0,
+      "savings_vs_raw_pct": 52.5,
+      "raw_tokens_all_files": 1558,
+      "build_time_ms": 63.72,
+      "ollama_time_s": 26.6,
+      "unique_nodes_visited": 33,
+      "graph_coverage_pct": 54.1,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "main CLI argument parse",
+          "capsule_tokens": 125,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "CLI help text format",
+          "capsule_tokens": 69,
+          "capsule_nodes": 4,
+          "new_nodes_this_turn": 1,
+          "overlap_pct": 75.0
+        },
+        {
+          "turn": 3,
+          "query": "calculator operation list",
+          "capsule_tokens": 301,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 7,
+          "overlap_pct": 30.0
+        },
+        {
+          "turn": 4,
+          "query": "plugin list command",
+          "capsule_tokens": 172,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 7,
+          "overlap_pct": 30.0
+        },
+        {
+          "turn": 5,
+          "query": "test CLI integration",
+          "capsule_tokens": 73,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 8,
+          "overlap_pct": 20.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "tiny_app",
+      "scenario": "Add memory store plugin",
+      "total_turns": 6,
+      "cumulative_capsule_tokens": 813,
+      "avg_tokens_per_turn": 135.5,
+      "savings_vs_raw_pct": 47.8,
+      "raw_tokens_all_files": 1558,
+      "build_time_ms": 63.72,
+      "ollama_time_s": 26.6,
+      "unique_nodes_visited": 22,
+      "graph_coverage_pct": 36.1,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "plugin system history",
+          "capsule_tokens": 171,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "plugin base class API",
+          "capsule_tokens": 171,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 1,
+          "overlap_pct": 90.0
+        },
+        {
+          "turn": 3,
+          "query": "memory storage variables",
+          "capsule_tokens": 19,
+          "capsule_nodes": 0,
+          "new_nodes_this_turn": 0,
+          "overlap_pct": 100.0
+        },
+        {
+          "turn": 4,
+          "query": "calculator use memory",
+          "capsule_tokens": 232,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 6,
+          "overlap_pct": 40.0
+        },
+        {
+          "turn": 5,
+          "query": "test memory plugin",
+          "capsule_tokens": 152,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 2,
+          "overlap_pct": 80.0
+        },
+        {
+          "turn": 6,
+          "query": "CLI memory commands",
+          "capsule_tokens": 68,
+          "capsule_nodes": 4,
+          "new_nodes_this_turn": 3,
+          "overlap_pct": 25.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "tiny_app",
+      "scenario": "Secure calculator input validation",
+      "total_turns": 6,
+      "cumulative_capsule_tokens": 916,
+      "avg_tokens_per_turn": 152.7,
+      "savings_vs_raw_pct": 41.2,
+      "raw_tokens_all_files": 1558,
+      "build_time_ms": 63.72,
+      "ollama_time_s": 26.6,
+      "unique_nodes_visited": 30,
+      "graph_coverage_pct": 49.2,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "expression parser tokenize",
+          "capsule_tokens": 103,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "input validation sanitize",
+          "capsule_tokens": 143,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 4,
+          "overlap_pct": 60.0
+        },
+        {
+          "turn": 3,
+          "query": "parser error handling",
+          "capsule_tokens": 195,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 2,
+          "overlap_pct": 80.0
+        },
+        {
+          "turn": 4,
+          "query": "calculator safe eval",
+          "capsule_tokens": 236,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 5,
+          "overlap_pct": 50.0
+        },
+        {
+          "turn": 5,
+          "query": "test invalid input",
+          "capsule_tokens": 73,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 7,
+          "overlap_pct": 30.0
+        },
+        {
+          "turn": 6,
+          "query": "main CLI input loop",
+          "capsule_tokens": 166,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 2,
+          "overlap_pct": 80.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "web_api",
+      "scenario": "Add JWT refresh token flow",
+      "total_turns": 7,
+      "cumulative_capsule_tokens": 1374,
+      "avg_tokens_per_turn": 196.3,
+      "savings_vs_raw_pct": 79.1,
+      "raw_tokens_all_files": 6567,
+      "build_time_ms": 200.52,
+      "ollama_time_s": 82.3,
+      "unique_nodes_visited": 52,
+      "graph_coverage_pct": 30.4,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "auth service JWT token",
+          "capsule_tokens": 263,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "JWT create decode verify",
+          "capsule_tokens": 83,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 9,
+          "overlap_pct": 10.0
+        },
+        {
+          "turn": 3,
+          "query": "auth middleware validate",
+          "capsule_tokens": 257,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 4,
+          "overlap_pct": 60.0
+        },
+        {
+          "turn": 4,
+          "query": "user session management",
+          "capsule_tokens": 260,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 5,
+          "query": "login register routes",
+          "capsule_tokens": 133,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 8,
+          "overlap_pct": 20.0
+        },
+        {
+          "turn": 6,
+          "query": "refresh token endpoint",
+          "capsule_tokens": 216,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 4,
+          "overlap_pct": 60.0
+        },
+        {
+          "turn": 7,
+          "query": "test auth refresh flow",
+          "capsule_tokens": 162,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 7,
+          "overlap_pct": 30.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "web_api",
+      "scenario": "Fix rate limiter bucket refill",
+      "total_turns": 6,
+      "cumulative_capsule_tokens": 1295,
+      "avg_tokens_per_turn": 215.8,
+      "savings_vs_raw_pct": 80.3,
+      "raw_tokens_all_files": 6567,
+      "build_time_ms": 200.52,
+      "ollama_time_s": 82.3,
+      "unique_nodes_visited": 27,
+      "graph_coverage_pct": 15.8,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "rate limit middleware",
+          "capsule_tokens": 158,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "token bucket algorithm",
+          "capsule_tokens": 203,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 4,
+          "overlap_pct": 60.0
+        },
+        {
+          "turn": 3,
+          "query": "rate limit config settings",
+          "capsule_tokens": 200,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 3,
+          "overlap_pct": 70.0
+        },
+        {
+          "turn": 4,
+          "query": "middleware pipeline order",
+          "capsule_tokens": 240,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 1,
+          "overlap_pct": 90.0
+        },
+        {
+          "turn": 5,
+          "query": "test rate limiting",
+          "capsule_tokens": 268,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 6,
+          "overlap_pct": 40.0
+        },
+        {
+          "turn": 6,
+          "query": "rate limit headers response",
+          "capsule_tokens": 226,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 3,
+          "overlap_pct": 70.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "web_api",
+      "scenario": "Add user role permissions",
+      "total_turns": 7,
+      "cumulative_capsule_tokens": 1526,
+      "avg_tokens_per_turn": 218.0,
+      "savings_vs_raw_pct": 76.8,
+      "raw_tokens_all_files": 6567,
+      "build_time_ms": 200.52,
+      "ollama_time_s": 82.3,
+      "unique_nodes_visited": 44,
+      "graph_coverage_pct": 25.7,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "user model fields role",
+          "capsule_tokens": 261,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "user service create update",
+          "capsule_tokens": 299,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 3,
+          "overlap_pct": 70.0
+        },
+        {
+          "turn": 3,
+          "query": "auth middleware role check",
+          "capsule_tokens": 257,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 9,
+          "overlap_pct": 10.0
+        },
+        {
+          "turn": 4,
+          "query": "admin routes permission guard",
+          "capsule_tokens": 87,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 5,
+          "query": "user routes role filter",
+          "capsule_tokens": 256,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 2,
+          "overlap_pct": 80.0
+        },
+        {
+          "turn": 6,
+          "query": "test role based access",
+          "capsule_tokens": 187,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 6,
+          "overlap_pct": 40.0
+        },
+        {
+          "turn": 7,
+          "query": "migration add role field",
+          "capsule_tokens": 179,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 4,
+          "overlap_pct": 60.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "web_api",
+      "scenario": "Optimize blog post pagination",
+      "total_turns": 6,
+      "cumulative_capsule_tokens": 1416,
+      "avg_tokens_per_turn": 236.0,
+      "savings_vs_raw_pct": 78.4,
+      "raw_tokens_all_files": 6567,
+      "build_time_ms": 200.52,
+      "ollama_time_s": 82.3,
+      "unique_nodes_visited": 32,
+      "graph_coverage_pct": 18.7,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "post service list query",
+          "capsule_tokens": 301,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "post model fields sort",
+          "capsule_tokens": 256,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 4,
+          "overlap_pct": 60.0
+        },
+        {
+          "turn": 3,
+          "query": "post routes pagination",
+          "capsule_tokens": 250,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 2,
+          "overlap_pct": 80.0
+        },
+        {
+          "turn": 4,
+          "query": "user service author posts",
+          "capsule_tokens": 258,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 5,
+          "overlap_pct": 50.0
+        },
+        {
+          "turn": 5,
+          "query": "test post pagination",
+          "capsule_tokens": 133,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 6,
+          "overlap_pct": 40.0
+        },
+        {
+          "turn": 6,
+          "query": "admin routes all posts",
+          "capsule_tokens": 218,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 5,
+          "overlap_pct": 50.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "web_api",
+      "scenario": "Implement password reset flow",
+      "total_turns": 7,
+      "cumulative_capsule_tokens": 1607,
+      "avg_tokens_per_turn": 229.6,
+      "savings_vs_raw_pct": 75.5,
+      "raw_tokens_all_files": 6567,
+      "build_time_ms": 200.52,
+      "ollama_time_s": 82.3,
+      "unique_nodes_visited": 38,
+      "graph_coverage_pct": 22.2,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "auth service password hash",
+          "capsule_tokens": 231,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "user service find by email",
+          "capsule_tokens": 344,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 9,
+          "overlap_pct": 10.0
+        },
+        {
+          "turn": 3,
+          "query": "reset token generate verify",
+          "capsule_tokens": 205,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 7,
+          "overlap_pct": 30.0
+        },
+        {
+          "turn": 4,
+          "query": "auth routes reset password",
+          "capsule_tokens": 241,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 2,
+          "overlap_pct": 80.0
+        },
+        {
+          "turn": 5,
+          "query": "email notification service",
+          "capsule_tokens": 200,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 3,
+          "overlap_pct": 70.0
+        },
+        {
+          "turn": 6,
+          "query": "test password reset",
+          "capsule_tokens": 186,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 2,
+          "overlap_pct": 80.0
+        },
+        {
+          "turn": 7,
+          "query": "rate limit reset attempts",
+          "capsule_tokens": 200,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 5,
+          "overlap_pct": 50.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "web_api",
+      "scenario": "Build admin analytics dashboard",
+      "total_turns": 6,
+      "cumulative_capsule_tokens": 1443,
+      "avg_tokens_per_turn": 240.5,
+      "savings_vs_raw_pct": 78.0,
+      "raw_tokens_all_files": 6567,
+      "build_time_ms": 200.52,
+      "ollama_time_s": 82.3,
+      "unique_nodes_visited": 37,
+      "graph_coverage_pct": 21.6,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "admin routes dashboard",
+          "capsule_tokens": 86,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "user service stats count",
+          "capsule_tokens": 343,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 3,
+          "query": "post service analytics",
+          "capsule_tokens": 336,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 7,
+          "overlap_pct": 30.0
+        },
+        {
+          "turn": 4,
+          "query": "auth service login history",
+          "capsule_tokens": 310,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 5,
+          "overlap_pct": 50.0
+        },
+        {
+          "turn": 5,
+          "query": "middleware admin only",
+          "capsule_tokens": 137,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 5,
+          "overlap_pct": 50.0
+        },
+        {
+          "turn": 6,
+          "query": "test admin analytics",
+          "capsule_tokens": 231,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 0,
+          "overlap_pct": 100.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "web_api",
+      "scenario": "Add API versioning support",
+      "total_turns": 6,
+      "cumulative_capsule_tokens": 1301,
+      "avg_tokens_per_turn": 216.8,
+      "savings_vs_raw_pct": 80.2,
+      "raw_tokens_all_files": 6567,
+      "build_time_ms": 200.52,
+      "ollama_time_s": 82.3,
+      "unique_nodes_visited": 53,
+      "graph_coverage_pct": 31.0,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "routes version prefix",
+          "capsule_tokens": 108,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "middleware accept header",
+          "capsule_tokens": 240,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 3,
+          "query": "config api version",
+          "capsule_tokens": 244,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 7,
+          "overlap_pct": 30.0
+        },
+        {
+          "turn": 4,
+          "query": "user routes backward compat",
+          "capsule_tokens": 264,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 9,
+          "overlap_pct": 10.0
+        },
+        {
+          "turn": 5,
+          "query": "post routes version check",
+          "capsule_tokens": 259,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 9,
+          "overlap_pct": 10.0
+        },
+        {
+          "turn": 6,
+          "query": "test versioned endpoints",
+          "capsule_tokens": 186,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 8,
+          "overlap_pct": 20.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "web_api",
+      "scenario": "Implement request body validation",
+      "total_turns": 6,
+      "cumulative_capsule_tokens": 1224,
+      "avg_tokens_per_turn": 204.0,
+      "savings_vs_raw_pct": 81.4,
+      "raw_tokens_all_files": 6567,
+      "build_time_ms": 200.52,
+      "ollama_time_s": 82.3,
+      "unique_nodes_visited": 53,
+      "graph_coverage_pct": 31.0,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "user model validation",
+          "capsule_tokens": 265,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "post model fields required",
+          "capsule_tokens": 256,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 3,
+          "query": "services input sanitize",
+          "capsule_tokens": 168,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 8,
+          "overlap_pct": 20.0
+        },
+        {
+          "turn": 4,
+          "query": "routes error response",
+          "capsule_tokens": 122,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 5,
+          "query": "middleware validation",
+          "capsule_tokens": 226,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 9,
+          "overlap_pct": 10.0
+        },
+        {
+          "turn": 6,
+          "query": "test invalid request body",
+          "capsule_tokens": 187,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 6,
+          "overlap_pct": 40.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "web_api",
+      "scenario": "Add audit logging middleware",
+      "total_turns": 7,
+      "cumulative_capsule_tokens": 1437,
+      "avg_tokens_per_turn": 205.3,
+      "savings_vs_raw_pct": 78.1,
+      "raw_tokens_all_files": 6567,
+      "build_time_ms": 200.52,
+      "ollama_time_s": 82.3,
+      "unique_nodes_visited": 54,
+      "graph_coverage_pct": 31.6,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "middleware logging request",
+          "capsule_tokens": 133,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "auth service user context",
+          "capsule_tokens": 289,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 3,
+          "query": "audit log model storage",
+          "capsule_tokens": 244,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 7,
+          "overlap_pct": 30.0
+        },
+        {
+          "turn": 4,
+          "query": "middleware pipeline order",
+          "capsule_tokens": 240,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 4,
+          "overlap_pct": 60.0
+        },
+        {
+          "turn": 5,
+          "query": "admin routes audit trail",
+          "capsule_tokens": 87,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 6,
+          "query": "test audit entries",
+          "capsule_tokens": 186,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 7,
+          "overlap_pct": 30.0
+        },
+        {
+          "turn": 7,
+          "query": "config audit enabled",
+          "capsule_tokens": 258,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 6,
+          "overlap_pct": 40.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "microsvc",
+      "scenario": "Add OAuth2 GitHub provider",
+      "total_turns": 8,
+      "cumulative_capsule_tokens": 865,
+      "avg_tokens_per_turn": 108.1,
+      "savings_vs_raw_pct": 91.8,
+      "raw_tokens_all_files": 10587,
+      "build_time_ms": 663.11,
+      "ollama_time_s": 86.1,
+      "unique_nodes_visited": 40,
+      "graph_coverage_pct": 13.1,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "auth OAuth service",
+          "capsule_tokens": 74,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "auth JWT token create",
+          "capsule_tokens": 119,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 6,
+          "overlap_pct": 40.0
+        },
+        {
+          "turn": 3,
+          "query": "oauth authorize callback",
+          "capsule_tokens": 74,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 0,
+          "overlap_pct": 100.0
+        },
+        {
+          "turn": 4,
+          "query": "user model external id",
+          "capsule_tokens": 169,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 5,
+          "query": "auth server routes",
+          "capsule_tokens": 198,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 4,
+          "overlap_pct": 60.0
+        },
+        {
+          "turn": 6,
+          "query": "test OAuth flow",
+          "capsule_tokens": 74,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 0,
+          "overlap_pct": 100.0
+        },
+        {
+          "turn": 7,
+          "query": "config OAuth settings",
+          "capsule_tokens": 74,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 0,
+          "overlap_pct": 100.0
+        },
+        {
+          "turn": 8,
+          "query": "shared logger debug",
+          "capsule_tokens": 83,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "microsvc",
+      "scenario": "Fix billing invoice rounding",
+      "total_turns": 7,
+      "cumulative_capsule_tokens": 937,
+      "avg_tokens_per_turn": 133.9,
+      "savings_vs_raw_pct": 91.1,
+      "raw_tokens_all_files": 10587,
+      "build_time_ms": 663.11,
+      "ollama_time_s": 86.1,
+      "unique_nodes_visited": 52,
+      "graph_coverage_pct": 17.0,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "billing invoice generate",
+          "capsule_tokens": 137,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "billing payment process",
+          "capsule_tokens": 101,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 3,
+          "query": "billing plans pricing",
+          "capsule_tokens": 86,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 4,
+          "overlap_pct": 60.0
+        },
+        {
+          "turn": 4,
+          "query": "invoice model fields",
+          "capsule_tokens": 114,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 5,
+          "query": "billing server routes",
+          "capsule_tokens": 198,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 5,
+          "overlap_pct": 50.0
+        },
+        {
+          "turn": 6,
+          "query": "test invoice rounding",
+          "capsule_tokens": 87,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 4,
+          "overlap_pct": 60.0
+        },
+        {
+          "turn": 7,
+          "query": "shared events invoice created",
+          "capsule_tokens": 214,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 9,
+          "overlap_pct": 10.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "microsvc",
+      "scenario": "Add SMS notification provider (Twilio)",
+      "total_turns": 6,
+      "cumulative_capsule_tokens": 534,
+      "avg_tokens_per_turn": 89.0,
+      "savings_vs_raw_pct": 95.0,
+      "raw_tokens_all_files": 10587,
+      "build_time_ms": 663.11,
+      "ollama_time_s": 86.1,
+      "unique_nodes_visited": 32,
+      "graph_coverage_pct": 10.5,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "notification SMS send",
+          "capsule_tokens": 65,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "notification provider base",
+          "capsule_tokens": 17,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 9,
+          "overlap_pct": 10.0
+        },
+        {
+          "turn": 3,
+          "query": "notification email SMTP",
+          "capsule_tokens": 119,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 4,
+          "overlap_pct": 60.0
+        },
+        {
+          "turn": 4,
+          "query": "notification templates",
+          "capsule_tokens": 64,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 0,
+          "overlap_pct": 100.0
+        },
+        {
+          "turn": 5,
+          "query": "notification server routes",
+          "capsule_tokens": 204,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 9,
+          "overlap_pct": 10.0
+        },
+        {
+          "turn": 6,
+          "query": "test SMS notification",
+          "capsule_tokens": 65,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 0,
+          "overlap_pct": 100.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "microsvc",
+      "scenario": "Tune circuit breaker thresholds",
+      "total_turns": 7,
+      "cumulative_capsule_tokens": 1076,
+      "avg_tokens_per_turn": 153.7,
+      "savings_vs_raw_pct": 89.8,
+      "raw_tokens_all_files": 10587,
+      "build_time_ms": 663.11,
+      "ollama_time_s": 86.1,
+      "unique_nodes_visited": 36,
+      "graph_coverage_pct": 11.8,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "circuit breaker pattern",
+          "capsule_tokens": 97,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "circuit breaker state open closed",
+          "capsule_tokens": 96,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 2,
+          "overlap_pct": 80.0
+        },
+        {
+          "turn": 3,
+          "query": "shared retry backoff",
+          "capsule_tokens": 133,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 9,
+          "overlap_pct": 10.0
+        },
+        {
+          "turn": 4,
+          "query": "shared metrics counter",
+          "capsule_tokens": 163,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 8,
+          "overlap_pct": 20.0
+        },
+        {
+          "turn": 5,
+          "query": "shared events circuit trip",
+          "capsule_tokens": 218,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 2,
+          "overlap_pct": 80.0
+        },
+        {
+          "turn": 6,
+          "query": "test circuit breaker",
+          "capsule_tokens": 272,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 2,
+          "overlap_pct": 80.0
+        },
+        {
+          "turn": 7,
+          "query": "config circuit thresholds",
+          "capsule_tokens": 97,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 3,
+          "overlap_pct": 70.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "microsvc",
+      "scenario": "Add health check to service discovery",
+      "total_turns": 6,
+      "cumulative_capsule_tokens": 580,
+      "avg_tokens_per_turn": 96.7,
+      "savings_vs_raw_pct": 94.5,
+      "raw_tokens_all_files": 10587,
+      "build_time_ms": 663.11,
+      "ollama_time_s": 86.1,
+      "unique_nodes_visited": 30,
+      "graph_coverage_pct": 9.8,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "gateway service discovery",
+          "capsule_tokens": 314,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "discovery register heartbeat",
+          "capsule_tokens": 75,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 3,
+          "query": "gateway router health",
+          "capsule_tokens": 19,
+          "capsule_nodes": 0,
+          "new_nodes_this_turn": 0,
+          "overlap_pct": 100.0
+        },
+        {
+          "turn": 4,
+          "query": "shared retry health check",
+          "capsule_tokens": 134,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 5,
+          "query": "gateway middleware timeout",
+          "capsule_tokens": 19,
+          "capsule_nodes": 0,
+          "new_nodes_this_turn": 0,
+          "overlap_pct": 100.0
+        },
+        {
+          "turn": 6,
+          "query": "test discovery health",
+          "capsule_tokens": 19,
+          "capsule_nodes": 0,
+          "new_nodes_this_turn": 0,
+          "overlap_pct": 100.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "microsvc",
+      "scenario": "Implement event bus retry mechanism",
+      "total_turns": 8,
+      "cumulative_capsule_tokens": 1140,
+      "avg_tokens_per_turn": 142.5,
+      "savings_vs_raw_pct": 89.2,
+      "raw_tokens_all_files": 10587,
+      "build_time_ms": 663.11,
+      "ollama_time_s": 86.1,
+      "unique_nodes_visited": 57,
+      "graph_coverage_pct": 18.6,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "shared events pub sub",
+          "capsule_tokens": 66,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "shared retry exponential backoff",
+          "capsule_tokens": 134,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 3,
+          "query": "shared logger structured",
+          "capsule_tokens": 158,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 8,
+          "overlap_pct": 20.0
+        },
+        {
+          "turn": 4,
+          "query": "billing events invoice created",
+          "capsule_tokens": 278,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 9,
+          "overlap_pct": 10.0
+        },
+        {
+          "turn": 5,
+          "query": "notification events user registered",
+          "capsule_tokens": 120,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 9,
+          "overlap_pct": 10.0
+        },
+        {
+          "turn": 6,
+          "query": "test event retry",
+          "capsule_tokens": 110,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 4,
+          "overlap_pct": 60.0
+        },
+        {
+          "turn": 7,
+          "query": "config retry max attempts",
+          "capsule_tokens": 138,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 4,
+          "overlap_pct": 60.0
+        },
+        {
+          "turn": 8,
+          "query": "shared metrics event count",
+          "capsule_tokens": 136,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 3,
+          "overlap_pct": 70.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "microsvc",
+      "scenario": "Add distributed tracing headers",
+      "total_turns": 7,
+      "cumulative_capsule_tokens": 1020,
+      "avg_tokens_per_turn": 145.7,
+      "savings_vs_raw_pct": 90.4,
+      "raw_tokens_all_files": 10587,
+      "build_time_ms": 663.11,
+      "ollama_time_s": 86.1,
+      "unique_nodes_visited": 36,
+      "graph_coverage_pct": 11.8,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "shared tracing trace id",
+          "capsule_tokens": 60,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "gateway middleware propagate",
+          "capsule_tokens": 19,
+          "capsule_nodes": 0,
+          "new_nodes_this_turn": 0,
+          "overlap_pct": 100.0
+        },
+        {
+          "turn": 3,
+          "query": "auth server tracing",
+          "capsule_tokens": 237,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 9,
+          "overlap_pct": 10.0
+        },
+        {
+          "turn": 4,
+          "query": "billing server tracing",
+          "capsule_tokens": 237,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 5,
+          "overlap_pct": 50.0
+        },
+        {
+          "turn": 5,
+          "query": "shared logger trace context",
+          "capsule_tokens": 135,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 3,
+          "overlap_pct": 70.0
+        },
+        {
+          "turn": 6,
+          "query": "test tracing propagation",
+          "capsule_tokens": 245,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 5,
+          "overlap_pct": 50.0
+        },
+        {
+          "turn": 7,
+          "query": "shared metrics trace duration",
+          "capsule_tokens": 87,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 4,
+          "overlap_pct": 60.0
+        }
+      ]
+    },
+    {
+      "type": "ollama_multi_turn",
+      "project": "microsvc",
+      "scenario": "Build metrics endpoint for Prometheus",
+      "total_turns": 8,
+      "cumulative_capsule_tokens": 1770,
+      "avg_tokens_per_turn": 221.2,
+      "savings_vs_raw_pct": 83.3,
+      "raw_tokens_all_files": 10587,
+      "build_time_ms": 663.11,
+      "ollama_time_s": 86.1,
+      "unique_nodes_visited": 37,
+      "graph_coverage_pct": 12.1,
+      "turns": [
+        {
+          "turn": 1,
+          "query": "shared metrics counter gauge",
+          "capsule_tokens": 170,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 10,
+          "overlap_pct": 0.0
+        },
+        {
+          "turn": 2,
+          "query": "gateway metrics requests",
+          "capsule_tokens": 269,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 4,
+          "overlap_pct": 60.0
+        },
+        {
+          "turn": 3,
+          "query": "auth metrics login count",
+          "capsule_tokens": 154,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 8,
+          "overlap_pct": 20.0
+        },
+        {
+          "turn": 4,
+          "query": "billing metrics revenue",
+          "capsule_tokens": 203,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 7,
+          "overlap_pct": 30.0
+        },
+        {
+          "turn": 5,
+          "query": "shared metrics endpoint",
+          "capsule_tokens": 227,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 2,
+          "overlap_pct": 80.0
+        },
+        {
+          "turn": 6,
+          "query": "test metrics output",
+          "capsule_tokens": 205,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 0,
+          "overlap_pct": 100.0
+        },
+        {
+          "turn": 7,
+          "query": "config metrics enabled",
+          "capsule_tokens": 285,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 4,
+          "overlap_pct": 60.0
+        },
+        {
+          "turn": 8,
+          "query": "notification metrics sent",
+          "capsule_tokens": 257,
+          "capsule_nodes": 10,
+          "new_nodes_this_turn": 2,
+          "overlap_pct": 80.0
+        }
+      ]
+    }
+  ]
+}
