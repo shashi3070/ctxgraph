@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.2.1 (2026-06-02)
+
+### Added
+- Azure OpenAI provider (`CTXGRAPH_PROVIDER=azure`, `AZURE_OPENAI_API_KEY`)
+- `ctx view --svg` — static SVG graph output
+- `docs/graph.svg` — graph visualization embedded in README
+- Framework integrations guide — LangChain, LangGraph, OpenAI Agents SDK, Azure OpenAI
+- Python API examples in README (`build_graph`, `render_capsule`, `search_relevant_nodes`)
+
+### Changed
+- README rewritten with polished hero, better tables, graph image
+- PyPI description now highlights token efficiency
+
 ## v0.2.0 (2026-06-02)
 
 ### Added
