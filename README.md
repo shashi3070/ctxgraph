@@ -301,9 +301,15 @@ ctx capsule "extract payment processing into separate module" --mode deep
 
 ## Framework Integrations
 
-ctxgraph can be used as a Python library — not just a CLI. This makes it easy to plug into LangChain, LangGraph, OpenAI Agents, or any custom AI pipeline.
+ctxgraph is a Python library first — the CLI is just a wrapper. This makes it easy to feed code context into LangChain, LangGraph, OpenAI Agents, or any LLM pipeline.
 
-### Python API
+### How the Python API works
+
+The flow is always the same:
+
+1. **`build_graph(path)`** → scans your code, stores a knowledge graph in `path/.ctxgraph/graph.db`
+2. **`get_storage(path)`** → opens that SQLite database for queries (fast, no re-scanning)
+3. **`render_capsule(storage, query)`** → searches the graph, returns a compact text capsule
 
 ```python
 from pathlib import Path
@@ -311,154 +317,158 @@ from ctxgraph.graph.builder import build_graph, get_storage
 from ctxgraph.capsule.renderer import render_capsule
 from ctxgraph.graph.query import search_relevant_nodes
 
-# 1. Build the graph (one-time setup)
-stats = build_graph(Path("/path/to/project"))
+# --- Step 1: Build (one-time, ~0.1-1s per project) ---
+stats = build_graph(Path("/path/to/my_project"))
 print(f"Built: {stats['total_nodes']} nodes, {stats['total_edges']} edges")
 
-# 2. Get storage for an existing graph
-storage = get_storage(Path("/path/to/project"))
+# --- Step 2: Use (instant — reads the .db file) ---
+storage = get_storage(Path("/path/to/my_project"))
 
-# 3. Generate a context capsule (token-efficient text)
+# Generate a capsule — a token-efficient DSL string
 capsule = render_capsule(storage, "fix JWT token validation", max_nodes=20)
 print(capsule)
+# → [CTX]fix JWT token validation
+#   [F]src/auth/jwt.py
+#     D:JWT token creation and validation
+#   [F]src/auth/middleware.py
+#     D:Auth middleware for request validation
+#   ...
 
-# 4. Search for relevant nodes programmatically
+# Or search for nodes programmatically
 results = search_relevant_nodes(storage, "auth login", max_nodes=10, max_depth=2)
 for node, score in results:
     print(f"  {node.type}:{node.name}  (score={score})")
 ```
 
+> **Tip:** `build_graph` is a one-time setup. In production, run `ctx build` during CI/deployment and let your app code only call `get_storage` + `render_capsule`.
+
 ### LangChain
 
-Inject ctxgraph capsules directly into your LangChain prompts — dramatically reducing token usage while providing precise code context.
+Pass the capsule as context in your prompt template. The LLM gets exactly the files, classes, and dependencies it needs — no token waste.
 
 ```python
 from pathlib import Path
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
-from ctxgraph.graph.builder import build_graph, get_storage
+from ctxgraph.graph.builder import get_storage          # graph already built
 from ctxgraph.capsule.renderer import render_capsule
 
-# Build graph once
-build_graph(Path("./my_project"))
+# Load existing graph (zero build time)
 storage = get_storage(Path("./my_project"))
 
-# Generate context for a specific task
-context = render_capsule(storage, "user authentication flow", max_nodes=20)
+# Generate capsule for the question
+context = render_capsule(storage, "login rate limiter", max_nodes=15)
 
 prompt = ChatPromptTemplate.from_messages([
-    ("system", "You are a senior Python developer. Use the code context below to answer the question.\n\n{context}"),
+    ("system", "You are a senior Python dev. Answer using the code context below.\n\n{context}"),
     ("user", "{question}"),
 ])
 
 llm = ChatOpenAI(model="gpt-4o")
-chain = prompt | llm
+response = prompt | llm | (lambda msg: msg.content)
 
-response = chain.invoke({
+print(response.invoke({
     "context": context,
-    "question": "Where is the login rate limiter implemented?",
-})
+    "question": "Where is the rate limiter applied in the login flow?",
+}))
+# → "The rate limiter is in src/auth/middleware.py at line 42.
+#    It wraps the login endpoint with a 5req/min limit per IP."
 ```
 
 ### LangGraph
 
-Use ctxgraph as a tool within a LangGraph agent — the agent requests context capsules when it needs to understand the codebase.
+Expose ctxgraph as a tool the agent calls on-demand. The agent fetches context only when it hits a code-related question.
 
 ```python
 from pathlib import Path
-from typing import Literal
 from langgraph.graph import StateGraph, MessagesState
 from langgraph.prebuilt import ToolNode
 from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool
-from ctxgraph.graph.builder import build_graph, get_storage
+from ctxgraph.graph.builder import get_storage
 from ctxgraph.capsule.renderer import render_capsule
 
-# Pre-build graph
-build_graph(Path("./my_project"))
-storage = get_storage(Path("./my_project"))
+# Pre-built graph — loaded instantly
+_storage = get_storage(Path("./my_project"))
 
 @tool
 def code_context(task: str) -> str:
-    """Get code context relevant to a task. Use this before answering code questions."""
-    return render_capsule(storage, task, max_nodes=20)
+    """Fetch relevant source code for a development task.
+    Use this whenever the user asks about implementation details,
+    bug fixes, or architecture in the codebase."""
+    return render_capsule(_storage, task, max_nodes=20)
 
+# --- Build LangGraph ---
 tools = [code_context]
-tool_node = ToolNode(tools)
-
 model = ChatOpenAI(model="gpt-4o", temperature=0).bind_tools(tools)
 
-def should_continue(state: MessagesState) -> Literal["tools", "__end__"]:
-    return "tools" if state["messages"][-1].tool_calls else "__end__"
-
-def call_model(state: MessagesState):
+def agent_node(state: MessagesState):
     return {"messages": [model.invoke(state["messages"])]}
 
 graph = StateGraph(MessagesState)
-graph.add_node("agent", call_model)
-graph.add_node("tools", tool_node)
+graph.add_node("agent", agent_node)
+graph.add_node("tools", ToolNode(tools))
 graph.set_entry_point("agent")
-graph.add_conditional_edges("agent", should_continue)
+graph.add_conditional_edges(
+    "agent",
+    lambda s: "tools" if s["messages"][-1].tool_calls else "__end__",
+)
 graph.add_edge("tools", "agent")
 
 app = graph.compile()
 
-for chunk in app.stream({"messages": [("user", "Find the bug in the payment processor")]}):
-    for node, msg in chunk.items():
-        print(f"[{node}]: {msg['messages'][0].content[:200] if msg.get('messages') else ''}")
+# --- Run ---
+for chunk in app.stream({"messages": [("user", "How does payment retry work?")]}):
+    for node, vals in chunk.items():
+        msg = vals["messages"][0]
+        if hasattr(msg, "content") and msg.content:
+            print(f"[{node}]: {msg.content[:300]}")
 ```
+
+When the user asks about code, the agent calls `code_context("payment retry")`, gets back a capsule with `[F]src/payment/retry.py`, `[F]src/payment/processor.py`, and their dependency edges, then answers with those files in context.
 
 ### OpenAI Agents SDK
 
-Use ctxgraph with the official OpenAI Agents SDK (also works with Azure OpenAI via `AzureOpenAIChatCompletionAgent`).
+Same pattern — ctxgraph is a function tool the agent invokes.
 
 ```python
 from pathlib import Path
-from openai import AzureOpenAI  # or OpenAI for standard API
 from agents import Agent, Runner, function_tool
-from ctxgraph.graph.builder import build_graph, get_storage
+from ctxgraph.graph.builder import get_storage
 from ctxgraph.capsule.renderer import render_capsule
 
-# Pre-build the graph
-build_graph(Path("./my_project"))
-storage = get_storage(Path("./my_project"))
+_storage = get_storage(Path("./my_project"))
 
 @function_tool
 def fetch_code_context(task_description: str) -> str:
-    """Retrieve relevant code context for a development task."""
-    return render_capsule(storage, task_description, max_nodes=20)
+    """Retrieve code context from the project's knowledge graph.
+    Provide a task description like 'JWT auth middleware' or 'payment processor'."""
+    return render_capsule(_storage, task_description, max_nodes=20)
 
 agent = Agent(
     name="Code Assistant",
-    instructions="You are a helpful coding assistant. Use the code context tool to understand the codebase before answering.",
-    model="gpt-4o",  # or AzureOpenAIChatCompletionAgent(deployment="gpt-4o", ...)
+    instructions="You help developers understand their codebase. Use fetch_code_context to get relevant files before answering.",
+    model="gpt-4o",
     tools=[fetch_code_context],
 )
 
-result = Runner.run_sync(
-    agent,
-    "How does the JWT authentication middleware work?",
-)
+result = Runner.run_sync(agent, "How does the notification system handle email vs SMS?")
 print(result.final_output)
 ```
 
-### Azure OpenAI with Custom Agent
+### Azure OpenAI (direct client)
 
-For Azure OpenAI, configure the client directly and inject ctxgraph context:
+For Azure OpenAI or any OpenAI-compatible endpoint, inject the capsule directly into the system message.
 
 ```python
 import os
 from openai import AzureOpenAI
 from pathlib import Path
-from ctxgraph.graph.builder import build_graph, get_storage
+from ctxgraph.graph.builder import get_storage
 from ctxgraph.capsule.renderer import render_capsule
 
-# Build graph
-build_graph(Path("./my_project"))
 storage = get_storage(Path("./my_project"))
-
-# Generate context capsule
-context = render_capsule(storage, "authentication and authorization", max_nodes=25)
+context = render_capsule(storage, "event bus architecture", max_nodes=25)
 
 client = AzureOpenAI(
     api_version="2024-08-01-preview",
@@ -469,8 +479,8 @@ client = AzureOpenAI(
 response = client.chat.completions.create(
     model="gpt-4o",  # deployment name
     messages=[
-        {"role": "system", "content": f"You are a senior Python developer. Use the code context below.\n\n{context}"},
-        {"role": "user", "content": "Explain the role-based access control (RBAC) implementation."},
+        {"role": "system", "content": f"You are a senior developer. Code context:\n\n{context}"},
+        {"role": "user", "content": "How do I add a new event handler?"},
     ],
 )
 print(response.choices[0].message.content)
