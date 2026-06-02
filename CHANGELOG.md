@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.4 (2026-06-02)
+
+### Fixed
+- README framework examples rewritten with clearer 3-step flow (build → get_storage → render_capsule)
+
 ## v0.2.3 (2026-06-02)
 
 ### Fixed
