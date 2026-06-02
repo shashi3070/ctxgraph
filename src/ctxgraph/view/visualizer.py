@@ -1,9 +1,26 @@
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 
 from ctxgraph.graph.storage import Storage
+
+# SVG constants
+SVG_WIDTH = 960
+SVG_HEIGHT = 680
+SVG_CENTER_X = SVG_WIDTH // 2
+SVG_CENTER_Y = SVG_HEIGHT // 2
+SVG_RADIUS = 260
+
+COLORS = {
+    "file": "#58a6ff",
+    "class": "#d29922",
+    "function": "#3fb950",
+    "module": "#bc8cff",
+}
+
+NODE_ORDER = {"file": 0, "class": 1, "function": 2, "module": 3}
 
 
 def render_view(storage: Storage) -> str:
@@ -60,6 +77,103 @@ def render_view(storage: Storage) -> str:
 
     template = _get_html_template()
     return template.replace("/* GRAPH_DATA */", json_data)
+
+
+def render_svg(storage: Storage) -> str:
+    """Generate a static SVG visualization of the knowledge graph."""
+    nodes = storage.get_all_nodes()
+    edges = storage.get_all_edges()
+
+    file_nodes = [n for n in nodes if n.type == "file"]
+    symbol_nodes = [n for n in nodes if n.type != "file"]
+    file_node_ids = {n.id for n in file_nodes}
+
+    # Layout: files in a circle, symbols at parent file position
+    n_files = len(file_nodes)
+    positions: dict[str, tuple[float, float]] = {}
+
+    for i, node in enumerate(file_nodes):
+        angle = (2 * math.pi * i / n_files) - math.pi / 2
+        x = SVG_CENTER_X + SVG_RADIUS * math.cos(angle)
+        y = SVG_CENTER_Y + SVG_RADIUS * math.sin(angle)
+        positions[node.id] = (x, y)
+
+    # Place symbol nodes near their parent file (offset slightly)
+    for node in symbol_nodes:
+        parent_id = f"file:{node.path}" if node.path else None
+        if parent_id and parent_id in positions:
+            px, py = positions[parent_id]
+            offset = 22
+            positions[node.id] = (px + offset, py + offset)
+        else:
+            positions[node.id] = (SVG_CENTER_X, SVG_CENTER_Y)
+
+    # Build edge lines
+    edge_lines: list[str] = []
+    for edge in edges:
+        src = positions.get(edge.source_id)
+        tgt = positions.get(edge.target_id)
+        if src and tgt:
+            edge_lines.append(
+                f'<line x1="{src[0]:.1f}" y1="{src[1]:.1f}" '
+                f'x2="{tgt[0]:.1f}" y2="{tgt[1]:.1f}" '
+                f'class="edge edge-{edge.relation}" />'
+            )
+
+    # Build node circles + labels
+    all_nodes = file_nodes + symbol_nodes
+    all_nodes.sort(key=lambda n: NODE_ORDER.get(n.type, 9))
+
+    node_groups: list[str] = []
+    for node in all_nodes:
+        x, y = positions.get(node.id, (SVG_CENTER_X, SVG_CENTER_Y))
+        r = 5 + (node.importance or 0.5) * 5
+        color = COLORS.get(node.type, "#8b949e")
+        label = node.name
+        node_groups.append(
+            f'<g class="node node-{node.type}">'
+            f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{r:.1f}" fill="{color}" stroke="#161b22" stroke-width="1.5" />'
+            f'<text x="{x + r + 6:.1f}" y="{y + 4:.1f}" class="label">{_esc(label)}</text>'
+            f'</g>'
+        )
+
+    # Stats
+    n_edges = len(set((e.source_id, e.target_id) for e in edges))
+
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {SVG_WIDTH} {SVG_HEIGHT}" width="100%" height="100%" style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0d1117;color:#c9d1d9;">
+<style>
+  .edge {{ stroke-opacity:0.4; stroke-width:1.2; }}
+  .edge-imports {{ stroke:#58a6ff; stroke-dasharray:4,2; }}
+  .edge-calls {{ stroke:#3fb950; stroke-dasharray:2,2; }}
+  .edge-defines {{ stroke:#d29922; }}
+  .edge-extends {{ stroke:#bc8cff; }}
+  .node {{ cursor:pointer; }}
+  .node-file circle {{ filter: drop-shadow(0 0 4px #58a6ff55); }}
+  .label {{ fill:#8b949e; font-size:10px; }}
+  .node-file .label {{ fill:#c9d1d9; font-weight:600; }}
+  .title {{ fill:#c9d1d9; font-size:18px; font-weight:700; }}
+  .subtitle {{ fill:#8b949e; font-size:12px; }}
+  .legend-item text {{ fill:#8b949e; font-size:11px; }}
+</style>
+<rect width="100%" height="100%" fill="#0d1117" />
+<text x="20" y="30" class="title">ctxgraph — Knowledge Graph</text>
+<text x="20" y="48" class="subtitle">{len(nodes)} nodes, {n_edges} edges</text>
+<g id="edges">{''.join(edge_lines)}</g>
+<g id="nodes">{''.join(node_groups)}</g>
+<g id="legend" transform="translate(20, {SVG_HEIGHT - 100})">
+  <rect x="0" y="0" width="220" height="80" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1" />
+  <circle cx="16" cy="18" r="5" fill="#58a6ff" /><text x="28" y="22" class="legend-item">File</text>
+  <circle cx="16" cy="38" r="5" fill="#d29922" /><text x="28" y="42" class="legend-item">Class</text>
+  <circle cx="16" cy="58" r="5" fill="#3fb950" /><text x="28" y="62" class="legend-item">Function</text>
+  <line x1="110" y1="16" x2="140" y2="16" stroke="#58a6ff" stroke-dasharray="4,2" stroke-width="1.5"/><text x="146" y="20" class="legend-item">Import</text>
+  <line x1="110" y1="36" x2="140" y2="36" stroke="#3fb950" stroke-dasharray="2,2" stroke-width="1.5"/><text x="146" y="40" class="legend-item">Call</text>
+  <line x1="110" y1="56" x2="140" y2="56" stroke="#d29922" stroke-width="1.5"/><text x="146" y="60" class="legend-item">Defines</text>
+</g>
+</svg>"""
+
+
+def _esc(text: str) -> str:
+    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
 
 
 def _short_path(path: str) -> str:

@@ -160,14 +160,17 @@ def view(
     ),
     port: Optional[int] = typer.Option(None, "--port", "-p", help="Port for server"),
     output: Optional[str] = typer.Option(
-        None, "--output", "-o", help="Save HTML to file"
+        None, "--output", "-o", help="Save HTML/SVG to file"
     ),
     open_browser: bool = typer.Option(
         True, "--open/--no-open", help="Open in browser automatically"
     ),
+    svg: bool = typer.Option(
+        False, "--svg", help="Generate static SVG instead of interactive HTML"
+    ),
 ):
     """Visualize the dependency graph in a browser."""
-    from ctxgraph.view.visualizer import render_view
+    from ctxgraph.view.visualizer import render_view, render_svg
 
     path = Path(repo_path).resolve() if repo_path else Path.cwd()
     storage = get_storage(path)
@@ -177,23 +180,46 @@ def view(
         )
         raise typer.Exit(1)
 
-    html = render_view(storage)
+    if svg:
+        content = render_svg(storage)
+        suffix = ".svg"
+    else:
+        content = render_view(storage)
+        suffix = ".html"
 
     if output:
         out_path = Path(output)
-        out_path.write_text(html, encoding="utf-8")
+        out_path.write_text(content, encoding="utf-8")
         console.print(f"Saved to [bold]{out_path}[/bold]")
     else:
-        out_path = path / ".ctxgraph" / "graph.html"
+        filename = f"graph{suffix}"
+        out_path = path / ".ctxgraph" / filename
         out_path.parent.mkdir(parents=True, exist_ok=True)
-        out_path.write_text(html, encoding="utf-8")
+        out_path.write_text(content, encoding="utf-8")
         console.print(f"Saved to [bold]{out_path}[/bold]")
 
-    if open_browser:
+    if open_browser and not svg:
         import webbrowser
 
         webbrowser.open(f"file://{out_path.absolute()}")
         console.print("Opened in browser.")
+
+
+@app.command()
+def serve(
+    repo_path: Optional[str] = typer.Option(
+        None, "--repo", "-r", help="Repository path"
+    ),
+    port: Optional[int] = typer.Option(
+        None, "--port", "-p", help="Port for SSE mode (default: stdio mode)"
+    ),
+):
+    """Start MCP server for dynamic graph queries (MCP protocol)."""
+    from ctxgraph.mcp.server import run_server
+
+    if port:
+        console.print(f"[yellow]SSE mode on port {port} - not yet supported, falling back to stdio[/yellow]")
+    run_server(repo_path)
 
 
 @app.command()

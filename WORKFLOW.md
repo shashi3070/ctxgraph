@@ -8,7 +8,7 @@
 │  ccg "fix jwt expiry"                                       │
 │  ctx build                                                   │
 │  ctx capsule "search"                                        │
-│  ctx view                                                    │
+│  ctx view / ctx serve                                        │
 └───────────┬─────────────────────────────────────────────┬───┘
             │                                             │
             ▼                                             ▼
@@ -19,8 +19,8 @@
 │  2. ctx capsule       │                   │  capsule → DSL output │
 │  3. Inject context    │                   │  query  → search      │
 │  4. Launch claude CLI  │                   │  view   → D3.js viz   │
-└───────────┬───────────┘                   └───────────┬───────────┘
-            │                                           │
+└───────────┬───────────┘                   │  serve  → MCP server   │
+            │                               └───────────┬───────────┘
             ▼                                           ▼
 ┌───────────────────────┐                   ┌───────────────────────┐
 │    Claude Code (SSO)  │                   │   SQLite Graph DB     │
@@ -28,7 +28,7 @@
 │  Sees: [CONTEXT]      │                   │                       │
 │  ...capsule...        │◄──────────────────│  nodes:  files, funcs │
 │  [/CONTEXT]           │     queries        │  edges:  imports,     │
-│  TASK: fix jwt        │     via MCP (P2)  │         calls, defines│
+│  TASK: fix jwt        │     via MCP       │         calls, defines│
 └───────────────────────┘                   └───────────────────────┘
 ```
 
@@ -112,7 +112,40 @@ User: "fix JWT expiry in auth"
             └──────────────┘
 ```
 
-### Phase 3: Claude Wrapper (`ccg "fix jwt"`)
+### Phase 3: MCP Server (`ctx serve`)
+
+```
+User: ctx serve  (or Claude Desktop with ctx as MCP server)
+    │
+    ▼
+┌──────────────────────────────────────────────┐
+│        MCP Server (stdio mode)                │
+│                                               │
+│  Tools exposed:                               │
+│                                               │
+│  search_graph(query, max_results)             │
+│    → Search nodes by name/summary/path        │
+│                                               │
+│  get_context_capsule(query, mode)             │
+│    → Generate DSL capsule for a task           │
+│                                               │
+│  get_file_dependencies(file_path)             │
+│    → List edges for a specific file           │
+│                                               │
+│  get_project_overview()                       │
+│    → High-level project structure             │
+│                                               │
+│  Protocol: JSON-RPC over stdio (MCP spec)     │
+└──────────────────┬───────────────────────────┘
+                   │
+                   ▼
+            ┌──────────────┐
+            │  Graph DB    │
+            │  SQLite      │
+            └──────────────┘
+```
+
+### Phase 4: Claude Wrapper (`ccg "fix jwt"`)
 
 ```
 Terminal: ccg "fix JWT expiry"
@@ -178,6 +211,7 @@ ctx build --exclude "legacy/*" --exclude "vendor/*"
 | `ctx query "search"` | Search graph interactively |
 | `ctx view` | Open D3.js graph visualization |
 | `ctx info` | Show graph statistics |
+| `ctx serve` | Start MCP server for dynamic queries |
 | `ccg "query"` | Claude wrapper (single-shot) |
 | `ccg --chat "query"` | Claude wrapper (interactive) |
 | `ccg --overview` | Send project overview to Claude |

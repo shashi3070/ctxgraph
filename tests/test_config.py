@@ -76,7 +76,6 @@ class TestSettings:
             assert "provider = " in content
 
     def test_exclude_patterns(self):
-        config_path = Path(tmp_path) if "tmp_path" in dir() else Path(".")
         s = Settings()
         assert isinstance(s.exclude_patterns, list)
 

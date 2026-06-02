@@ -50,6 +50,14 @@ PROVIDER_CONFIGS = {
         "chat_endpoint": "/chat/completions",
         "api_key_env": "OPENAI_API_KEY",
     },
+    "azure": {
+        "endpoint_default": "https://YOUR_RESOURCE.openai.azure.com",
+        "api_key_required": True,
+        "models": ["gpt-4o", "gpt-4o-mini"],
+        "chat_endpoint": "/openai/deployments/{deployment}/chat/completions?api-version=2024-08-01-preview",
+        "api_key_env": "AZURE_OPENAI_API_KEY",
+        "api_key_header": "api-key",
+    },
     "custom": {
         "endpoint_default": None,
         "api_key_required": False,
@@ -158,7 +166,10 @@ class Settings:
     def get_chat_url(self) -> str:
         pconfig = self.get_provider_config()
         endpoint = self.endpoint.rstrip("/")
-        return f"{endpoint}{pconfig.get('chat_endpoint', '/v1/chat/completions')}"
+        chat_ep = pconfig.get("chat_endpoint", "/v1/chat/completions")
+        if "{deployment}" in chat_ep:
+            chat_ep = chat_ep.replace("{deployment}", self.model)
+        return f"{endpoint}{chat_ep}"
 
     def to_dict(self) -> dict:
         return dict(self._data)
@@ -210,7 +221,7 @@ def create_default_config(repo_path: Path):
 exclude = []
 
 [ai]
-# Provider: ollama, claude, openai, or custom
+# Provider: ollama, claude, openai, azure, or custom
 provider = "ollama"
 # Model name
 model = "qwen2.5-coder:7b"

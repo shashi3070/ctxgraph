@@ -21,6 +21,8 @@ def chat_completion(
         return _claude_chat(settings, system_prompt, user_prompt)
     elif provider == "openai":
         return _openai_chat(settings, system_prompt, user_prompt)
+    elif provider == "azure":
+        return _azure_chat(settings, system_prompt, user_prompt)
     else:
         return _custom_chat(settings, system_prompt, user_prompt)
 
@@ -116,6 +118,38 @@ def _openai_chat(settings: Settings, system: str, user: str) -> Optional[str]:
             headers={
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {api_key}",
+            },
+        )
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            result = json.loads(resp.read())
+            return result.get("choices", [{}])[0].get("message", {}).get("content", "")
+    except (urllib.error.URLError, json.JSONDecodeError, TimeoutError):
+        return None
+
+
+def _azure_chat(settings: Settings, system: str, user: str) -> Optional[str]:
+    api_key = settings.api_key
+    if not api_key:
+        return None
+
+    url = settings.get_chat_url()
+    payload = {
+        "messages": [
+            {"role": "system", "content": system},
+            {"role": "user", "content": user},
+        ],
+        "max_tokens": settings.max_tokens,
+        "temperature": settings.temperature,
+    }
+
+    try:
+        data = json.dumps(payload).encode()
+        req = urllib.request.Request(
+            url,
+            data=data,
+            headers={
+                "Content-Type": "application/json",
+                "api-key": api_key,
             },
         )
         with urllib.request.urlopen(req, timeout=60) as resp:

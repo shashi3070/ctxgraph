@@ -67,17 +67,19 @@ def build_and_capsule_tokens(project_name: str, query: str, mode: str = "balance
     nodes, edges = generate_context_subgraph(storage, query, max_nodes=max_nodes)
     edge_count = len(edges)
 
-    file_nodes = [n for n in all_nodes if n.type == "file"]
+    # Baseline "without graph": tokens from ALL .py files in project (not just graph nodes)
     total_raw_tokens = 0
     raw_files_count = 0
-    for fn in file_nodes:
-        fp = proj_dir / (fn.path or "")
-        if fp.is_file():
-            try:
-                total_raw_tokens += count_tokens(fp.read_text(encoding="utf-8", errors="replace"))
-                raw_files_count += 1
-            except Exception:
-                pass
+    for fp in sorted(proj_dir.rglob("*.py")):
+        from ctxgraph.exclude.patterns import should_exclude as _se
+        # Only exclude genuine build artifacts, not source files
+        if _se(fp, proj_dir, None):
+            continue
+        try:
+            total_raw_tokens += count_tokens(fp.read_text(encoding="utf-8", errors="replace"))
+            raw_files_count += 1
+        except Exception:
+            pass
 
     storage.close()
 
