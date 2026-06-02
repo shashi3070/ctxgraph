@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.3 (2026-06-02)
+
+### Fixed
+- README provider examples: added Windows PowerShell `$env:` syntax
+
 ## v0.2.2 (2026-06-02)
 
 ### Fixed

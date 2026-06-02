@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ctxgraph"
-version = "0.2.2"
+version = "0.2.3"
 description = "AI context engine for Python — cuts LLM tokens 97% via code knowledge graphs. Build, query, and generate compact context capsules for Claude, OpenAI, Ollama."
 readme = "README.md"
 license = {text = "MIT"}
