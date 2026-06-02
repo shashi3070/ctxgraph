@@ -11,7 +11,7 @@ ccg "fix the login redirect bug"   # Launch Claude with context pre-loaded
 ctx view                           # Interactive D3.js visualization (or --svg for static)
 ```
 
-<img src="docs/graph.svg" alt="ctxgraph knowledge graph visualization" width="100%">
+<img src="https://raw.githubusercontent.com/shashi3070/ctxgraph/master/docs/graph.svg" alt="ctxgraph knowledge graph visualization" width="100%">
 
 ---
 
@@ -241,7 +241,7 @@ max_depth = 2
 | `AZURE_OPENAI_API_KEY` | Azure OpenAI API |
 
 ```bash
-# Ollama (default)
+# Ollama (default — no env vars needed)
 ctx capsule "query"
 
 # Claude
@@ -260,6 +260,17 @@ CTXGRAPH_PROVIDER=azure \
 # Custom (OpenAI-compatible)
 CTXGRAPH_PROVIDER=custom CTXGRAPH_ENDPOINT=http://my-api/v1 ctx capsule "query"
 ```
+
+> **Windows (PowerShell):** Use `$env:` prefix instead:
+> ```powershell
+> $env:CTXGRAPH_PROVIDER = "azure"; $env:CTXGRAPH_MODEL = "gpt-4o"; ctx capsule "query"
+> ```
+> Or set them once per session:
+> ```powershell
+> $env:CTXGRAPH_PROVIDER = "azure"
+> $env:AZURE_OPENAI_API_KEY = "sk-..."
+> ctx capsule "query"
+> ```
 
 ---
 

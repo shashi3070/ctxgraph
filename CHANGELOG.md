@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.2 (2026-06-02)
+
+### Fixed
+- README graph image now uses absolute GitHub URL (renders on PyPI)
+
 ## v0.2.1 (2026-06-02)
 
 ### Added
