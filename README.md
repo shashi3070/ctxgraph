@@ -9,6 +9,7 @@ ctx init                           # Scaffold .ctxgraph with config + default sk
 ctx build                          # Build knowledge graph (AST analysis → SQLite)
 ctx ask "how does JWT auth work"   # Ask questions with automatic token savings
 ctx capsule "fix JWT expiry"       # 92-99% fewer tokens vs raw code
+ctx chat "refactor this module"    # Multi-turn conversation with persistent sessions
 ctx history --stats                # Track total tokens saved across all queries
 ccg "fix the login redirect bug"   # Launch Claude with context pre-loaded
 ctx view                           # Interactive D3.js visualization (or --svg for static)
@@ -128,7 +129,7 @@ ctx capsule "user authentication" --savings
 # └──────────────────────────┴──────────────┘
 ```
 
-`ctx ask` shows this automatically on every query. See how many tokens you save with each question.
+`ctx ask` and `ctx chat` show this automatically. See how many tokens you save with each interaction.
 
 ---
 
@@ -212,6 +213,85 @@ The greeting system is implemented in `src/greet.py`. The `greet()` function tak
 and returns a formatted greeting string. The `Greeter` class extends this with a configurable
 prefix. Both use type hints and follow the project conventions.
 ```
+
+### `ctx chat [message]` — Interactive multi-turn conversation
+
+Chat mode maintains a persistent session across turns. Sessions are saved to `.ctxgraph/chats/` and survive CLI restart.
+
+#### Single-shot mode
+
+```bash
+ctx chat "how does the auth system work"       # Start or continue a session
+ctx chat "what about the JWT tokens"           # Follow-up question — stays in REPL
+ctx chat --new "explain the payment flow"      # Start a fresh session
+```
+
+#### Interactive REPL mode
+
+Run `ctx chat` without a message to enter interactive mode. No session is created until you send your first message.
+
+```bash
+$ ctx chat
+Chat Commands:
+  /resume       Select and resume a previous session
+  /compact      Compact current session (summarize oldest messages)
+  /new          Start a fresh session
+  /list         List all chat sessions
+  /show         Show current session context
+  /help         Show this help message
+  /exit         Exit chat mode
+
+Or type any message to send it to the LLM.
+
+> how does the auth system work?
+Started new session: a1b2c3d4
+
+# (LLM answer + token savings table)
+Session a1b2c3d4: 625/200,000 tokens used
+
+> and the refresh tokens?
+# (Continues same session — sends capsule + history)
+Session a1b2c3d4: 1,234/200,000 tokens used
+
+> /resume
+# Use ↑/↓ to select a previous session, Enter to confirm
+# (Resume session e5f6g7h8)
+
+> /compact
+Session compacted.
+
+> /exit
+```
+
+#### Session picker (`/resume`)
+
+Use the up/down arrow keys to navigate, Enter to select, Esc to cancel:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Chat Sessions  (↑/↓ select, Enter confirm, Esc cancel)      │
+├─────┬──────────┬───────┬────────┬───────────────────────────┤
+│  #  │ ID       │ Turns │ Tokens │ Last                      │
+├─────┼──────────┼───────┼────────┼───────────────────────────┤
+│  1  │ a1b2c3d4 │     5 │  1,234 │ how does the auth system… │
+│  2  │ e5f6g7h8 │     2 │    456 │ fix the login redirect…   │
+└─────┴──────────┴───────┴────────┴───────────────────────────┘
+```
+
+#### Session management
+
+- Sessions auto-compact when approaching the token limit (`max_session_tokens` in config, default 200k)
+- Oldest turns are summarized into a compact system note; latest turns preserved
+- Each session shows token usage at the end of every turn
+
+**Flags:**
+
+| Flag | Description |
+|------|-------------|
+| `--new` | Start a fresh session (discard previous context) |
+| `--list`, `-l` | List all sessions with turn/token counts |
+| `--show <id>` | View a session's transcript |
+| `--compact`, `-c` | Manually trigger compaction |
 
 ### `ctx capsule <query>` — Generate context capsule
 
@@ -352,6 +432,23 @@ branching = "prefer early returns over nested if-else"
 
 Now it appears in `ctx skill list` and can be activated with `--skill my-team-rules`.
 
+**Skill template:**
+
+`ctx init` ships a fully-commented skill template at `.ctxgraph/skills/template.example.toml`. It shows every available section and their options:
+
+```toml
+# .ctxgraph/skills/template.example.toml (commented reference)
+#
+# [about]     — REQUIRED: name and description
+# [rules]     — REQUIRED: instruction key/value pairs
+# [context]   — OPTIONAL: file filters and limits
+# [response]  — OPTIONAL: output formatting controls
+# [output]    — OPTIONAL: save-to-file behavior
+# [meta]      — OPTIONAL: author, version, requirements
+```
+
+To create a new skill, copy the file (remove `.example` from the name) and uncomment the sections you need.
+
 ### `ctx info` — Graph statistics
 
 ```bash
@@ -415,11 +512,18 @@ provider = "ollama"           # ollama, claude, openai, azure, custom
 model = "qwen2.5-coder:7b"
 endpoint = "http://localhost:11434"
 api_key = ""
+# For Azure provider, uncomment and set:
+# azure_deployment = "my-gpt-4o-deployment"
+# api_version = "2024-08-01-preview"
 
 [context]
 mode = "balanced"
 max_nodes = 20
 max_depth = 2
+
+[chat]
+# Max tokens per chat session before auto-compact
+max_session_tokens = 200000
 ```
 
 ### Environment variables
@@ -432,6 +536,8 @@ max_depth = 2
 | `ANTHROPIC_API_KEY` | `ai.api_key` | Claude provider |
 | `OPENAI_API_KEY` | `ai.api_key` | OpenAI provider |
 | `AZURE_OPENAI_API_KEY` | `ai.api_key` | Azure provider |
+| `AZURE_OPENAI_DEPLOYMENT` | `ai.azure_deployment` | Azure deployment name |
+| `AZURE_OPENAI_API_VERSION` | `ai.api_version` | Azure API version |
 
 ### Provider examples
 
@@ -446,11 +552,16 @@ CTXGRAPH_PROVIDER=claude CTXGRAPH_MODEL=claude-sonnet-4-20250514 ctx ask "explai
 CTXGRAPH_PROVIDER=openai CTXGRAPH_MODEL=gpt-4o ctx ask "find the bug"
 
 # Azure OpenAI
+# Uses `api-key` header (not Bearer), requires `azure_deployment` and `api_version`
 CTXGRAPH_PROVIDER=azure \
   CTXGRAPH_MODEL=gpt-4o \
   CTXGRAPH_ENDPOINT=https://my-resource.openai.azure.com \
   AZURE_OPENAI_API_KEY=sk-... \
+  AZURE_OPENAI_DEPLOYMENT=my-gpt-4o-deployment \
+  AZURE_OPENAI_API_VERSION=2024-08-01-preview \
   ctx ask "refactor this"
+# The endpoint is your resource URL. The chat URL becomes:
+#   /openai/deployments/{azure_deployment}/chat/completions?api-version={api_version}
 
 # Custom (OpenAI-compatible)
 CTXGRAPH_PROVIDER=custom CTXGRAPH_ENDPOINT=http://my-api/v1 ctx ask "explain"
@@ -571,7 +682,7 @@ from ctxgraph.capsule.savings import compute_savings
 
 savings = compute_savings(Path("./my_project"), capsule_text)
 print(f"Saved {savings['savings_pct']}% tokens")
-print(f"DSL is {savings['dsl_vs_json']}% more efficient than JSON")
+print(f"DSL is {savings['dsl_vs_json_pct']}% more efficient than JSON")
 ```
 
 ### LangChain
@@ -735,6 +846,7 @@ src/ctxgraph/
 │   ├── init.py              — Project scaffold (.ctxgraph dir)
 │   ├── settings.py          — TOML/JSON/env config loading
 │   └── providers.py         — Ollama, Claude, OpenAI clients
+├── chat.py                  — Chat session management (multi-turn, compaction)
 ├── clients/models.py        — Mode enum (fast/balanced/deep)
 ├── exclude/patterns.py      — Exclusion pattern matching
 ├── view/visualizer.py       — D3.js HTML graph generator
@@ -743,7 +855,8 @@ src/ctxgraph/
 ├── skills/
 │   ├── __init__.py          — Skill discovery + loading
 │   ├── project-style.toml   — Default skill: project conventions
-│   └── field-guide.toml     — Default skill: field guide
+│   ├── field-guide.toml     — Default skill: field guide
+│   └── template.example.toml — Commented skill template reference
 └── history.py               — JSONL history append/query/stats
 ```
 

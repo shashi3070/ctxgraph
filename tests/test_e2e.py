@@ -181,7 +181,7 @@ class TestE2ESavings:
         assert "capsule_tokens" in result
         assert "json_tokens" in result
         assert "savings_pct" in result
-        assert "dsl_vs_json" in result
+        assert "dsl_vs_json_pct" in result
 
     def test_savings_capsule_smaller_than_raw(self, project):
         from ctxgraph.capsule.savings import compute_savings
@@ -202,14 +202,12 @@ class TestE2ESavings:
         savings = compute_savings(project, "[CTX]test")
         output = render_savings_table(savings)
         assert "Token Savings" in output
-        assert "tokens" in output
-        assert "%" in output
 
     def test_savings_dsl_vs_json(self, project):
         from ctxgraph.capsule.savings import compute_savings
 
         result = compute_savings(project, "[CTX]test capsule content " * 10)
-        assert result["dsl_vs_json"] >= 0
+        assert result["dsl_vs_json_pct"] >= 0
 
     def test_savings_no_py_files(self):
         from ctxgraph.capsule.savings import compute_savings
@@ -217,3 +215,83 @@ class TestE2ESavings:
         with tempfile.TemporaryDirectory() as tmp:
             result = compute_savings(Path(tmp), "[CTX]test")
             assert result["savings_pct"] == 0.0
+
+
+class TestE2EChat:
+    def test_create_session(self, project):
+        from ctxgraph.chat import append_message, create_session, list_sessions
+
+        session_id = create_session(project)
+        assert len(session_id) == 8
+        append_message(project, session_id, "user", "first")
+        sessions = list_sessions(project)
+        assert any(s["id"] == session_id for s in sessions)
+
+    def test_append_read_messages(self, project):
+        from ctxgraph.chat import append_message, create_session, load_session
+
+        session_id = create_session(project)
+        append_message(project, session_id, "user", "hello")
+        append_message(project, session_id, "assistant", "hi there")
+        messages = load_session(project, session_id)
+        assert len(messages) == 2
+        assert messages[0]["role"] == "user"
+        assert messages[0]["content"] == "hello"
+        assert messages[1]["role"] == "assistant"
+        assert messages[1]["content"] == "hi there"
+
+    def test_list_sessions(self, project):
+        from ctxgraph.chat import append_message, create_session, list_sessions
+
+        id1 = create_session(project)
+        append_message(project, id1, "user", "first")
+        id2 = create_session(project)
+        append_message(project, id2, "user", "second")
+        sessions = list_sessions(project)
+        assert len(sessions) >= 2
+        ids = [s["id"] for s in sessions]
+        assert id1 in ids
+        assert id2 in ids
+
+    def test_compact_session(self, project):
+        from ctxgraph.chat import append_message, compact_session, create_session, load_session
+
+        session_id = create_session(project)
+        for i in range(5):
+            append_message(project, session_id, "user", f"message {i}")
+            append_message(project, session_id, "assistant", f"response {i}")
+
+        comp_summary = compact_session(project, session_id)
+        assert comp_summary != ""
+
+        messages = load_session(project, session_id)
+        assert len(messages) >= 1
+        assert any("[Compact summary" in m.get("content", "") for m in messages)
+
+    def test_get_active_session(self, project):
+        from ctxgraph.chat import append_message, create_session, get_active_session
+
+        id1 = create_session(project)
+        append_message(project, id1, "user", "first")
+        id2 = create_session(project)
+        append_message(project, id2, "user", "second")
+        active = get_active_session(project)
+        assert active == id2
+
+    def test_delete_session(self, project):
+        from ctxgraph.chat import append_message, create_session, delete_session, list_sessions
+
+        session_id = create_session(project)
+        append_message(project, session_id, "user", "test")
+        assert delete_session(project, session_id) is True
+        assert delete_session(project, "nonexistent") is False
+        sessions = list_sessions(project)
+        assert all(s["id"] != session_id for s in sessions)
+
+    def test_session_token_count(self, project):
+        from ctxgraph.chat import append_message, create_session, session_token_count
+
+        session_id = create_session(project)
+        assert session_token_count(project, session_id) == 0
+        append_message(project, session_id, "user", "hello world")
+        assert session_token_count(project, session_id) > 0

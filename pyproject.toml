@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ctxgraph"
-version = "0.3.2"
+version = "0.4.0"
 description = "97% cheaper AI coding. ctx init → ctx build → ctx ask. Knowledge graphs, token-efficient capsules, query history, skills, and multi-provider LLM answers (Ollama, Claude, OpenAI, Azure). Cut context costs from cents to fractions of a cent."
 readme = "README.md"
 license = {text = "MIT"}
@@ -47,6 +47,9 @@ ccg = "ctxgraph.wrapper.claude:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+ctxgraph = ["skills/*.toml"]
 
 [tool.ruff]
 target-version = "py310"

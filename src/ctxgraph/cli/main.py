@@ -15,6 +15,18 @@ from ctxgraph.config.settings import Settings, create_default_config
 from ctxgraph.graph.builder import build_graph, get_storage
 from ctxgraph.graph.query import search_relevant_nodes
 from ctxgraph.history import append_entry, get_entries, get_stats
+from ctxgraph.chat import (
+    append_message,
+    compact_session,
+    create_session,
+    delete_session,
+    get_active_session,
+    interactive_session_picker,
+    list_sessions,
+    load_session,
+    session_token_count,
+    show_session_context,
+)
 from ctxgraph.skills import discover_skills, get_builtin_skills, load_skill
 
 app = typer.Typer(name="ctx", help="Context graph engine for AI coding assistants")
@@ -360,7 +372,6 @@ def ask(
             console.print(gtable)
 
     savings_data = compute_savings(path, capsule_text)
-    console.print(render_savings_table(savings_data))
 
     provider_name = provider or settings.provider
     model_name = model or settings.model
@@ -376,8 +387,9 @@ def ask(
         {"role": "user", "content": f"Context Capsule:\n{capsule_text}\n\nQuestion: {query}"},
     ]
 
+    body_model = settings.azure_deployment if provider_name == "azure" else model_name
     body = _json.dumps({
-        "model": model_name,
+        "model": body_model,
         "messages": messages,
         "stream": False,
         "temperature": settings.temperature,
@@ -389,7 +401,8 @@ def ask(
     api_key = settings.api_key
     if api_key:
         akh = provider_cfg.get("api_key_header", "Authorization")
-        headers[akh] = f"Bearer {api_key}"
+        prefix = "" if akh == "api-key" else "Bearer "
+        headers[akh] = f"{prefix}{api_key}"
 
     try:
         req = urllib.request.Request(chat_url, data=body, headers=headers)
@@ -401,6 +414,8 @@ def ask(
 
     answer = data.get("message", {}).get("content", "") or data.get("response", "")
     console.print(f"\n[bold cyan]Answer:[/bold cyan]\n{answer}")
+
+    console.print(render_savings_table(savings_data))
 
     append_entry(path, {
         "query": query,
@@ -531,6 +546,227 @@ def skill(
     else:
         console.print(f"[red]Unknown action: {action}. Use: list, show[/red]")
         raise typer.Exit(1)
+
+
+def _send_chat_message(
+    path: Path,
+    session_id: Optional[str],
+    message: str,
+    settings: Settings,
+) -> str:
+    import json as _json
+    import urllib.request
+
+    if session_id is None:
+        session_id = create_session(path)
+        console.print(f"[green]Started new session: {session_id}[/green]")
+
+    max_tok = settings.chat_max_session_tokens
+    current_tokens = session_token_count(path, session_id)
+    msg_tokens = max(1, len(message) // 4)
+    if current_tokens + msg_tokens > max_tok * 0.9:
+        console.print("[yellow]Session approaching token limit. Auto-compacting...[/yellow]")
+        compact_session(path, session_id)
+
+    session = load_session(path, session_id)
+    append_message(path, session_id, "user", message)
+
+    storage = get_storage(path)
+    if storage is None:
+        console.print("[red]No graph found. Run [bold]ctx build[/bold] first.[/red]")
+        raise typer.Exit(1)
+
+    capsule_text = render_capsule(storage, message, max_nodes=15)
+    savings_data = compute_savings(path, capsule_text)
+
+    provider_name = settings.provider
+    provider_cfg = settings.get_provider_config()
+
+    chat_history = [{"role": m["role"], "content": m["content"]} for m in session]
+
+    system_msg = "You are an expert software engineer. Continue the conversation naturally, using context from the codebase and prior messages."
+    llm_messages = [{"role": "system", "content": system_msg}]
+    llm_messages.extend(chat_history)
+    llm_messages.append({
+        "role": "user",
+        "content": f"Context Capsule:\n{capsule_text}\n\nMessage: {message}",
+    })
+
+    body_model = settings.azure_deployment if provider_name == "azure" else settings.model
+    body = _json.dumps({
+        "model": body_model,
+        "messages": llm_messages,
+        "stream": False,
+        "temperature": settings.temperature,
+        "max_tokens": settings.max_tokens,
+    }).encode("utf-8")
+
+    chat_url = settings.get_chat_url()
+    headers = {"Content-Type": "application/json"}
+    api_key = settings.api_key
+    if api_key:
+        akh = provider_cfg.get("api_key_header", "Authorization")
+        prefix = "" if akh == "api-key" else "Bearer "
+        headers[akh] = f"{prefix}{api_key}"
+
+    try:
+        req = urllib.request.Request(chat_url, data=body, headers=headers)
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            data = _json.loads(resp.read().decode("utf-8"))
+    except Exception as e:
+        console.print(f"[red]LLM request failed: {e}[/red]")
+        raise typer.Exit(1)
+
+    answer = data.get("message", {}).get("content", "") or data.get("response", "")
+    console.print(f"\n[bold cyan]Answer:[/bold cyan]\n{answer}")
+    console.print(render_savings_table(savings_data))
+
+    append_message(path, session_id, "assistant", answer, metadata={"capsule_tokens": savings_data["capsule_tokens"]})
+    current_tokens = session_token_count(path, session_id)
+    console.print(f"\n[dim]Session {session_id}: {current_tokens}/{max_tok:,} tokens used[/dim]")
+
+    return session_id
+
+
+def _show_chat_help():
+    help_lines = [
+        "[bold cyan]Chat Commands:[/bold cyan]",
+        "  /resume       Select and resume a previous session",
+        "  /compact      Compact current session (summarize oldest messages)",
+        "  /new          Start a fresh session",
+        "  /list         List all chat sessions",
+        "  /show         Show current session context",
+        "  /help         Show this help message",
+        "  /exit         Exit chat mode",
+        "",
+        "Or type any message to send it to the LLM.",
+    ]
+    console.print("\n".join(help_lines))
+
+
+def _show_sessions(path: Path):
+    sessions = list_sessions(path)
+    if not sessions:
+        console.print("[yellow]No chat sessions found.[/yellow]")
+        return
+    table = Table(title="Chat Sessions")
+    table.add_column("ID", style="cyan")
+    table.add_column("Created", style="green")
+    table.add_column("Turns", style="yellow", justify="right")
+    table.add_column("Tokens", style="magenta", justify="right")
+    table.add_column("Last", style="white")
+    for s in sessions:
+        table.add_row(s["id"], s["created"][:19], str(s["turns"]), str(s["tokens"]), s["last_message"])
+    console.print(table)
+
+
+def _repl_loop(path: Path, settings: Settings, initial_session_id: Optional[str] = None):
+    session_id = initial_session_id
+    while True:
+        try:
+            user_input = console.input("[bold cyan]>[/bold cyan] ")
+        except (KeyboardInterrupt, EOFError):
+            console.print("\n[yellow]Exiting chat.[/yellow]")
+            break
+
+        if not user_input.strip():
+            continue
+
+        if user_input.startswith("/"):
+            cmd = user_input[1:].strip().lower().split()[0]
+            if cmd == "exit":
+                break
+            elif cmd == "help":
+                _show_chat_help()
+            elif cmd == "list":
+                _show_sessions(path)
+            elif cmd == "resume":
+                sid = interactive_session_picker(path)
+                if sid:
+                    session_id = sid
+                    console.print(f"[green]Resumed session {sid}[/green]")
+                else:
+                    console.print("[yellow]No session selected.[/yellow]")
+            elif cmd == "show":
+                if session_id:
+                    ctx = show_session_context(path, session_id)
+                    console.print(ctx)
+                else:
+                    console.print("[yellow]No active session.[/yellow]")
+            elif cmd == "compact":
+                if session_id:
+                    summary = compact_session(path, session_id)
+                    if summary:
+                        console.print("[green]Session compacted.[/green]")
+                    else:
+                        console.print("[yellow]Session too short to compact.[/yellow]")
+                else:
+                    console.print("[yellow]No active session.[/yellow]")
+            elif cmd == "new":
+                session_id = create_session(path)
+                console.print(f"[green]Started new session: {session_id}[/green]")
+            else:
+                console.print(f"[yellow]Unknown command: /{cmd}. Type /help for available commands.[/yellow]")
+        else:
+            session_id = _send_chat_message(path, session_id, user_input, settings)
+
+
+@app.command()
+def chat(
+    message: str = typer.Argument("", help="Message to send in the chat session"),
+    new_session: bool = typer.Option(False, "--new", help="Start a new session"),
+    list_sessions_flag: bool = typer.Option(
+        False, "--list", "-l", help="List chat sessions"
+    ),
+    show_session: Optional[str] = typer.Option(
+        None, "--show", help="Show session context by ID"
+    ),
+    compact: bool = typer.Option(
+        False, "--compact", "-c", help="Manually compact the current session"
+    ),
+):
+    path = Path.cwd()
+    settings = Settings(path)
+
+    if list_sessions_flag:
+        _show_sessions(path)
+        return
+
+    if show_session:
+        ctx = show_session_context(path, show_session)
+        if not ctx:
+            console.print(f"[red]Session '{show_session}' not found or empty.[/red]")
+            return
+        console.print(f"[bold cyan]Session: {show_session}[/bold cyan]\n{ctx}")
+        return
+
+    if new_session:
+        session_id = create_session(path)
+        console.print(f"[green]Started new session: {session_id}[/green]")
+    else:
+        session_id = None
+
+    if compact:
+        if session_id is None:
+            session_id = get_active_session(path)
+        if session_id:
+            summary = compact_session(path, session_id)
+            if summary:
+                console.print(f"[green]Session {session_id} compacted.[/green]")
+            else:
+                console.print("[yellow]Session too short to compact.[/yellow]")
+        else:
+            console.print("[yellow]No active session to compact.[/yellow]")
+        return
+
+    if message:
+        session_id = _send_chat_message(path, session_id, message, settings)
+        console.print()
+        _repl_loop(path, settings, session_id)
+    else:
+        _show_chat_help()
+        console.print()
+        _repl_loop(path, settings, session_id)
 
 
 if __name__ == "__main__":

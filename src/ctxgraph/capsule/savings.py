@@ -49,35 +49,44 @@ def compute_savings(repo_path: Path, capsule_text: str) -> dict:
         savings_pct = 0.0
 
     if json_tokens > 0:
-        dsl_vs_json = round((1 - capsule_tokens / json_tokens) * 100, 1)
+        dsl_vs_json_pct = round((1 - capsule_tokens / json_tokens) * 100, 1)
+        dsl_as_pct_of_json = round(capsule_tokens / json_tokens * 100, 1)
     else:
-        dsl_vs_json = 0.0
+        dsl_vs_json_pct = 0.0
+        dsl_as_pct_of_json = 0.0
 
     return {
         "raw_tokens": raw_tokens,
         "capsule_tokens": capsule_tokens,
         "json_tokens": json_tokens,
         "savings_pct": savings_pct,
-        "dsl_vs_json": dsl_vs_json,
+        "dsl_vs_json_pct": dsl_vs_json_pct,
+        "dsl_as_pct_of_json": dsl_as_pct_of_json,
     }
 
 
 def render_savings_table(savings: dict) -> str:
-    table = Table(title="Token Savings")
-    table.add_column("Metric", style="cyan")
-    table.add_column("Value", style="green")
+    saved = savings['raw_tokens'] - savings['capsule_tokens']
+    ratio = f"{savings['savings_pct']}%"
+    bar_len = 20
+    filled = int(savings['savings_pct'] / 100 * bar_len) if savings['savings_pct'] > 0 else 0
+    bar = "█" * filled + "░" * (bar_len - filled)
 
-    table.add_row("Raw Project .py Files", f"{savings['raw_tokens']:,} tokens")
-    table.add_row("Capsule DSL", f"{savings['capsule_tokens']:,} tokens")
-    table.add_row("JSON Equivalent", f"{savings['json_tokens']:,} tokens")
-    table.add_row(
-        "Savings vs Raw",
-        f"{savings['savings_pct']}% ({savings['raw_tokens'] - savings['capsule_tokens']:,} tokens saved)",
-    )
-    table.add_row(
-        "DSL vs JSON",
-        f"{savings['dsl_vs_json']}% more efficient",
-    )
+    table = Table(title=f"Token Savings  {bar}  {ratio}")
+    table.add_column("Metric", style="cyan")
+    table.add_column("Value", style="green", justify="right")
+
+    table.add_row("Raw .py files", f"{savings['raw_tokens']:>10,} tokens")
+    table.add_row("Capsule DSL", f"{savings['capsule_tokens']:>10,} tokens")
+    table.add_row("JSON equivalent", f"{savings['json_tokens']:>10,} tokens")
+    table.add_row("", "")
+    table.add_row("Tokens saved", f"{saved:>10,}")
+    table.add_row("Savings vs raw", f"{savings['savings_pct']:>9}%")
+    dsl_ratio = f"DSL is {savings['dsl_as_pct_of_json']}% of JSON"
+    if abs(savings['dsl_vs_json_pct']) < 10:
+        table.add_row("DSL vs JSON", f"{dsl_ratio:>20}")
+    else:
+        table.add_row("DSL vs JSON", f"{savings['dsl_vs_json_pct']:>9}% more efficient")
 
     console = Console()
     with console.capture() as capture:

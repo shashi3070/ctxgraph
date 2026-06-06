@@ -1,0 +1,43 @@
+# ============================
+# ctxgraph Skill Template
+# ============================
+# This is a commented reference file showing every available skill section.
+# To create your own skill, copy this file, remove the '.example' suffix,
+# and uncomment/customize the sections you need.
+#
+# Usage: ctx ask --skill my-skill "your question"
+
+# [about] — REQUIRED section describing the skill
+# [about]
+# name = "My Custom Skill"
+# description = "What this skill does — shown in --help"
+
+# [rules] — REQUIRED section; instructions injected into the LLM system prompt
+# Each key is a rule name, the value is the instruction text.
+# [rules]
+# style = "use functional style; avoid classes where possible"
+# conventions = "follow existing patterns in the codebase"
+# safety = "never suggest removing code you don't understand"
+
+# [context] — OPTIONAL section; defines what context to include
+# [context]
+# include_files = ["src/core/*.py", "README.md"]
+# exclude_dirs = ["tests", "docs"]
+# max_lines_per_file = 200
+
+# [response] — OPTIONAL section; controls answer formatting
+# [response]
+# format = "markdown"
+# max_length = 2000
+# include_examples = true
+
+# [output] — OPTIONAL section; custom output handling
+# [output]
+# save_to = "results/analysis.md"
+# append = false
+
+# [meta] — OPTIONAL metadata
+# [meta]
+# author = "your-name"
+# version = "1.0.0"
+# requires = ["ctxgraph>=0.3.0"]

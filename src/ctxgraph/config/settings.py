@@ -19,12 +19,17 @@ DEFAULT_CONFIG = {
         "api_key": None,
         "temperature": 0.1,
         "max_tokens": 4096,
+        "azure_deployment": None,
+        "api_version": "2024-08-01-preview",
     },
     "context": {
         "mode": "balanced",
         "max_nodes": 20,
         "max_depth": 2,
         "max_tokens": 4000,
+    },
+    "chat": {
+        "max_session_tokens": 200000,
     },
 }
 
@@ -54,7 +59,7 @@ PROVIDER_CONFIGS = {
         "endpoint_default": "https://YOUR_RESOURCE.openai.azure.com",
         "api_key_required": True,
         "models": ["gpt-4o", "gpt-4o-mini"],
-        "chat_endpoint": "/openai/deployments/{deployment}/chat/completions?api-version=2024-08-01-preview",
+        "chat_endpoint": "/openai/deployments/{deployment}/chat/completions?api-version={api_version}",
         "api_key_env": "AZURE_OPENAI_API_KEY",
         "api_key_header": "api-key",
     },
@@ -120,6 +125,14 @@ class Settings:
         if env_provider:
             self._data["ai"]["provider"] = env_provider
 
+        env_azure_deploy = os.environ.get("AZURE_OPENAI_DEPLOYMENT")
+        if env_azure_deploy:
+            self._data["ai"]["azure_deployment"] = env_azure_deploy
+
+        env_api_version = os.environ.get("AZURE_OPENAI_API_VERSION")
+        if env_api_version:
+            self._data["ai"]["api_version"] = env_api_version
+
     @property
     def provider(self) -> str:
         return self._data["ai"]["provider"]
@@ -160,6 +173,19 @@ class Settings:
     def max_depth(self) -> int:
         return self._data["context"].get("max_depth", 2)
 
+    @property
+    def azure_deployment(self) -> str:
+        dep = self._data["ai"].get("azure_deployment")
+        return dep if dep else self.model
+
+    @property
+    def api_version(self) -> str:
+        return self._data["ai"].get("api_version", "2024-08-01-preview")
+
+    @property
+    def chat_max_session_tokens(self) -> int:
+        return self._data["chat"].get("max_session_tokens", 200000)
+
     def get_provider_config(self) -> dict:
         return PROVIDER_CONFIGS.get(self.provider, PROVIDER_CONFIGS["custom"])
 
@@ -168,7 +194,9 @@ class Settings:
         endpoint = self.endpoint.rstrip("/")
         chat_ep = pconfig.get("chat_endpoint", "/v1/chat/completions")
         if "{deployment}" in chat_ep:
-            chat_ep = chat_ep.replace("{deployment}", self.model)
+            chat_ep = chat_ep.replace("{deployment}", self.azure_deployment)
+        if "{api_version}" in chat_ep:
+            chat_ep = chat_ep.replace("{api_version}", self.api_version)
         return f"{endpoint}{chat_ep}"
 
     def to_dict(self) -> dict:
@@ -227,8 +255,11 @@ provider = "ollama"
 model = "qwen2.5-coder:7b"
 # API endpoint
 endpoint = "http://localhost:11434"
-# API key (or set env var: ANTHROPIC_API_KEY, OPENAI_API_KEY)
+# API key (or set env var: ANTHROPIC_API_KEY, OPENAI_API_KEY, AZURE_OPENAI_API_KEY)
 api_key = ""
+# For Azure provider, uncomment and set:
+# azure_deployment = "my-gpt-4o-deployment"
+# api_version = "2024-08-01-preview"
 
 [context]
 # Mode: fast, balanced, deep
@@ -237,6 +268,10 @@ mode = "balanced"
 max_nodes = 20
 # Max BFS depth for dependency traversal
 max_depth = 2
+
+[chat]
+# Max tokens per chat session before auto-compact
+max_session_tokens = 200000
 """,
         encoding="utf-8",
     )

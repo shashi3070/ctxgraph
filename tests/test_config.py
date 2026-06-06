@@ -83,3 +83,71 @@ class TestSettings:
         s = Settings()
         url = s.get_chat_url()
         assert "ollama" in url or "localhost:11434" in url or "/api/chat" in url
+
+    def test_azure_deployment_property(self):
+        s = Settings()
+        assert s.azure_deployment == s.model
+
+    def test_azure_deployment_explicit(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            config_dir = Path(tmp) / ".ctxgraph"
+            config_dir.mkdir()
+            config_path = config_dir / "config.toml"
+            config_path.write_text(
+                '[ai]\nprovider = "azure"\nazure_deployment = "my-gpt-4o"\nmodel = "gpt-4o"\n'
+            )
+            s = Settings(Path(tmp))
+            assert s.azure_deployment == "my-gpt-4o"
+
+    def test_azure_api_version_default(self):
+        s = Settings()
+        assert s.api_version == "2024-08-01-preview"
+
+    def test_azure_api_version_config(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            config_dir = Path(tmp) / ".ctxgraph"
+            config_dir.mkdir()
+            config_path = config_dir / "config.toml"
+            config_path.write_text(
+                '[ai]\nprovider = "azure"\napi_version = "2024-05-01-preview"\n'
+            )
+            s = Settings(Path(tmp))
+            assert s.api_version == "2024-05-01-preview"
+
+    def test_azure_env_deployment_override(self):
+        old = os.environ.get("AZURE_OPENAI_DEPLOYMENT")
+        os.environ["AZURE_OPENAI_DEPLOYMENT"] = "env-deploy"
+        try:
+            s = Settings()
+            assert s.azure_deployment == "env-deploy"
+        finally:
+            if old:
+                os.environ["AZURE_OPENAI_DEPLOYMENT"] = old
+            else:
+                del os.environ["AZURE_OPENAI_DEPLOYMENT"]
+
+    def test_azure_env_api_version_override(self):
+        old = os.environ.get("AZURE_OPENAI_API_VERSION")
+        os.environ["AZURE_OPENAI_API_VERSION"] = "2024-10-01-preview"
+        try:
+            s = Settings()
+            assert s.api_version == "2024-10-01-preview"
+        finally:
+            if old:
+                os.environ["AZURE_OPENAI_API_VERSION"] = old
+            else:
+                del os.environ["AZURE_OPENAI_API_VERSION"]
+
+    def test_azure_chat_url(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            config_dir = Path(tmp) / ".ctxgraph"
+            config_dir.mkdir()
+            config_path = config_dir / "config.toml"
+            config_path.write_text(
+                '[ai]\nprovider = "azure"\nmodel = "gpt-4o"\nendpoint = "https://test.openai.azure.com"\nazure_deployment = "my-deploy"\napi_version = "2024-08-01-preview"\n'
+            )
+            s = Settings(Path(tmp))
+            url = s.get_chat_url()
+            assert "my-deploy" in url
+            assert "api-version=2024-08-01-preview" in url
+            assert url.startswith("https://test.openai.azure.com")
