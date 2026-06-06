@@ -1,9 +1,20 @@
 # Changelog
 
+## v0.5.1 (2026-06-06)
+
+### Added
+- `CTXGRAPH_REPO_PATH` environment variable support — MCP server now checks this env var when neither `--repo` nor a `.ctxgraph` walk-up resolves, making Claude Desktop integration reliable on Windows
+- Diagnostic stderr output in MCP server — prints the resolved repo root and graph DB path on startup, so users can see exactly where the server is looking
+
+### Changed
+- MCP server "no graph found" error now includes the exact path searched and suggests using `--repo` or `CTXGRAPH_REPO_PATH`
+- README Claude Desktop config examples updated with `--repo` and `CTXGRAPH_REPO_PATH` patterns
+- Windows note added to MCP section
+
 ## v0.5.0 (2026-06-06)
 
 ### Added
-- `_find_repo_root()` in MCP server — auto-discovers project root by walking up from `cwd()` looking for `.ctxgraph/`, so Claude Desktop can find the graph regardless of where it spawns the process
+- `_find_repo_root()` in MCP server — auto-discovers project root by walking up from `cwd()` looking for `.ctxgraph/`
 - `_parse_toml_value()` in settings — properly parses unquoted TOML values as `int`, `float`, or `bool` instead of always storing as strings
 - Defensive `int()`/`float()` conversions in all numeric setting properties (`chat_max_session_tokens`, `temperature`, `max_tokens`, `max_nodes`, `max_depth`)
 
