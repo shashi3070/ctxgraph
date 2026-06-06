@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.3.1 (2026-06-06)
+
+### Changed
+- Comprehensive README rewrite with full feature coverage, Quick Start, example output, custom skill guide, per-command flag tables, and Python API examples for all new modules (history, skills, savings)
+
 ## v0.3.0 (2026-06-06)
 
 ### Added
