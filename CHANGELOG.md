@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.5.7 (2026-06-06)
+
+### Fixed
+- Re-upload to PyPI with architecture image already live on GitHub master so it renders correctly
+
 ## v0.5.6 (2026-06-06)
 
 ### Changed
