@@ -1,0 +1,12 @@
+# Project Field Guide — default ctxgraph skill
+# Activate with: ctx ask --skill field-guide "..."
+
+[about]
+name = "Project Field Guide"
+description = "Maps each file/module to its domain purpose for oriented reasoning"
+
+[rules]
+when_answering = "always reason about which files are relevant; explain your file-sourcing logic before answering"
+file_mapping = "when suggesting changes, always reference the file path; assume the capsule already provides full context"
+safety = "never suggest editing files not present in the capsule context unless you explicitly note they are new"
+precision = "prefer targeted edits to specific lines over broad rewrites; preserve existing code structure"

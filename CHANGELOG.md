@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.3.0 (2026-06-06)
+
+### Added
+- `ctx init` — scaffold `.ctxgraph/` directory with `config.toml`, default skills, and `history.jsonl`
+- `ctx ask <query>` — ask questions about the codebase via LLM (Ollama/Claude/OpenAI) with automatic token savings display
+- `ctx history [--tail N] [--filter F] [--stats]` — query history viewer with aggregate statistics
+- `ctx skill list|show <name>` — skills system with two default skills (`project-style`, `field-guide`)
+- `ctx capsule --savings` — token savings table comparing capsule DSL vs raw `.py` files vs JSON
+- `ctx capsule --skill <name>` — prepend skill context to capsules
+- `ctx ask --graph` — show graph search results alongside LLM answer
+- `ctx ask --provider` / `--model` — override LLM provider/model per query
+- `ctx build --provider` / `--model` — forward provider/model settings
+- History module: JSONL append, tail/filter/stats queries, auto-prune
+- Skills module: TOML-based skill discovery, built-in defaults, per-command activation
+- Token savings module: rough token estimation for raw `.py` files, capsule DSL, and JSON equivalent
+- 14 new end-to-end tests (78 total)
+
+### Changed
+- Capsule renderer accepts optional `skill_context` parameter for skill system prompt prepend
+- Settings module: provider/model endpoint forwarded to `--provider`/`--model` CLI flags
+
 ## v0.2.4 (2026-06-02)
 
 ### Fixed

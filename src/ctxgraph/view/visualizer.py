@@ -246,14 +246,18 @@ svg { width: 100%; height: 100%; }
     <div class="tt-type"></div>
     <div class="tt-summary"></div>
   </div>
-  <svg></svg>
+<svg width="100%" height="100%"></svg>
 </div>
 <script>
+document.addEventListener("DOMContentLoaded", () => {
 const graphData = /* GRAPH_DATA */;
 const width = window.innerWidth;
 const height = window.innerHeight;
 
 const svg = d3.select("svg");
+svg.attr("width", width).attr("height", height);
+svg.attr("viewBox", `0 0 ${width} ${height}`);
+
 const g = svg.append("g");
 
 const zoom = d3.zoom()
@@ -389,7 +393,11 @@ window.filterByType = function(type) {
 };
 
 window.addEventListener("resize", () => {
-  svg.attr("width", window.innerWidth).attr("height", window.innerHeight);
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  svg.attr("width", w).attr("height", h);
+  svg.attr("viewBox", `0 0 ${w} ${h}`);
+});
 });
 </script>
 </body>

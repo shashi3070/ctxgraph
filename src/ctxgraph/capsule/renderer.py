@@ -12,6 +12,7 @@ def render_capsule(
     query: str,
     max_nodes: int = 15,
     include_deps: bool = True,
+    skill_context: Optional[str] = None,
 ) -> str:
     from ctxgraph.graph.query import generate_context_subgraph
 
@@ -19,7 +20,14 @@ def render_capsule(
     if not nodes:
         return _empty_capsule(query)
 
-    return _build_dsl(nodes, edges, storage, query)
+    dsl = _build_dsl(nodes, edges, storage, query)
+    if skill_context:
+        dsl = _prepend_skill_context(dsl, skill_context)
+    return dsl
+
+
+def _prepend_skill_context(dsl: str, skill_text: str) -> str:
+    return f"## Project Knowledge\n\n{skill_text}\n\n{dsl}"
 
 
 def render_project_overview(

@@ -1,0 +1,15 @@
+# Project Style Guide — default ctxgraph skill
+# Activate with: ctx ask --skill project-style "..."
+
+[about]
+name = "Project Style Guide"
+description = "Enforces project conventions, code style, and naming patterns"
+
+[rules]
+import_style = "absolute imports, grouped: stdlib, third-party, local"
+naming = "snake_case for functions/variables, PascalCase for classes, UPPER_CASE for constants"
+type_hints = "use Python type hints everywhere (from __future__ import annotations)"
+docstrings = "google-style docstrings for public functions and classes"
+line_length = "max 100 characters"
+error_handling = "prefer specific exceptions over bare except; avoid swallowing errors"
+testing = "pytest with parametrize; tests in tests/ mirroring src/ structure"

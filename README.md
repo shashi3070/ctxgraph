@@ -57,10 +57,10 @@ Repository (.py files)
 ### Architecture
 
 ```
-┌─────────┐    ┌──────────────┐    ┌──────────────┐
-│   CLI   │───▶│  Analyzers   │───▶│   SQLite DB  │
-│  typer  │    │  AST-based   │    │  .ctxgraph/  │
-└────┬────┘    └──────────────┘    └──────┬───────┘
+┌─────────┐    ┌──────────────┐    ┌──────────────┐    ┌─────────────┐
+│   CLI   │───▶│  Analyzers   │───▶│   SQLite DB  │───▶│ Skills/Hist │
+│  typer  │    │  AST-based   │    │  .ctxgraph/  │    │ .ctxgraph/  │
+└────┬────┘    └──────────────┘    └──────┬───────┘    └─────────────┘
      │                                    │
      ├── ctx build ──────────────────────▶│  Graph build
      │                                    │
@@ -68,9 +68,17 @@ Repository (.py files)
      │                                    │
      ├── ctx query ◀─────────────────────│  Keyword search
      │                                    │
-     ├── ctx view ◀──────────────────────│  D3.js viz
-     │                                    │
-     ├── ctx serve ◀─────────────────────│  MCP server
+      ├── ctx ask ◀──────────────────────│  LLM query + savings
+      │                                    │
+      ├── ctx view ◀──────────────────────│  D3.js viz
+      │                                    │
+      ├── ctx serve ◀─────────────────────│  MCP server
+      │                                    │
+      ├── ctx init ───────────────────────│  Scaffold project
+      │                                    │
+      ├── ctx history ◀───────────────────│  Query log
+      │                                    │
+      └── ctx skill ◀─────────────────────│  Skill management
      │                                    │
      └── ccg wrapper ───▶ Claude Code ───┘  AI tool
 ```
@@ -130,9 +138,35 @@ JSON: 426 tokens                        DSL: 143 tokens
 
 **+16.7pp average coverage improvement** — better answers, concrete file names, real code structure.
 
+### Token Savings Display
+
+Use `--savings` to see how many tokens each capsule saves:
+
+```bash
+ctx capsule "user authentication" --savings
+# ┌──────────────────────────┬──────────────┐
+# │ Metric                   │ Value        │
+# ├──────────────────────────┼──────────────┤
+# │ Raw Project .py Files    │ 10,587 tokens│
+# │ Capsule DSL              │ 132 tokens   │
+# │ JSON Equivalent          │ 490 tokens   │
+# │ Savings vs Raw           │ 98.8%        │
+# │ DSL vs JSON              │ 73.1%        │
+# └──────────────────────────┴──────────────┘
+```
+
+`ctx ask` shows this automatically on every query.
+
 ---
 
 ## Commands
+
+### `ctx init` — Scaffold project
+```bash
+ctx init
+# Creates: .ctxgraph/config.toml, .ctxgraph/skills/, .ctxgraph/history.jsonl
+```
+Sets up a fresh `.ctxgraph/` directory with default config and built-in skills. Idempotent — safe to run on existing projects.
 
 ### `ctx build` — Build knowledge graph
 ```bash
@@ -141,12 +175,24 @@ ctx build /path/to/project       # Specific repo
 ctx build --exclude "vendor/*"   # Custom exclude patterns
 ```
 
+### `ctx ask <query>` — Ask questions via LLM
+```bash
+ctx ask "how does JWT auth work"                            # Uses configured provider
+ctx ask "fix login bug" --provider claude --model claude-sonnet-4-20250514
+ctx ask "refactor payment flow" --skill project-style       # Activate a skill
+ctx ask "find auth code" --graph                            # Show graph search results
+ctx ask "deep dive" --mode deep                             # Deep graph context
+```
+Shows token savings automatically. Requires a running Ollama instance (or other configured provider).
+
 ### `ctx capsule <query>` — Generate context
 ```bash
 ctx capsule "fix JWT token validation"              # Balanced (default: 20 nodes, depth 2)
 ctx capsule "fix JWT token validation" --mode fast  # Fast (10 nodes, depth 1)
 ctx capsule "fix JWT token validation" --mode deep  # Deep (40 nodes, depth 3)
 ctx capsule --overview                              # Project architecture overview
+ctx capsule "fix auth" --savings                    # Show token savings table
+ctx capsule "fix auth" --skill project-style         # Prepends skill context
 ```
 
 | Mode | Max Nodes | BFS Depth | When to Use |
@@ -187,6 +233,22 @@ Claude Desktop config:
 }
 ```
 Tools: `search_graph`, `get_context_capsule`, `get_file_dependencies`, `get_project_overview`.
+
+### `ctx history` — Query history
+```bash
+ctx history                          # Last 10 queries
+ctx history -n 20                    # Last 20
+ctx history --filter "auth"          # Filter by keyword
+ctx history --stats                  # Aggregate statistics
+```
+History stored in JSONL format at `.ctxgraph/history.jsonl`. Auto-prunes to 1000 entries.
+
+### `ctx skill` — Manage skills
+```bash
+ctx skill list                       # Show all available skills
+ctx skill show project-style         # Display skill contents
+```
+Skills are TOML files in `.ctxgraph/skills/`. Activate with `ctx ask --skill <name>` or `ctx capsule --skill <name>`.
 
 ### `ctx info` — Graph statistics
 ```bash
@@ -502,25 +564,34 @@ python benchmarks/run_ollama_comparison.py   # Requires local Ollama
 ### Project Structure
 ```
 src/ctxgraph/
-├── cli/main.py              — Typer CLI (6 commands)
+├── cli/main.py              — Typer CLI (9 commands)
 ├── graph/
 │   ├── models.py            — Node, Edge, Graph dataclasses
 │   ├── storage.py           — SQLite persistence
 │   ├── builder.py           — Graph build orchestrator
 │   └── query.py             — Tokenizer + BFS + relevance scoring
-├── capsule/renderer.py      — DSL context generation
+├── capsule/
+│   ├── renderer.py          — DSL context generation
+│   └── savings.py           — Token savings computation
 ├── analyzers/python/
 │   ├── importer.py          — AST import extraction
 │   ├── symbols.py           — AST class/function/method analysis
 │   └── semantic.py          — Docstring summarization
 ├── config/
+│   ├── __init__.py
+│   ├── init.py              — Project scaffold (.ctxgraph dir)
 │   ├── settings.py          — TOML/JSON/env config loading
 │   └── providers.py         — Ollama, Claude, OpenAI clients
 ├── clients/models.py        — Mode enum (fast/balanced/deep)
 ├── exclude/patterns.py      — Exclusion pattern matching
 ├── view/visualizer.py       — D3.js HTML graph generator
 ├── wrapper/claude.py        — ccg Claude wrapper
-└── mcp/server.py            — MCP protocol server
+├── mcp/server.py            — MCP protocol server
+├── skills/
+│   ├── __init__.py          — Skill discovery + loading
+│   ├── project-style.toml   — Default skill: project conventions
+│   └── field-guide.toml     — Default skill: field guide
+└── history.py               — JSONL history append/query/stats
 ```
 
 ---
