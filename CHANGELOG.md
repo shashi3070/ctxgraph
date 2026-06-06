@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.5.3 (2026-06-06)
+
+### Fixed
+- MCP server now captures and displays the actual `mcp` import error instead of a generic
+  "missing dependencies" message, making Windows security policy issues (e.g. `pywintypes.dll`
+  blocked by AppLocker/Defender) diagnosable
+- Added specific detection of `pywintypes.dll` load failures with a suggested workaround
+  (`pip install mcp==1.0.0`)
+
 ## v0.5.2 (2026-06-06)
 
 ### Added

@@ -48,8 +48,10 @@ try:
     from mcp.server.models import InitializationOptions
 
     HAS_MCP = True
-except ImportError:
+    _MCP_IMPORT_ERROR = None
+except ImportError as _e:
     HAS_MCP = False
+    _MCP_IMPORT_ERROR = _e
 
 from ctxgraph.capsule.renderer import render_capsule, render_project_overview
 from ctxgraph.clients.models import ModelMode, get_mode_config
@@ -285,8 +287,17 @@ def create_server(repo_path: Optional[str] = None) -> Optional[Any]:
 
 def run_server(repo_path: Optional[str] = None, port: Optional[int] = None):
     if not HAS_MCP:
+        details = ""
+        if _MCP_IMPORT_ERROR:
+            details = f"\n  Error: {_MCP_IMPORT_ERROR}"
+            err_str = str(_MCP_IMPORT_ERROR)
+            if "DLL load failed" in err_str and "pywintypes" in err_str:
+                details += (
+                    "\n  This appears to be a Windows security policy blocking pywin32 DLLs.\n"
+                    "  Try: pip install mcp==1.0.0"
+                )
         print(
-            "MCP support requires additional dependencies.\n"
+            f"MCP support requires additional dependencies.{details}\n"
             "Install with: pip install ctxgraph[mcp]",
             file=sys.stderr,
         )
