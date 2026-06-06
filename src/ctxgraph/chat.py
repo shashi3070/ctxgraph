@@ -177,6 +177,8 @@ def interactive_session_picker(repo_path: Path) -> Optional[str]:
     table.add_column("Last", style="white")
 
     def render_table(highlight: int) -> Table:
+        from rich.markup import escape
+
         t = Table(title="Chat Sessions  (↑/↓ select, Enter confirm, Esc cancel)", show_header=True)
         t.add_column("#", style="dim", width=3)
         t.add_column("ID", style="cyan")
@@ -184,13 +186,14 @@ def interactive_session_picker(repo_path: Path) -> Optional[str]:
         t.add_column("Tokens", style="magenta", justify="right")
         t.add_column("Last", style="white")
         for i, s in enumerate(sessions):
-            style = "reverse" if i == highlight else ""
+            row_style = "reverse" if i == highlight else None
             t.add_row(
-                f"{i + 1}",
-                f"[{style}]{s['id']}[/{style}]",
-                f"[{style}]{s['turns']}[/{style}]",
-                f"[{style}]{s['tokens']}[/{style}]",
-                f"[{style}]{s['last_message']}[/{style}]",
+                str(i + 1),
+                escape(s["id"]),
+                str(s["turns"]),
+                str(s["tokens"]),
+                escape(s["last_message"]),
+                style=row_style,
             )
         return t
 

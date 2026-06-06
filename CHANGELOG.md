@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.5.4 (2026-06-06)
+
+### Fixed
+- `ctx chat` `/resume` crash: `MarkupError: closing tag '[/]' has nothing to close` when
+  session picker rendered a non-highlighted row with empty style string, producing
+  `[]...[/]` which Rich interpreted as markup tags. Now uses `escape()` for all text
+  content and row-level `style=` parameter instead of inline markup wrapping.
+
 ## v0.5.3 (2026-06-06)
 
 ### Fixed
