@@ -149,6 +149,34 @@ def create_server(repo_path: Optional[str] = None) -> Optional[Any]:
                     "properties": {},
                 },
             ),
+            types.Tool(
+                name="read_file",
+                description="Read the full contents of a source file from the repository",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "file_path": {
+                            "type": "string",
+                            "description": "Path to the file (relative to repo root)",
+                        },
+                    },
+                    "required": ["file_path"],
+                },
+            ),
+            types.Tool(
+                name="search_files",
+                description="Search for files in the repository matching a glob pattern",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "pattern": {
+                            "type": "string",
+                            "description": "Glob pattern (e.g. '**/*.py', 'src/**/*service*', '**/*test*')",
+                        },
+                    },
+                    "required": ["pattern"],
+                },
+            ),
         ]
 
     @server.call_tool()
@@ -208,6 +236,46 @@ def create_server(repo_path: Optional[str] = None) -> Optional[Any]:
         elif name == "get_project_overview":
             overview = render_project_overview(storage)
             return [types.TextContent(type="text", text=overview)]
+
+        elif name == "read_file":
+            file_path = arguments.get("file_path", "")
+            full_path = (path / file_path).resolve()
+            if not str(full_path).startswith(str(path.resolve())):
+                return [types.TextContent(
+                    type="text",
+                    text=f"Access denied: {file_path} is outside the repository root.",
+                )]
+            if not full_path.exists():
+                return [types.TextContent(
+                    type="text",
+                    text=f"File not found: {file_path}",
+                )]
+            if not full_path.is_file():
+                return [types.TextContent(
+                    type="text",
+                    text=f"Not a file: {file_path}",
+                )]
+            content = full_path.read_text(encoding="utf-8", errors="replace")
+            lines = content.count("\n") + 1
+            tokens = max(1, len(content) // 4)
+            content += f"\n---\nLine count: {lines} | Tokens: ~{tokens}"
+            return [types.TextContent(type="text", text=content)]
+
+        elif name == "search_files":
+            pattern = arguments.get("pattern", "")
+            matches = sorted(path.rglob(pattern))
+            matches = [m for m in matches if m.is_file()]
+            if not matches:
+                return [types.TextContent(
+                    type="text",
+                    text=f"No files found matching: {pattern}",
+                )]
+            lines = [f"Files matching '{pattern}':", ""]
+            for m in matches[:100]:
+                lines.append(f"  {m.relative_to(path).as_posix()}")
+            if len(matches) > 100:
+                lines.append(f"  ... and {len(matches) - 100} more")
+            return [types.TextContent(type="text", text="\n".join(lines))]
 
         else:
             return [types.TextContent(type="text", text=f"Unknown tool: {name}")]

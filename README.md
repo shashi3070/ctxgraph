@@ -516,7 +516,7 @@ Or set the `CTXGRAPH_REPO_PATH` environment variable instead of passing `--repo`
 }
 ```
 
-Tools: `search_graph`, `get_context_capsule`, `get_file_dependencies`, `get_project_overview`.
+Tools: `search_graph`, `get_context_capsule`, `get_file_dependencies`, `get_project_overview`, `read_file`, `search_files`.
 
 > **Windows users:** Claude Desktop may not set the working directory to your project root. Always use `--repo` or `CTXGRAPH_REPO_PATH` to ensure the server can find your graph.
 

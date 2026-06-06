@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.5.2 (2026-06-06)
+
+### Added
+- `read_file` MCP tool — Claude can read actual source file contents from the repo (with path traversal protection)
+- `search_files` MCP tool — Claude can discover files by glob pattern (e.g. `**/*service*`, `src/**/*.py`)
+- `read_file` response now includes line count and token estimate (e.g. `Line count: 47 | Tokens: ~612`)
+
+### Changed
+- README MCP tools list updated with `read_file` and `search_files`
+
 ## v0.5.1 (2026-06-06)
 
 ### Added
