@@ -30,6 +30,8 @@ ccg "fix the login redirect bug"   # Launch Claude with context pre-loaded
 ctx view                           # Interactive D3.js visualization (or --svg for static)
 ```
 
+<img src="https://raw.githubusercontent.com/shashi3070/ctxgraph/master/docs/ctxgraph_python_lib.png" alt="ctxgraph architecture overview" width="100%">
+
 <img src="https://raw.githubusercontent.com/shashi3070/ctxgraph/master/docs/graph.svg" alt="ctxgraph knowledge graph visualization" width="100%">
 
 ---
@@ -71,7 +73,7 @@ Sending entire files to an AI is wasteful. ctxgraph analyzes your code with AST-
 
 Independent analysis by Claude compared ctxgraph's token efficiency against other common approaches for the same task — answering `"how does InventoryService link to OrderService"` in a real codebase:
 
-![Approach comparison](docs/approach-comparison.png)
+![Approach comparison](https://raw.githubusercontent.com/shashi3070/ctxgraph/master/docs/approach-comparison.png)
 
 | Approach | Total Input Tokens | Tool Calls | Session Overhead |
 |---|---|---|---|

@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.5.6 (2026-06-06)
+
+### Changed
+- Fixed approach comparison image URL to use raw GitHub link so it renders on PyPI
+- Replaced hero architecture image with new overview diagram, kept graph.svg below it
+
 ## v0.5.5 (2026-06-06)
 
 ### Changed
