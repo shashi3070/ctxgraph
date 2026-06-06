@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.5.5 (2026-06-06)
+
+### Changed
+- Restructured README: MCP/Claude use case now leads the hero, approach comparison moved to
+  "Why ctxgraph?" section, `ctx serve` promoted to first command in Commands section
+
 ## v0.5.4 (2026-06-06)
 
 ### Fixed

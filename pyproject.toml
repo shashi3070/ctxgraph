@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ctxgraph"
-version = "0.5.4"
+version = "0.5.5"
 description = "97% cheaper AI coding. ctxgraph builds a knowledge graph of your Python codebase, then generates token-efficient context capsules for any AI tool. Or hook up Ollama/Claude/OpenAI and use it as a code-aware coding assistant — like ChatGPT or Claude Code, but with built-in graph context. Cut token costs by 97%, work offline with just a graph, or connect your favorite LLM."
 readme = "README.md"
 license = {text = "MIT"}
