@@ -6,12 +6,31 @@
 pip install ctxgraph
 
 ctx build                          # Build knowledge graph
+ctx ask "how does JWT auth work"   # Ask questions with automatic token savings
 ctx capsule "fix JWT expiry"       # 92-99% fewer tokens vs raw code
 ccg "fix the login redirect bug"   # Launch Claude with context pre-loaded
 ctx view                           # Interactive D3.js visualization (or --svg for static)
 ```
 
 <img src="https://raw.githubusercontent.com/shashi3070/ctxgraph/master/docs/graph.svg" alt="ctxgraph knowledge graph visualization" width="100%">
+
+---
+
+## Quick Start
+
+```bash
+# 1. Initialize project
+ctx init                           # Creates .ctxgraph/config.toml + default skills
+
+# 2. Build the knowledge graph
+ctx build                          # AST analysis → SQLite graph
+
+# 3. Ask questions (requires Ollama or other LLM provider)
+ctx ask "how does authentication work"
+
+# 4. Or generate a capsule for your AI tool
+ctx capsule "fix login rate limiter" --savings
+```
 
 ---
 
@@ -54,35 +73,6 @@ Repository (.py files)
 └─────────────────────────────────────────────────────────┘
 ```
 
-### Architecture
-
-```
-┌─────────┐    ┌──────────────┐    ┌──────────────┐    ┌─────────────┐
-│   CLI   │───▶│  Analyzers   │───▶│   SQLite DB  │───▶│ Skills/Hist │
-│  typer  │    │  AST-based   │    │  .ctxgraph/  │    │ .ctxgraph/  │
-└────┬────┘    └──────────────┘    └──────┬───────┘    └─────────────┘
-     │                                    │
-     ├── ctx build ──────────────────────▶│  Graph build
-     │                                    │
-     ├── ctx capsule ◀───────────────────│  Query + BFS
-     │                                    │
-     ├── ctx query ◀─────────────────────│  Keyword search
-     │                                    │
-      ├── ctx ask ◀──────────────────────│  LLM query + savings
-      │                                    │
-      ├── ctx view ◀──────────────────────│  D3.js viz
-      │                                    │
-      ├── ctx serve ◀─────────────────────│  MCP server
-      │                                    │
-      ├── ctx init ───────────────────────│  Scaffold project
-      │                                    │
-      ├── ctx history ◀───────────────────│  Query log
-      │                                    │
-      └── ctx skill ◀─────────────────────│  Skill management
-     │                                    │
-     └── ccg wrapper ───▶ Claude Code ───┘  AI tool
-```
-
 ---
 
 ## Token Efficiency
@@ -121,26 +111,7 @@ JSON: 426 tokens                        DSL: 143 tokens
 
 > **97.0% average token reduction** across 4 projects, 42 benchmark runs. The larger the project, the greater the savings.
 
-### With Graph vs Without (Ollama)
-
-| Query | No Context | With ctxgraph | Δ |
-|-------|:----------:|:-------------:|:-:|
-| Calculator expression parsing | 100% | 100% | — |
-| Plugin registration system | 33% | **100%** | **+67pp** |
-| JWT authentication (web_api) | 75% | **100%** | **+25pp** |
-| Middleware pipeline (web_api) | 100% | 100% | — |
-| Circuit breaker (microsvc) | 75% | 75% | — |
-| Services & communication | 50% | **100%** | **+50pp** |
-| PipelineBuilder pattern | 100% | 75% | -25pp* |
-| Processor registration | 33% | **67%** | **+34pp** |
-| Event bus & error handling | 100% | 100% | — |
-> \* Without context the model gave a generic answer matching all keywords; with context it focused on actual code — more honest, more useful.
-
-**+16.7pp average coverage improvement** — better answers, concrete file names, real code structure.
-
 ### Token Savings Display
-
-Use `--savings` to see how many tokens each capsule saves:
 
 ```bash
 ctx capsule "user authentication" --savings
@@ -155,37 +126,95 @@ ctx capsule "user authentication" --savings
 # └──────────────────────────┴──────────────┘
 ```
 
-`ctx ask` shows this automatically on every query.
+`ctx ask` shows this automatically on every query. See how many tokens you save with each question.
 
 ---
 
 ## Commands
 
 ### `ctx init` — Scaffold project
+
 ```bash
-ctx init
-# Creates: .ctxgraph/config.toml, .ctxgraph/skills/, .ctxgraph/history.jsonl
+ctx init                              # Default: current directory
+ctx init /path/to/project             # Specific path
 ```
-Sets up a fresh `.ctxgraph/` directory with default config and built-in skills. Idempotent — safe to run on existing projects.
+
+Creates a `.ctxgraph/` directory with everything you need:
+
+```
+.ctxgraph/
+├── config.toml          # API provider, model, context settings
+├── history.jsonl        # Query history (auto-created, auto-pruned to 1000)
+└── skills/
+    ├── project-style.toml   # Default skill: project conventions
+    └── field-guide.toml     # Default skill: field guide
+```
+
+Idempotent — safe to run on existing projects. Existing files are never overwritten.
 
 ### `ctx build` — Build knowledge graph
+
 ```bash
 ctx build                        # Current directory
 ctx build /path/to/project       # Specific repo
 ctx build --exclude "vendor/*"   # Custom exclude patterns
+ctx build --provider claude      # Set LLM provider for later use
+ctx build --model gpt-4o         # Set LLM model for later use
 ```
 
 ### `ctx ask <query>` — Ask questions via LLM
-```bash
-ctx ask "how does JWT auth work"                            # Uses configured provider
-ctx ask "fix login bug" --provider claude --model claude-sonnet-4-20250514
-ctx ask "refactor payment flow" --skill project-style       # Activate a skill
-ctx ask "find auth code" --graph                            # Show graph search results
-ctx ask "deep dive" --mode deep                             # Deep graph context
-```
-Shows token savings automatically. Requires a running Ollama instance (or other configured provider).
 
-### `ctx capsule <query>` — Generate context
+The marquee command. Generates a context capsule, sends it to your LLM provider, and shows token savings.
+
+```bash
+ctx ask "how does JWT auth work"                       # Uses configured provider (default: Ollama)
+ctx ask "fix login bug" --provider claude --model claude-sonnet-4-20250514
+ctx ask "refactor payment flow" --skill project-style   # Activate a skill as system prompt
+ctx ask "find auth code" --graph                        # Show graph search results table
+ctx ask "deep dive" --mode deep                         # Use deep graph context (40 nodes)
+ctx ask "explain" --skill field-guide --graph            # Combine skill + graph results
+```
+
+**Flags:**
+
+| Flag | Description |
+|------|-------------|
+| `--provider` | LLM provider: `ollama`, `claude`, `openai`, `azure`, `custom` |
+| `--model` | Model name (e.g. `gpt-4o`, `claude-sonnet-4-20250514`) |
+| `--skill` | Skill name to activate (e.g. `project-style`, `field-guide`) |
+| `--graph` | Show ranked graph search results alongside the answer |
+| `--mode` | Graph context mode: `fast`, `balanced` (default), `deep` |
+
+**Requirements:**
+- A built graph (run `ctx build` first)
+- A running LLM provider (Ollama by default at `http://localhost:11434`)
+
+**Example output:**
+
+```bash
+$ ctx ask "how does the greeting system work"
+
+# (Token savings table shown automatically)
+┌──────────────────────────┬──────────────┐
+│ Metric                   │ Value        │
+├──────────────────────────┼──────────────┤
+│ Raw Project .py Files    │ 1,234 tokens │
+│ Capsule DSL              │ 45 tokens    │
+│ JSON Equivalent          │ 180 tokens   │
+│ Savings vs Raw           │ 96.4%        │
+│ DSL vs JSON              │ 75.0%        │
+└──────────────────────────┴──────────────┘
+
+Answer:
+The greeting system is implemented in `src/greet.py`. The `greet()` function takes a name
+and returns a formatted greeting string. The `Greeter` class extends this with a configurable
+prefix. Both use type hints and follow the project conventions.
+```
+
+### `ctx capsule <query>` — Generate context capsule
+
+Generate a token-efficient DSL capsule for use with any AI tool.
+
 ```bash
 ctx capsule "fix JWT token validation"              # Balanced (default: 20 nodes, depth 2)
 ctx capsule "fix JWT token validation" --mode fast  # Fast (10 nodes, depth 1)
@@ -202,55 +231,127 @@ ctx capsule "fix auth" --skill project-style         # Prepends skill context
 | `deep` | 40 | 3 | Complex refactoring, architecture |
 
 ### `ctx query <search>` — Search graph
+
 ```bash
 ctx query "user auth"
 ctx query "payment gateway" --mode deep
 ```
-Returns ranked nodes with relevance scores.
+
+Returns ranked nodes with relevance scores, displaying type, name, path, and score.
 
 ### `ctx view` — Visualize graph
-```bash
-ctx view
-ctx view --output graph.html
-ctx view --port 8080 --no-open
-```
-Interactive D3.js force-directed HTML — no JS build tools needed.
 
-### `ctx serve` — MCP server
 ```bash
-pip install ctxgraph[mcp]
-ctx serve
+ctx view                              # Opens interactive D3.js HTML in browser
+ctx view --output graph.html          # Save to custom path
+ctx view --svg                        # Generate static SVG
+ctx view --no-open                    # Generate without opening browser
 ```
-Claude Desktop config:
-```json
-{
-  "mcpServers": {
-    "ctxgraph": {
-      "command": "ctx",
-      "args": ["serve"]
-    }
-  }
-}
-```
-Tools: `search_graph`, `get_context_capsule`, `get_file_dependencies`, `get_project_overview`.
 
 ### `ctx history` — Query history
+
+Review past questions, token savings, and provider usage.
+
 ```bash
-ctx history                          # Last 10 queries
-ctx history -n 20                    # Last 20
-ctx history --filter "auth"          # Filter by keyword
-ctx history --stats                  # Aggregate statistics
+ctx history                           # Last 10 queries
+ctx history -n 20                     # Last 20
+ctx history --filter "auth"           # Filter by keyword in query text
+ctx history --stats                   # Aggregate statistics
 ```
-History stored in JSONL format at `.ctxgraph/history.jsonl`. Auto-prunes to 1000 entries.
+
+**Example output:**
+
+```bash
+$ ctx history
+┌────────────┬──────────────────────────────────────────────────┬─────────┬──────────┬──────────┐
+│ Time       │ Query                                            │ Savings │ Provider │ Skill    │
+├────────────┼──────────────────────────────────────────────────┼─────────┼──────────┼──────────┤
+│ 2026-06-06 │ how does the greeting system work                │ 96.4%   │ ollama   │ -        │
+│ 2026-06-06 │ fix login rate limiter                           │ 97.1%   │ ollama   │ -        │
+│ 2026-06-06 │ refactor payment module with proper error handl… │ 95.8%   │ claude   │ project-style │
+└────────────┴──────────────────────────────────────────────────┴─────────┴──────────┴──────────┘
+
+$ ctx history --stats
+┌──────────────────────┬───────────┐
+│ Metric               │ Value     │
+├──────────────────────┼───────────┤
+│ Total Queries        │ 24        │
+│ Total Raw Tokens     │ 254,088   │
+│ Total Tokens Saved   │ 246,465   │
+│ Avg Savings          │ 96.5%     │
+│   Provider: ollama   │ 18        │
+│   Provider: claude   │ 6         │
+└──────────────────────┴───────────┘
+```
+
+History is stored as JSONL in `.ctxgraph/history.jsonl`. Auto-prunes to 1000 entries (oldest dropped).
 
 ### `ctx skill` — Manage skills
+
+Skills are reusable system prompts that prepend project knowledge to your capsule context.
+
 ```bash
-ctx skill list                       # Show all available skills
-ctx skill show project-style         # Display skill contents
+ctx skill list                         # Show all available skills
+ctx skill show project-style           # Display a skill's contents
 ```
-Skills are TOML files in `.ctxgraph/skills/`. Activate with `ctx ask --skill <name>` or `ctx capsule --skill <name>`.
+
+**Example:**
+
+```bash
+$ ctx skill list
+┌─────────┬─────────────────┬────────────────────────────────────────────────────┐
+│ Source  │ Name            │ Preview                                            │
+├─────────┼─────────────────┼────────────────────────────────────────────────────┤
+│ builtin │ project-style   │ # Project Style Guide — default ctxgraph skill     │
+│ builtin │ field-guide     │ # Project Field Guide — default ctxgraph skill     │
+└─────────┴─────────────────┴────────────────────────────────────────────────────┘
+
+$ ctx skill show project-style
+Skill: project-style
+
+# Project Style Guide — default ctxgraph skill
+# Activate with: ctx ask --skill project-style "..."
+
+[about]
+name = "Project Style Guide"
+description = "Enforces project conventions, code style, and naming patterns"
+
+[rules]
+import_style = "absolute imports, grouped: stdlib, third-party, local"
+naming = "snake_case for functions/variables, PascalCase for classes, UPPER_CASE for constants"
+...
+```
+
+**Activating a skill:**
+
+```bash
+ctx ask "refactor payment flow" --skill project-style
+ctx capsule "fix auth" --skill field-guide
+```
+
+When activated, the skill contents are prepended as a `## Project Knowledge` section before the capsule DSL.
+
+**Creating your own skills:**
+
+Skills are TOML files in `.ctxgraph/skills/`. Create a new file:
+
+```toml
+# .ctxgraph/skills/my-team-rules.toml
+
+[about]
+name = "Team Conventions"
+description = "Custom team coding conventions"
+
+[rules]
+testing = "must write pytest tests for all new functions"
+documentation = "every public API needs a docstring with Args and Returns"
+branching = "prefer early returns over nested if-else"
+```
+
+Now it appears in `ctx skill list` and can be activated with `--skill my-team-rules`.
 
 ### `ctx info` — Graph statistics
+
 ```bash
 ctx info
 # ┌────────────────────┬───────┐
@@ -262,9 +363,33 @@ ctx info
 # └────────────────────┴───────┘
 ```
 
+### `ctx serve` — MCP server
+
+```bash
+pip install ctxgraph[mcp]
+ctx serve
+```
+
+Claude Desktop config:
+
+```json
+{
+  "mcpServers": {
+    "ctxgraph": {
+      "command": "ctx",
+      "args": ["serve"]
+    }
+  }
+}
+```
+
+Tools: `search_graph`, `get_context_capsule`, `get_file_dependencies`, `get_project_overview`.
+
 ---
 
 ## Claude Wrapper (`ccg`)
+
+The `ccg` command launches Claude Code with ctxgraph context pre-loaded:
 
 ```bash
 ccg "fix the JWT expiry bug in auth module"          # Single-shot
@@ -277,7 +402,8 @@ ccg --mode deep "redesign the database schema"        # Deep mode
 
 ## Configuration
 
-`.ctxgraph/config.toml`:
+`.ctxgraph/config.toml` is auto-created by `ctx init`:
+
 ```toml
 [graph]
 exclude = ["legacy/*", "vendor/*"]
@@ -286,6 +412,7 @@ exclude = ["legacy/*", "vendor/*"]
 provider = "ollama"           # ollama, claude, openai, azure, custom
 model = "qwen2.5-coder:7b"
 endpoint = "http://localhost:11434"
+api_key = ""
 
 [context]
 mode = "balanced"
@@ -293,45 +420,46 @@ max_nodes = 20
 max_depth = 2
 ```
 
-| Environment Variable | Overrides |
-|----------------------|-----------|
-| `CTXGRAPH_PROVIDER` | `ai.provider` |
-| `CTXGRAPH_MODEL` | `ai.model` |
-| `CTXGRAPH_ENDPOINT` | `ai.endpoint` |
-| `ANTHROPIC_API_KEY` | Claude API |
-| `OPENAI_API_KEY` | OpenAI API |
-| `AZURE_OPENAI_API_KEY` | Azure OpenAI API |
+### Environment variables
+
+| Variable | Overrides | Required For |
+|----------|-----------|-------------|
+| `CTXGRAPH_PROVIDER` | `ai.provider` | — |
+| `CTXGRAPH_MODEL` | `ai.model` | — |
+| `CTXGRAPH_ENDPOINT` | `ai.endpoint` | — |
+| `ANTHROPIC_API_KEY` | `ai.api_key` | Claude provider |
+| `OPENAI_API_KEY` | `ai.api_key` | OpenAI provider |
+| `AZURE_OPENAI_API_KEY` | `ai.api_key` | Azure provider |
+
+### Provider examples
 
 ```bash
 # Ollama (default — no env vars needed)
-ctx capsule "query"
+ctx ask "how does auth work"
 
 # Claude
-CTXGRAPH_PROVIDER=claude CTXGRAPH_MODEL=claude-sonnet-4-20250514 ctx capsule "query"
+CTXGRAPH_PROVIDER=claude CTXGRAPH_MODEL=claude-sonnet-4-20250514 ctx ask "explain the architecture"
 
 # OpenAI
-CTXGRAPH_PROVIDER=openai CTXGRAPH_MODEL=gpt-4o ctx capsule "query"
+CTXGRAPH_PROVIDER=openai CTXGRAPH_MODEL=gpt-4o ctx ask "find the bug"
 
 # Azure OpenAI
 CTXGRAPH_PROVIDER=azure \
   CTXGRAPH_MODEL=gpt-4o \
   CTXGRAPH_ENDPOINT=https://my-resource.openai.azure.com \
   AZURE_OPENAI_API_KEY=sk-... \
-  ctx capsule "query"
+  ctx ask "refactor this"
 
 # Custom (OpenAI-compatible)
-CTXGRAPH_PROVIDER=custom CTXGRAPH_ENDPOINT=http://my-api/v1 ctx capsule "query"
+CTXGRAPH_PROVIDER=custom CTXGRAPH_ENDPOINT=http://my-api/v1 ctx ask "explain"
+
+# Per-command override (overrides both config and env vars)
+ctx ask "how does this work" --provider claude --model claude-sonnet-4-20250514
 ```
 
 > **Windows (PowerShell):** Use `$env:` prefix instead:
 > ```powershell
-> $env:CTXGRAPH_PROVIDER = "azure"; $env:CTXGRAPH_MODEL = "gpt-4o"; ctx capsule "query"
-> ```
-> Or set them once per session:
-> ```powershell
-> $env:CTXGRAPH_PROVIDER = "azure"
-> $env:AZURE_OPENAI_API_KEY = "sk-..."
-> ctx capsule "query"
+> $env:CTXGRAPH_PROVIDER = "azure"; $env:CTXGRAPH_MODEL = "gpt-4o"; ctx ask "query"
 > ```
 
 ---
@@ -339,6 +467,7 @@ CTXGRAPH_PROVIDER=custom CTXGRAPH_ENDPOINT=http://my-api/v1 ctx capsule "query"
 ## Use Cases
 
 ### Debug a failing test
+
 ```bash
 ctx build
 ctx capsule "test_user_login is failing with auth error" --mode deep
@@ -346,17 +475,35 @@ ctx capsule "test_user_login is failing with auth error" --mode deep
 #   [F]src/auth/login.py
 #   [C]AuthService
 #   [DEP] auth/login.py → core/database.py, auth/session.py
+
+# Or ask directly:
+ctx ask "test_user_login is failing" --mode deep
+# → Explains the issue with file references and suggests fixes
 ```
 
 ### Understand a new codebase
+
 ```bash
+ctx build
 ctx capsule "project architecture" --overview
 ccg --chat "explain the overall architecture and data flow"
+
+# Or explore with skills active:
+ctx ask "explain the architecture" --skill field-guide
 ```
 
 ### Refactor across modules
+
 ```bash
 ctx capsule "extract payment processing into separate module" --mode deep
+ctx ask "plan the payment module extraction" --skill project-style --mode deep
+```
+
+### Track your LLM usage
+
+```bash
+ctx history --stats
+# Shows total queries, tokens saved, avg savings, provider breakdown
 ```
 
 ---
@@ -404,6 +551,27 @@ for node, score in results:
 
 > **Tip:** `build_graph` is a one-time setup. In production, run `ctx build` during CI/deployment and let your app code only call `get_storage` + `render_capsule`.
 
+### Compose with skill context
+
+```python
+from ctxgraph.skills import load_skill
+
+storage = get_storage(Path("./my_project"))
+skill_text = load_skill(Path("./my_project"), "project-style")
+capsule = render_capsule(storage, "fix auth", max_nodes=20, skill_context=skill_text)
+# Capsule now has "## Project Knowledge" section prepended
+```
+
+### Compute token savings
+
+```python
+from ctxgraph.capsule.savings import compute_savings
+
+savings = compute_savings(Path("./my_project"), capsule_text)
+print(f"Saved {savings['savings_pct']}% tokens")
+print(f"DSL is {savings['dsl_vs_json']}% more efficient than JSON")
+```
+
 ### LangChain
 
 Pass the capsule as context in your prompt template. The LLM gets exactly the files, classes, and dependencies it needs — no token waste.
@@ -412,13 +580,10 @@ Pass the capsule as context in your prompt template. The LLM gets exactly the fi
 from pathlib import Path
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
-from ctxgraph.graph.builder import get_storage          # graph already built
+from ctxgraph.graph.builder import get_storage
 from ctxgraph.capsule.renderer import render_capsule
 
-# Load existing graph (zero build time)
 storage = get_storage(Path("./my_project"))
-
-# Generate capsule for the question
 context = render_capsule(storage, "login rate limiter", max_nodes=15)
 
 prompt = ChatPromptTemplate.from_messages([
@@ -433,13 +598,11 @@ print(response.invoke({
     "context": context,
     "question": "Where is the rate limiter applied in the login flow?",
 }))
-# → "The rate limiter is in src/auth/middleware.py at line 42.
-#    It wraps the login endpoint with a 5req/min limit per IP."
 ```
 
 ### LangGraph
 
-Expose ctxgraph as a tool the agent calls on-demand. The agent fetches context only when it hits a code-related question.
+Expose ctxgraph as a tool the agent calls on-demand.
 
 ```python
 from pathlib import Path
@@ -450,17 +613,13 @@ from langchain_core.tools import tool
 from ctxgraph.graph.builder import get_storage
 from ctxgraph.capsule.renderer import render_capsule
 
-# Pre-built graph — loaded instantly
 _storage = get_storage(Path("./my_project"))
 
 @tool
 def code_context(task: str) -> str:
-    """Fetch relevant source code for a development task.
-    Use this whenever the user asks about implementation details,
-    bug fixes, or architecture in the codebase."""
+    """Fetch relevant source code for a development task."""
     return render_capsule(_storage, task, max_nodes=20)
 
-# --- Build LangGraph ---
 tools = [code_context]
 model = ChatOpenAI(model="gpt-4o", temperature=0).bind_tools(tools)
 
@@ -479,7 +638,6 @@ graph.add_edge("tools", "agent")
 
 app = graph.compile()
 
-# --- Run ---
 for chunk in app.stream({"messages": [("user", "How does payment retry work?")]}):
     for node, vals in chunk.items():
         msg = vals["messages"][0]
@@ -487,11 +645,7 @@ for chunk in app.stream({"messages": [("user", "How does payment retry work?")]}
             print(f"[{node}]: {msg.content[:300]}")
 ```
 
-When the user asks about code, the agent calls `code_context("payment retry")`, gets back a capsule with `[F]src/payment/retry.py`, `[F]src/payment/processor.py`, and their dependency edges, then answers with those files in context.
-
 ### OpenAI Agents SDK
-
-Same pattern — ctxgraph is a function tool the agent invokes.
 
 ```python
 from pathlib import Path
@@ -503,8 +657,7 @@ _storage = get_storage(Path("./my_project"))
 
 @function_tool
 def fetch_code_context(task_description: str) -> str:
-    """Retrieve code context from the project's knowledge graph.
-    Provide a task description like 'JWT auth middleware' or 'payment processor'."""
+    """Retrieve code context from the project's knowledge graph."""
     return render_capsule(_storage, task_description, max_nodes=20)
 
 agent = Agent(
@@ -519,8 +672,6 @@ print(result.final_output)
 ```
 
 ### Azure OpenAI (direct client)
-
-For Azure OpenAI or any OpenAI-compatible endpoint, inject the capsule directly into the system message.
 
 ```python
 import os
@@ -539,7 +690,7 @@ client = AzureOpenAI(
 )
 
 response = client.chat.completions.create(
-    model="gpt-4o",  # deployment name
+    model="gpt-4o",
     messages=[
         {"role": "system", "content": f"You are a senior developer. Code context:\n\n{context}"},
         {"role": "user", "content": "How do I add a new event handler?"},
@@ -556,12 +707,13 @@ print(response.choices[0].message.content)
 git clone https://github.com/shashi3070/ctxgraph.git
 cd ctxgraph
 pip install -e ".[dev]"
-pytest
+pytest                          # 88+ tests
 python benchmarks/run_benchmarks.py
 python benchmarks/run_ollama_comparison.py   # Requires local Ollama
 ```
 
 ### Project Structure
+
 ```
 src/ctxgraph/
 ├── cli/main.py              — Typer CLI (9 commands)
@@ -578,7 +730,6 @@ src/ctxgraph/
 │   ├── symbols.py           — AST class/function/method analysis
 │   └── semantic.py          — Docstring summarization
 ├── config/
-│   ├── __init__.py
 │   ├── init.py              — Project scaffold (.ctxgraph dir)
 │   ├── settings.py          — TOML/JSON/env config loading
 │   └── providers.py         — Ollama, Claude, OpenAI clients
