@@ -2,21 +2,26 @@
 
 ## What is ctxgraph?
 
-ctxgraph is a **knowledge graph engine** that makes AI coding assistants **97% cheaper** and **smarter**. 
+ctxgraph is a **knowledge graph engine** that makes AI coding assistants **97% cheaper** and **smarter**.
 
 It analyzes your Python codebase using AST-based static analysis, builds a searchable dependency graph, and delivers *only the code that matters* to your AI — not every line in your project.
 
 ### Two ways to use it:
 
-**🔧 As a token-saving context engine** — Output compact DSL capsules for any AI tool (Claude, ChatGPT, Cursor, etc.). Cut context costs from dollars to fractions of a cent.
+**🔌 MCP tool for Claude Desktop** — Connect via `ctx serve` and give Claude surgical code context. No more Glob/Grep/Read token waste. Every graph query costs ~50 tokens vs 1,500+ for Claude Code's system prompt alone.
 
-**🤖 As a full AI coding assistant** — Hook up Ollama (free, local), Claude, or OpenAI, and ask questions, refactor code, debug issues, or explore architecture through `ctx ask` or `ctx chat` — just like ChatGPT or Claude Code, but with built-in codebase awareness.
+**🧠 Standalone AI assistant** — Hook up Ollama (free, local), Claude, or OpenAI, and ask questions, refactor code, debug issues, or explore architecture through `ctx ask` or `ctx chat` — just like ChatGPT or Claude Code, but with built-in codebase awareness.
 
 ```bash
 pip install ctxgraph
 
 ctx init                           # Scaffold .ctxgraph with config + default skills
 ctx build                          # Build knowledge graph (AST analysis → SQLite)
+
+# For Claude Desktop — add to claude_desktop_config.json
+ctx serve --repo /path/to/project  # Start MCP server
+
+# Or use standalone
 ctx ask "how does JWT auth work"   # Ask questions with automatic token savings (needs LLM)
 ctx capsule "fix JWT expiry"       # 92-99% fewer tokens vs raw code (no LLM needed)
 ctx chat "refactor this module"    # Multi-turn conversation with persistent sessions
@@ -32,16 +37,22 @@ ctx view                           # Interactive D3.js visualization (or --svg f
 ## Quick Start
 
 ```bash
+# 0. Install with MCP support (for Claude Desktop)
+pip install ctxgraph[mcp]
+
 # 1. Initialize project
 ctx init                           # Creates .ctxgraph/config.toml + default skills
 
 # 2. Build the knowledge graph
 ctx build                          # AST analysis → SQLite graph
 
-# 3a. Ask questions (requires Ollama or other LLM provider — free with Ollama)
+# 3a. Connect to Claude Desktop (add to claude_desktop_config.json)
+ctx serve --repo /path/to/project
+
+# 3b. Ask questions directly (requires Ollama or other LLM provider)
 ctx ask "how does authentication work"
 
-# 3b. Or just generate a capsule for your AI tool (no LLM needed)
+# 3c. Or generate a capsule for any AI tool (no LLM needed)
 ctx capsule "fix login rate limiter" --savings
 
 # 4. Explore interactively
@@ -55,6 +66,23 @@ ctx chat                           # Multi-turn REPL with persistent sessions
 Sending entire files to an AI is wasteful. ctxgraph analyzes your code with AST-based static analysis, stores the result in a queryable SQLite graph, and retrieves *only the relevant nodes* — compressed into a token-efficient DSL format.
 
 **No LLM? No problem.** ctxgraph's core features (graph building, capsule generation, search, visualization) work entirely offline. You only need an LLM provider when you want to ask questions via `ctx ask` or chat via `ctx chat`.
+
+### Token cost per query: ctxgraph vs other approaches
+
+Independent analysis by Claude compared ctxgraph's token efficiency against other common approaches for the same task — answering `"how does InventoryService link to OrderService"` in a real codebase:
+
+![Approach comparison](docs/approach-comparison.png)
+
+| Approach | Total Input Tokens | Tool Calls | Session Overhead |
+|---|---|---|---|
+| **ctxgraph** (graph-based MCP) | **~5,600** | 3 | ~0 |
+| Claude Code (agentic) | ~8,000 | 4–6 | ~1,500 (system prompt) |
+| CLAUDE.md (static index) | ~8,400 | 2 | ~2,800 (static index) |
+| No tooling (full dump) | ~85,000+ | 0 | — |
+
+The key insight: **ctxgraph's graph is pre-built.** Graph queries cost ~50 tokens — you fetch only what you need. Agentic approaches (Claude Code) burn tokens exploring the filesystem. Static index approaches (CLAUDE.md) burn tokens loading a full index every session.
+
+### Savings vs raw file dumps
 
 | Without ctxgraph | With ctxgraph | Savings |
 |:---|---:|:---:|
@@ -148,61 +176,52 @@ ctx capsule "user authentication" --savings
 
 ---
 
-## Approach Comparison
+## Commands
 
-Independent analysis by Claude compared ctxgraph's token efficiency against other common approaches for the same task — answering `"how does InventoryService link to OrderService"` in a real codebase:
+### `ctx serve` — MCP server
 
-![Approach comparison](docs/approach-comparison.png)
+Start the MCP protocol server for Claude Desktop and other MCP-compatible clients to query the knowledge graph directly.
 
-### How each approach works step-by-step
-
-**ctxgraph (graph-based surgical fetch)**
-```
-search_graph("InventoryService OrderService")   → paths only (~50 tok)
-get_file_dependencies()                          → dependency map
-read_file × 2                                    → exact files needed
-Done. 0 irrelevant tokens.
+```bash
+pip install ctxgraph[mcp]
+ctx serve --repo /path/to/your/project       # Explicit path (recommended for Claude Desktop)
+ctx serve                                    # Auto-detect from cwd or CTXGRAPH_REPO_PATH
 ```
 
-**Claude Code (agentic filesystem access)**
-```
-Load system prompt (~1,500 tok)
-Glob("**/*service*")                              → list paths
-Grep("InventoryService")                          → narrow hits
-Read × 2–3 (target files + maybe models.py)
-Answer. Small extra overhead from explore steps.
+**Claude Desktop config** (use `--repo` or your project path):
+
+```json
+{
+  "mcpServers": {
+    "ctxgraph": {
+      "command": "ctx",
+      "args": ["serve", "--repo", "C:\\Users\\yourname\\projects\\myapp"]
+    }
+  }
+}
 ```
 
-**CLAUDE.md approach (static map)**
-```
-Load full index (~2,800 tok) — paid every session
-Scan index manually, pick files
-Read × 2 (explicit paths)
-Index cost is fixed — paid even for unrelated queries.
+Or set the `CTXGRAPH_REPO_PATH` environment variable instead of passing `--repo`:
+
+```json
+{
+  "mcpServers": {
+    "ctxgraph": {
+      "command": "ctx",
+      "args": ["serve"],
+      "env": {
+        "CTXGRAPH_REPO_PATH": "C:\\Users\\yourname\\projects\\myapp"
+      }
+    }
+  }
+}
 ```
 
-**No tooling (full dump)**
-```
-All 34 files pasted in (~85k tok)
-Context overflow risk above ~200 files
-Early files pushed out, answers degrade
-Not viable at scale.
-```
+Tools: `search_graph`, `get_context_capsule`, `get_file_dependencies`, `get_project_overview`, `read_file`, `search_files`.
 
-| Approach | Total Input Tokens | Tool Calls | Session Overhead |
-|---|---|---|---|
-| ctxgraph | **~5,600** | 3 | ~0 |
-| Claude Code | ~8,000 | 4–6 | ~1,500 (system prompt) |
-| CLAUDE.md | ~8,400 | 2 | ~2,800 (static index) |
-| No tooling | ~85,000+ | 0 | — |
-
-The key insight: **ctxgraph's graph is pre-built.** `search_graph` returns file paths for ~50 tokens, then you fetch only what you need. Agentic approaches (Claude Code) burn tokens exploring the filesystem dynamically. Static index approaches (CLAUDE.md) burn tokens loading a full index on every session — even for unrelated queries.
+> **Windows users:** Claude Desktop may not set the working directory to your project root. Always use `--repo` or `CTXGRAPH_REPO_PATH` to ensure the server can find your graph.
 
 ---
-
-
-
-## Commands
 
 ### `ctx init` — Scaffold project
 
@@ -530,49 +549,6 @@ ctx info
 # │   functions        │ 312   │
 # └────────────────────┴───────┘
 ```
-
-### `ctx serve` — MCP server
-
-Start the MCP protocol server for Claude Desktop and other MCP-compatible clients to query the knowledge graph directly.
-
-```bash
-pip install ctxgraph[mcp]
-ctx serve --repo /path/to/your/project       # Explicit path (recommended for Claude Desktop)
-ctx serve                                    # Auto-detect from cwd or CTXGRAPH_REPO_PATH
-```
-
-**Claude Desktop config** (use `--repo` or your project path):
-
-```json
-{
-  "mcpServers": {
-    "ctxgraph": {
-      "command": "ctx",
-      "args": ["serve", "--repo", "C:\\Users\\yourname\\projects\\myapp"]
-    }
-  }
-}
-```
-
-Or set the `CTXGRAPH_REPO_PATH` environment variable instead of passing `--repo`:
-
-```json
-{
-  "mcpServers": {
-    "ctxgraph": {
-      "command": "ctx",
-      "args": ["serve"],
-      "env": {
-        "CTXGRAPH_REPO_PATH": "C:\\Users\\yourname\\projects\\myapp"
-      }
-    }
-  }
-}
-```
-
-Tools: `search_graph`, `get_context_capsule`, `get_file_dependencies`, `get_project_overview`, `read_file`, `search_files`.
-
-> **Windows users:** Claude Desktop may not set the working directory to your project root. Always use `--repo` or `CTXGRAPH_REPO_PATH` to ensure the server can find your graph.
 
 ---
 
