@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.5.0 (2026-06-06)
+
+### Added
+- `_find_repo_root()` in MCP server — auto-discovers project root by walking up from `cwd()` looking for `.ctxgraph/`, so Claude Desktop can find the graph regardless of where it spawns the process
+- `_parse_toml_value()` in settings — properly parses unquoted TOML values as `int`, `float`, or `bool` instead of always storing as strings
+- Defensive `int()`/`float()` conversions in all numeric setting properties (`chat_max_session_tokens`, `temperature`, `max_tokens`, `max_nodes`, `max_depth`)
+
+### Fixed
+- `TypeError: can't multiply sequence by non-int of type 'float'` in chat mode when `max_session_tokens` was read from TOML config
+- Custom TOML parser now correctly distinguishes quoted strings from unquoted numeric/bool values
+
+### Changed
+- README rewritten to clearly communicate dual nature: works as a token-saving context engine (no LLM needed) and as a full AI coding assistant (with Ollama/Claude/OpenAI)
+- Package description updated
+
 ## v0.3.1 (2026-06-06)
 
 ### Changed

@@ -151,11 +151,11 @@ class Settings:
 
     @property
     def temperature(self) -> float:
-        return self._data["ai"].get("temperature", 0.1)
+        return float(self._data["ai"].get("temperature", 0.1))
 
     @property
     def max_tokens(self) -> int:
-        return self._data["ai"].get("max_tokens", 4096)
+        return int(self._data["ai"].get("max_tokens", 4096))
 
     @property
     def exclude_patterns(self) -> list[str]:
@@ -167,11 +167,11 @@ class Settings:
 
     @property
     def max_nodes(self) -> int:
-        return self._data["context"].get("max_nodes", 20)
+        return int(self._data["context"].get("max_nodes", 20))
 
     @property
     def max_depth(self) -> int:
-        return self._data["context"].get("max_depth", 2)
+        return int(self._data["context"].get("max_depth", 2))
 
     @property
     def azure_deployment(self) -> str:
@@ -184,7 +184,7 @@ class Settings:
 
     @property
     def chat_max_session_tokens(self) -> int:
-        return self._data["chat"].get("max_session_tokens", 200000)
+        return int(self._data["chat"].get("max_session_tokens", 200000))
 
     def get_provider_config(self) -> dict:
         return PROVIDER_CONFIGS.get(self.provider, PROVIDER_CONFIGS["custom"])
@@ -218,10 +218,27 @@ class Settings:
                 key, _, value = line.partition("=")
                 key = key.strip()
                 value = value.strip()
-                value = value.strip('"').strip("'")
+
+                if (value.startswith('"') and value.endswith('"')) or \
+                   (value.startswith("'") and value.endswith("'")):
+                    value = value[1:-1]
+                else:
+                    value = Settings._parse_toml_value(value)
+
                 current_section[key] = value
 
         return result
+
+    @staticmethod
+    def _parse_toml_value(value: str):
+        if value.lower() in ("true", "false"):
+            return value.lower() == "true"
+        try:
+            if "." in value:
+                return float(value)
+            return int(value)
+        except ValueError:
+            return value
 
     @staticmethod
     def _deep_merge(base: dict, override: dict):

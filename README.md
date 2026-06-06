@@ -1,14 +1,24 @@
 # ctxgraph — AI Context Engine for Python
 
-**Slash your LLM token costs by 97%.** Stop dumping entire files into AI context. ctxgraph builds a multi-layer knowledge graph from your Python codebase and generates *compact context capsules* — delivering only what your AI needs, not every line of code.
+## What is ctxgraph?
+
+ctxgraph is a **knowledge graph engine** that makes AI coding assistants **97% cheaper** and **smarter**. 
+
+It analyzes your Python codebase using AST-based static analysis, builds a searchable dependency graph, and delivers *only the code that matters* to your AI — not every line in your project.
+
+### Two ways to use it:
+
+**🔧 As a token-saving context engine** — Output compact DSL capsules for any AI tool (Claude, ChatGPT, Cursor, etc.). Cut context costs from dollars to fractions of a cent.
+
+**🤖 As a full AI coding assistant** — Hook up Ollama (free, local), Claude, or OpenAI, and ask questions, refactor code, debug issues, or explore architecture through `ctx ask` or `ctx chat` — just like ChatGPT or Claude Code, but with built-in codebase awareness.
 
 ```bash
 pip install ctxgraph
 
 ctx init                           # Scaffold .ctxgraph with config + default skills
 ctx build                          # Build knowledge graph (AST analysis → SQLite)
-ctx ask "how does JWT auth work"   # Ask questions with automatic token savings
-ctx capsule "fix JWT expiry"       # 92-99% fewer tokens vs raw code
+ctx ask "how does JWT auth work"   # Ask questions with automatic token savings (needs LLM)
+ctx capsule "fix JWT expiry"       # 92-99% fewer tokens vs raw code (no LLM needed)
 ctx chat "refactor this module"    # Multi-turn conversation with persistent sessions
 ctx history --stats                # Track total tokens saved across all queries
 ccg "fix the login redirect bug"   # Launch Claude with context pre-loaded
@@ -28,11 +38,14 @@ ctx init                           # Creates .ctxgraph/config.toml + default ski
 # 2. Build the knowledge graph
 ctx build                          # AST analysis → SQLite graph
 
-# 3. Ask questions (requires Ollama or other LLM provider)
+# 3a. Ask questions (requires Ollama or other LLM provider — free with Ollama)
 ctx ask "how does authentication work"
 
-# 4. Or generate a capsule for your AI tool
+# 3b. Or just generate a capsule for your AI tool (no LLM needed)
 ctx capsule "fix login rate limiter" --savings
+
+# 4. Explore interactively
+ctx chat                           # Multi-turn REPL with persistent sessions
 ```
 
 ---
@@ -40,6 +53,8 @@ ctx capsule "fix login rate limiter" --savings
 ## Why ctxgraph?
 
 Sending entire files to an AI is wasteful. ctxgraph analyzes your code with AST-based static analysis, stores the result in a queryable SQLite graph, and retrieves *only the relevant nodes* — compressed into a token-efficient DSL format.
+
+**No LLM? No problem.** ctxgraph's core features (graph building, capsule generation, search, visualization) work entirely offline. You only need an LLM provider when you want to ask questions via `ctx ask` or chat via `ctx chat`.
 
 | Without ctxgraph | With ctxgraph | Savings |
 |:---|---:|:---:|

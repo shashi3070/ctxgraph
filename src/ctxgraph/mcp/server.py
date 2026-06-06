@@ -44,11 +44,18 @@ from ctxgraph.graph.builder import get_storage
 from ctxgraph.graph.query import search_relevant_nodes
 
 
+def _find_repo_root(start: Path) -> Path:
+    for parent in [start] + list(start.parents):
+        if (parent / ".ctxgraph").is_dir():
+            return parent
+    return start
+
+
 def create_server(repo_path: Optional[str] = None) -> Optional[Any]:
     if not HAS_MCP:
         return None
 
-    path = Path(repo_path).resolve() if repo_path else Path.cwd()
+    path = Path(repo_path).resolve() if repo_path else _find_repo_root(Path.cwd())
     storage = get_storage(path)
 
     server = Server("ctxgraph")
