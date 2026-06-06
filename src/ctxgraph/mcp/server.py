@@ -8,15 +8,27 @@ directly through tools instead of static context capsules.
 Protocol: https://modelcontextprotocol.io
 
 Usage:
-    ctx serve                  # Start MCP server (stdio mode)
-    ctx serve --port 8080      # Start MCP server (SSE mode)
+    ctx serve                                       # Auto-detect from cwd (stdio mode)
+    ctx serve --repo /path/to/project                # Explicit project root
+    ctx serve --port 8080                            # SSE mode (not yet supported)
 
-Claude Desktop config:
+Claude Desktop config (with --repo):
 {
     "mcpServers": {
         "ctxgraph": {
             "command": "ctx",
-            "args": ["serve"]
+            "args": ["serve", "--repo", "C:\\path\\to\\project"]
+        }
+    }
+}
+
+Or via CTXGRAPH_REPO_PATH env var:
+{
+    "mcpServers": {
+        "ctxgraph": {
+            "command": "ctx",
+            "args": ["serve"],
+            "env": {"CTXGRAPH_REPO_PATH": "C:\\path\\to\\project"}
         }
     }
 }
@@ -25,6 +37,7 @@ Claude Desktop config:
 from __future__ import annotations
 
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Any, Optional
@@ -51,11 +64,23 @@ def _find_repo_root(start: Path) -> Path:
     return start
 
 
+def _resolve_repo_path(repo_path: Optional[str] = None) -> Path:
+    if repo_path:
+        return Path(repo_path).resolve()
+    env_path = os.environ.get("CTXGRAPH_REPO_PATH")
+    if env_path:
+        return Path(env_path).resolve()
+    return _find_repo_root(Path.cwd())
+
+
 def create_server(repo_path: Optional[str] = None) -> Optional[Any]:
     if not HAS_MCP:
         return None
 
-    path = Path(repo_path).resolve() if repo_path else _find_repo_root(Path.cwd())
+    path = _resolve_repo_path(repo_path)
+    db_path = path / ".ctxgraph" / "graph.db"
+    print(f"[ctxgraph] Repo root: {path}", file=sys.stderr)
+    print(f"[ctxgraph] Graph DB: {db_path}", file=sys.stderr)
     storage = get_storage(path)
 
     server = Server("ctxgraph")
@@ -137,7 +162,10 @@ def create_server(repo_path: Optional[str] = None) -> Optional[Any]:
         if storage is None:
             return [types.TextContent(
                 type="text",
-                text="No graph found. Run `ctx build` first.",
+                text=f"No graph found at: {path / '.ctxgraph' / 'graph.db'}\n\n"
+                     f"Run `ctx build` in your project root first.\n"
+                     f"Or set the CTXGRAPH_REPO_PATH environment variable to your project root.\n"
+                     f"Or pass --repo to ctx serve, e.g. `ctx serve --repo /path/to/project`.",
             )]
 
         if name == "search_graph":

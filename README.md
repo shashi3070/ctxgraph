@@ -479,25 +479,46 @@ ctx info
 
 ### `ctx serve` — MCP server
 
+Start the MCP protocol server for Claude Desktop and other MCP-compatible clients to query the knowledge graph directly.
+
 ```bash
 pip install ctxgraph[mcp]
-ctx serve
+ctx serve --repo /path/to/your/project       # Explicit path (recommended for Claude Desktop)
+ctx serve                                    # Auto-detect from cwd or CTXGRAPH_REPO_PATH
 ```
 
-Claude Desktop config:
+**Claude Desktop config** (use `--repo` or your project path):
 
 ```json
 {
   "mcpServers": {
     "ctxgraph": {
       "command": "ctx",
-      "args": ["serve"]
+      "args": ["serve", "--repo", "C:\\Users\\yourname\\projects\\myapp"]
+    }
+  }
+}
+```
+
+Or set the `CTXGRAPH_REPO_PATH` environment variable instead of passing `--repo`:
+
+```json
+{
+  "mcpServers": {
+    "ctxgraph": {
+      "command": "ctx",
+      "args": ["serve"],
+      "env": {
+        "CTXGRAPH_REPO_PATH": "C:\\Users\\yourname\\projects\\myapp"
+      }
     }
   }
 }
 ```
 
 Tools: `search_graph`, `get_context_capsule`, `get_file_dependencies`, `get_project_overview`.
+
+> **Windows users:** Claude Desktop may not set the working directory to your project root. Always use `--repo` or `CTXGRAPH_REPO_PATH` to ensure the server can find your graph.
 
 ---
 
