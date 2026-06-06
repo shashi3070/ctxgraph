@@ -4,15 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ctxgraph"
-version = "0.3.1"
-description = "AI context engine for Python — cuts LLM tokens 97% via code knowledge graphs. Build, query, and generate compact context capsules for Claude, OpenAI, Ollama."
+version = "0.3.2"
+description = "97% cheaper AI coding. ctx init → ctx build → ctx ask. Knowledge graphs, token-efficient capsules, query history, skills, and multi-provider LLM answers (Ollama, Claude, OpenAI, Azure). Cut context costs from cents to fractions of a cent."
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
 authors = [
     {name = "ctxgraph contributors"}
 ]
-keywords = ["code-graph", "knowledge-graph", "claude", "code-analysis", "ai-context"]
+keywords = ["code-graph", "knowledge-graph", "claude", "code-analysis", "ai-context", "token-savings", "ollama", "openai", "ctx", "capsule"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",

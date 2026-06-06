@@ -1,13 +1,15 @@
 # ctxgraph — AI Context Engine for Python
 
-**Slash your LLM token costs by 97%.** ctxgraph builds a multi-layer knowledge graph from your Python codebase, then generates *compact context capsules* — delivering only what your AI needs, not every line of code.
+**Slash your LLM token costs by 97%.** Stop dumping entire files into AI context. ctxgraph builds a multi-layer knowledge graph from your Python codebase and generates *compact context capsules* — delivering only what your AI needs, not every line of code.
 
 ```bash
 pip install ctxgraph
 
-ctx build                          # Build knowledge graph
+ctx init                           # Scaffold .ctxgraph with config + default skills
+ctx build                          # Build knowledge graph (AST analysis → SQLite)
 ctx ask "how does JWT auth work"   # Ask questions with automatic token savings
 ctx capsule "fix JWT expiry"       # 92-99% fewer tokens vs raw code
+ctx history --stats                # Track total tokens saved across all queries
 ccg "fix the login redirect bug"   # Launch Claude with context pre-loaded
 ctx view                           # Interactive D3.js visualization (or --svg for static)
 ```
