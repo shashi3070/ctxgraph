@@ -8,7 +8,7 @@ It analyzes your Python codebase using AST-based static analysis, builds a searc
 
 ### Two ways to use it:
 
-**🔌 MCP tool for Claude Desktop** — Connect via `ctx serve` and give Claude surgical code context. No more Glob/Grep/Read token waste. Every graph query costs ~50 tokens vs 1,500+ for Claude Code's system prompt alone.
+**🔌 MCP tool for any AI coding assistant** — Connect via `ctx serve` and give Claude Desktop, Claude Code, Cursor, or any MCP-compatible client surgical code context. No more Glob/Grep/Read token waste. Every graph query costs ~50 tokens vs 1,500+ for system prompts alone.
 
 **🧠 Standalone AI assistant** — Hook up Ollama (free, local), Claude, or OpenAI, and ask questions, refactor code, debug issues, or explore architecture through `ctx ask` or `ctx chat` — just like ChatGPT or Claude Code, but with built-in codebase awareness.
 
