@@ -148,6 +148,60 @@ ctx capsule "user authentication" --savings
 
 ---
 
+## Approach Comparison
+
+Independent analysis by Claude compared ctxgraph's token efficiency against other common approaches for the same task — answering `"how does InventoryService link to OrderService"` in a real codebase:
+
+![Approach comparison](docs/approach-comparison.png)
+
+### How each approach works step-by-step
+
+**ctxgraph (graph-based surgical fetch)**
+```
+search_graph("InventoryService OrderService")   → paths only (~50 tok)
+get_file_dependencies()                          → dependency map
+read_file × 2                                    → exact files needed
+Done. 0 irrelevant tokens.
+```
+
+**Claude Code (agentic filesystem access)**
+```
+Load system prompt (~1,500 tok)
+Glob("**/*service*")                              → list paths
+Grep("InventoryService")                          → narrow hits
+Read × 2–3 (target files + maybe models.py)
+Answer. Small extra overhead from explore steps.
+```
+
+**CLAUDE.md approach (static map)**
+```
+Load full index (~2,800 tok) — paid every session
+Scan index manually, pick files
+Read × 2 (explicit paths)
+Index cost is fixed — paid even for unrelated queries.
+```
+
+**No tooling (full dump)**
+```
+All 34 files pasted in (~85k tok)
+Context overflow risk above ~200 files
+Early files pushed out, answers degrade
+Not viable at scale.
+```
+
+| Approach | Total Input Tokens | Tool Calls | Session Overhead |
+|---|---|---|---|
+| ctxgraph | **~5,600** | 3 | ~0 |
+| Claude Code | ~8,000 | 4–6 | ~1,500 (system prompt) |
+| CLAUDE.md | ~8,400 | 2 | ~2,800 (static index) |
+| No tooling | ~85,000+ | 0 | — |
+
+The key insight: **ctxgraph's graph is pre-built.** `search_graph` returns file paths for ~50 tokens, then you fetch only what you need. Agentic approaches (Claude Code) burn tokens exploring the filesystem dynamically. Static index approaches (CLAUDE.md) burn tokens loading a full index on every session — even for unrelated queries.
+
+---
+
+
+
 ## Commands
 
 ### `ctx init` — Scaffold project
