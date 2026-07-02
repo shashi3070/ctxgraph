@@ -4,19 +4,25 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ctxgraph"
-version = "0.5.7"
+version = "0.5.8"
 description = "97% cheaper AI coding. ctxgraph builds a knowledge graph of your Python codebase, then generates token-efficient context capsules for any AI tool. Or hook up Ollama/Claude/OpenAI and use it as a code-aware coding assistant — like ChatGPT or Claude Code, but with built-in graph context. Cut token costs by 97%, work offline with just a graph, or connect your favorite LLM."
 readme = "README.md"
-license = {text = "MIT"}
+license-files = ["LICENSE"]
 requires-python = ">=3.10"
 authors = [
-    {name = "ctxgraph contributors"}
+    {name = "Shashi Kundan", email = "shashikundan0001@gmail.com"}
 ]
-keywords = ["code-graph", "knowledge-graph", "claude", "code-analysis", "ai-context", "token-savings", "ollama", "openai", "ctx", "capsule"]
+keywords = [
+    "code-graph", "knowledge-graph", "claude", "code-analysis",
+    "ai-context", "token-savings", "ollama", "openai", "ctx",
+    "capsule", "python", "codebase", "llm", "code-intelligence",
+    "ast", "code-navigation", "dependency-graph",
+]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -25,10 +31,18 @@ classifiers = [
     "Topic :: Software Development :: Code Generators",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
+
 dependencies = [
     "typer>=0.9",
     "rich>=13.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/shashi3070/ctxgraph"
+Repository = "https://github.com/shashi3070/ctxgraph"
+Documentation = "https://github.com/shashi3070/ctxgraph#readme"
+Issues = "https://github.com/shashi3070/ctxgraph/issues"
+Changelog = "https://github.com/shashi3070/ctxgraph/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 mcp = [
